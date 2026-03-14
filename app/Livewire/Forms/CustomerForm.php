@@ -25,10 +25,17 @@ class CustomerForm extends Form
 
     public ?string $neighborhood = null;
 
+    public ?Customer $customer = null;
+
     public function rules(): array
     {
         return [
-            'name'         => ['required', 'string', 'max:255', 'unique:customers,name'],
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('customers', 'name')->ignore($this->customer?->id),
+            ],
             'email'        => ['nullable', 'email', 'max:255'],
             'phone'        => ['nullable', 'string', 'max:20'],
             'gender'       => ['nullable', Rule::enum(Gender::class)],
@@ -39,21 +46,33 @@ class CustomerForm extends Form
         ];
     }
 
+    public function setCustomer(Customer $customer): void
+    {
+        $this->customer = $customer;
+
+        $this->name = $customer->name;
+        $this->email = $customer->email;
+        $this->phone = $customer->phone;
+        $this->gender = $customer->gender?->value;
+        $this->zip_code = $customer->zip_code;
+        $this->address = $customer->address;
+        $this->street = $customer->street;
+        $this->neighborhood = $customer->neighborhood;
+    }
+
     public function store(): void
     {
         $this->validate();
 
-        Customer::create([
-            'name'         => $this->name,
-            'email'        => $this->email,
-            'phone'        => $this->phone,
-            'gender'       => $this->gender,
-            'zip_code'     => $this->zip_code,
-            'address'      => $this->address,
-            'street'       => $this->street,
-            'neighborhood' => $this->neighborhood,
-        ]);
+        Customer::create($this->except('customer'));
 
         $this->reset();
+    }
+
+    public function update(): void
+    {
+        $this->validate();
+
+        $this->customer->update($this->except('customer'));
     }
 }
