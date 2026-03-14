@@ -20,7 +20,7 @@
                 <livewire:layout.sidebar />
 
                 <!-- Main Content -->
-                <main class="flex-1 overflow-y-auto">
+                <main class="flex-1 overflow-y-auto pt-16 lg:pt-0">
                     <div class="p-4 lg:p-8">
                         {{ $slot }}
                     </div>

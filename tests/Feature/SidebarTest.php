@@ -13,7 +13,7 @@ it('renders the sidebar component', function () {
     $this->actingAs($user);
 
     Livewire::test('layout.sidebar')
-        ->assertSee('Garagem')
+        ->assertSee(config('app.name'))
         ->assertSee(__('sidebar.dashboard'))
         ->assertSee(__('sidebar.sales'))
         ->assertSee(__('sidebar.settings'))
