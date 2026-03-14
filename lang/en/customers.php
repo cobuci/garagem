@@ -23,4 +23,5 @@ return [
     'save'             => 'Save',
     'cancel'           => 'Cancel',
     'created'          => 'Customer created successfully.',
+    'updated'          => 'Customer updated successfully.',
 ];

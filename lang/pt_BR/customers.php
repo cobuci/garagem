@@ -23,4 +23,5 @@ return [
     'save'             => 'Salvar',
     'cancel'           => 'Cancelar',
     'created'          => 'Cliente cadastrado com sucesso.',
+    'updated'          => 'Cliente atualizado com sucesso.',
 ];
