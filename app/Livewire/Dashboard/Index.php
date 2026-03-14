@@ -9,11 +9,11 @@ use Livewire\Component;
 
 class Index extends Component
 {
-    public function logout(): RedirectResponse
+    public function logout(): void
     {
         Auth::logout();
 
-        return redirect()->route('login');
+        $this->redirect(route('login'));
     }
 
     public function render(): View
