@@ -6,6 +6,7 @@ use App\Models\Customer;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class Show extends Component
@@ -17,7 +18,7 @@ class Show extends Component
         $this->customer = $customer;
     }
 
-    #[Computed]
+    #[Computed, On(['customer:created', 'customer:updated'])]
     public function orders(): Collection
     {
         return collect(range(1, 5))->map(fn ($i) => (object) [

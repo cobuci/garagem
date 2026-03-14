@@ -9,6 +9,7 @@ use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+
 use function Pest\Laravel\assertDatabaseHas;
 
 uses(RefreshDatabase::class);
