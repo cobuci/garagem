@@ -6,11 +6,13 @@
 
         <title>{{ $title ?? config('app.name') }}</title>
 
+        <wireui:scripts />
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
         @livewireStyles
     </head>
     <body>
+        <x-notifications />
         {{ $slot }}
 
         @livewireScripts
