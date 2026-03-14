@@ -11,9 +11,24 @@
 
         @livewireStyles
     </head>
-    <body>
+    <body class="bg-gray-50 font-sans antialiased">
         <x-notifications />
-        {{ $slot }}
+
+        @auth
+            <div class="flex flex-col lg:flex-row min-h-screen">
+                <!-- Sidebar -->
+                <livewire:layout.sidebar />
+
+                <!-- Main Content -->
+                <main class="flex-1 overflow-y-auto">
+                    <div class="p-4 lg:p-8">
+                        {{ $slot }}
+                    </div>
+                </main>
+            </div>
+        @else
+            {{ $slot }}
+        @endauth
 
         @livewireScripts
     </body>
