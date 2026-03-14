@@ -13,7 +13,9 @@ class Login extends Component
     use WireUiActions;
 
     public string $email = '';
+
     public string $otp = '';
+
     public int $step = 1;
 
     protected $rules = [

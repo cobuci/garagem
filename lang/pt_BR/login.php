@@ -19,4 +19,8 @@ return [
     'otp_sent_message'  => 'OTP enviado para o seu e-mail.',
     'invalid_otp'       => 'OTP inválido.',
     'error'             => 'Erro',
+    'otp_subject'       => 'Seu Código de Acesso Único',
+    'otp_line1'         => 'Seu código de acesso único é: :otp',
+    'otp_line2'         => 'Este código expira em 10 minutos.',
+    'otp_line3'         => 'Se você não solicitou este código, por favor ignore este e-mail.',
 ];

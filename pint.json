@@ -26,7 +26,8 @@
         },
         "class_attributes_separation": {
             "elements": {
-                "method": "one"
+                "method": "one",
+                "property": "one"
             }
         },
         "method_argument_space": {
