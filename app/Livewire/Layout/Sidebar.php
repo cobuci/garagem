@@ -36,8 +36,8 @@ class Sidebar extends Component
                     [
                         'label'  => __('sidebar.customers'),
                         'icon'   => 'users',
-                        'route'  => '#',
-                        'active' => false,
+                        'route'  => 'customers.index',
+                        'active' => request()->routeIs('customers.*'),
                     ],
                     [
                         'label'  => __('sidebar.reports'),
