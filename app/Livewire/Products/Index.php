@@ -48,7 +48,7 @@ class Index extends Component
         ];
     }
 
-    #[Computed, On('product:created')]
+    #[Computed, On(['product:created', 'product:updated'])]
     public function products(): LengthAwarePaginator|Paginator|\Illuminate\Support\Collection
     {
         if ($this->selectedCategoryId === 0) {

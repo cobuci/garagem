@@ -11,6 +11,9 @@
                 <div>
                     <livewire:products.create/>
                 </div>
+                <div>
+                    <livewire:products.edit/>
+                </div>
 
                 <x-button
                     sm
@@ -87,6 +90,7 @@
                     <th class="w-32 px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-700 whitespace-nowrap">{{ __('products.cost') }}</th>
                     <th class="w-32 px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-700 whitespace-nowrap">{{ __('products.sale') }}</th>
                     <th class="w-24 px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-700 whitespace-nowrap">{{ __('products.stock') }}</th>
+                    <th class="w-10 px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-700 whitespace-nowrap"></th>
                 </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
@@ -123,10 +127,18 @@
                                     {{ $product->stock_quantity }}
                                 </span>
                         </td>
+                        <td class="px-6 py-4 text-right">
+                            <x-button
+                                xs
+                                flat
+                                icon="pencil"
+                                x-on:click="$dispatch('product:edit', { product: {{ $product->id }} })"
+                            />
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                        <td colspan="8" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
                             {{ __('products.empty') }}
                         </td>
                     </tr>
