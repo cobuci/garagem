@@ -7,6 +7,8 @@ return [
     'orders'     => 'Pedidos',
     'customers'  => 'Clientes',
     'reports'    => 'Relatórios',
+    'inventory'  => 'Estoque',
+    'products'   => 'Produtos',
     'settings'   => 'Configurações',
     'logout'     => 'Sair',
     'user'       => 'Usuário',

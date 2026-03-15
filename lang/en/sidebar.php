@@ -7,6 +7,8 @@ return [
     'orders'     => 'Orders',
     'customers'  => 'Customers',
     'reports'    => 'Reports',
+    'inventory'  => 'Inventory',
+    'products'   => 'Products',
     'settings'   => 'Settings',
     'logout'     => 'Logout',
     'user'       => 'User',

@@ -47,6 +47,17 @@ class Sidebar extends Component
                     ],
                 ],
             ],
+            [
+                'title' => __('sidebar.inventory'),
+                'items' => [
+                    [
+                        'label'  => __('sidebar.products'),
+                        'icon'   => 'tag',
+                        'route'  => 'products.index',
+                        'active' => request()->routeIs('products.*'),
+                    ],
+                ],
+            ],
         ];
     }
 
