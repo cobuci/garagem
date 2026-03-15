@@ -6,7 +6,7 @@ use App\Livewire\Dashboard\Index;
 use App\Livewire\Login;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', Login::class)->name('login');
+Route::get('/', Login::class)->middleware('guest')->name('login');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', Index::class)->name('dashboard');
