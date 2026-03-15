@@ -56,7 +56,7 @@
          class="fixed inset-0 bg-gray-600 bg-opacity-75 z-40 lg:hidden"></div>
 
     <div :class="open ? 'translate-x-0' : '-translate-x-full'"
-         class="fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform lg:translate-x-0 lg:static lg:inset-0 transition duration-300 ease-in-out z-40 flex flex-col h-screen">
+         class="fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform lg:translate-x-0 transition duration-300 ease-in-out z-40 flex flex-col h-screen">
 
         <div class="p-6 flex items-center space-x-3">
             <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
