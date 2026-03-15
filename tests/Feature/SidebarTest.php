@@ -17,7 +17,8 @@ it('renders the sidebar component', function () {
         ->assertSee(__('sidebar.dashboard'))
         ->assertSee(__('sidebar.sales'))
         ->assertSee(__('sidebar.settings'))
-        ->assertSee(__('sidebar.logout'));
+        ->assertSee(__('sidebar.logout'))
+        ->assertSee(__('sidebar.dark_mode'));
 });
 
 it('can logout from the sidebar', function () {

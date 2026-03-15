@@ -1,5 +1,10 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+      x-data="{
+        darkMode: localStorage.getItem('darkMode') === 'true'
+      }"
+      x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))"
+      :class="{ 'dark': darkMode }">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,16 +16,16 @@
 
         @livewireStyles
     </head>
-    <body class="bg-gray-50 font-sans antialiased">
+    <body class="bg-gray-50 dark:bg-gray-900 font-sans antialiased transition-colors duration-300" x-cloak>
         <x-notifications />
 
         @auth
-            <div class="flex flex-col lg:flex-row min-h-screen">
+            <div class="flex flex-col lg:flex-row min-h-screen relative">
                 <!-- Sidebar -->
                 <livewire:layout.sidebar />
 
                 <!-- Main Content -->
-                <main class="flex-1 overflow-y-auto pt-16 lg:pt-0">
+                <main class="flex-1 lg:ml-64 pt-16 lg:pt-0 min-h-screen bg-gray-50 dark:bg-gray-900">
                     <div class="p-4 lg:p-8">
                         {{ $slot }}
                     </div>
