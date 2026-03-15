@@ -31,4 +31,7 @@ return [
     'kg'               => 'Quilogramas (kg)',
     'unit'             => 'Unidade (un)',
     'success_created'  => 'Produto criado com sucesso!',
+    'success_updated'  => 'Produto atualizado com sucesso!',
+    'edit'             => 'Editar Produto',
+    'expiration_date'  => 'Validade',
 ];

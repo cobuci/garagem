@@ -31,4 +31,7 @@ return [
     'kg'               => 'Kilograms (kg)',
     'unit'             => 'Unit (un)',
     'success_created'  => 'Product created successfully!',
+    'success_updated'  => 'Product updated successfully!',
+    'edit'             => 'Edit Product',
+    'expiration_date'  => 'Expiration Date',
 ];
