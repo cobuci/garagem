@@ -13,7 +13,7 @@ class ProductForm extends Form
 
     public string $brand = '';
 
-    public ?float $weightValue = null;
+    public ?string $weightValue = null;
 
     public string $weightType = 'g';
 
