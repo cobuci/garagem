@@ -7,7 +7,7 @@
             </div>
         </div>
 
-        <div class="flex items-center border-b border-gray-200 dark:border-gray-700 overflow-x-auto no-scrollbar w-full max-w-full">
+        <div class="flex items-center border-b border-gray-200 dark:border-gray-700 overflow-x-auto w-full max-w-full">
             <div class="flex gap-8">
                 @foreach($this->categories as $category)
                     <button
