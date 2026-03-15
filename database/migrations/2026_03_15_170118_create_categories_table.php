@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('icon')->nullable();
+            $table->integer('sort_order')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

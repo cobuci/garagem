@@ -11,7 +11,8 @@ class CategoryProductSeeder extends Seeder
     public function run(): void
     {
         Category::factory(10)
-            ->has(Product::factory(10))
+            ->sequence(fn ($sequence) => ['sort_order' => $sequence->index])
+            ->has(Product::factory(20))
             ->create();
     }
 }
