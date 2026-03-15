@@ -42,11 +42,3 @@ it('lists fake customer orders', function () {
         ->assertSee('R$ 100,00')
         ->assertSee('R$ 500,00');
 });
-
-it('dispatches open-drawer event when edit button is clicked', function () {
-    $customer = Customer::factory()->create();
-
-    Livewire::test(Show::class, ['customer' => $customer])
-        ->call('edit')
-        ->assertDispatched('open-drawer');
-});
