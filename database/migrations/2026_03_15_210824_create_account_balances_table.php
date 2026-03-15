@@ -11,8 +11,8 @@ return new class extends Migration
     {
         Schema::create('account_balances', function (Blueprint $table) {
             $table->id();
-            $table->integer('current_balance')->default(0);
-            $table->integer('target_balance')->default(0);
+            $table->bigInteger('current_balance')->default(0);
+            $table->bigInteger('target_balance')->default(0);
             $table->timestamps();
         });
 
