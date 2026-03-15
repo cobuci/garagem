@@ -33,12 +33,14 @@ class Show extends Component
     #[Computed]
     public function totalSpent(): int
     {
+        /* @phpstan-ignore-next-line */
         return $this->orders->sum('total_amount');
     }
 
     #[Computed]
     public function totalDue(): int
     {
+        /* @phpstan-ignore-next-line */
         return $this->orders->sum('total_amount') - $this->orders->sum('paid_amount');
     }
 

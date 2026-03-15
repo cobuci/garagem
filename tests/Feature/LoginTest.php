@@ -103,6 +103,14 @@ it('authenticates user with correct otp', function () {
     assertAuthenticatedAs($user);
 });
 
+it('redirects authenticated user to dashboard if access login page', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->get(route('login'))
+        ->assertRedirect(route('dashboard'));
+});
+
 it('fails to authenticate user with incorrect otp', function () {
     $user = User::factory()->create();
     $user->sendOneTimePassword();

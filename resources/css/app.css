@@ -27,3 +27,41 @@
 [x-cloak] {
     display: none !important;
 }
+
+@layer base {
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-gray-300) transparent;
+    }
+
+    .dark * {
+        scrollbar-color: var(--color-gray-700) transparent;
+    }
+
+    /* Webkit (Chrome, Safari, Edge) */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--color-gray-300);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--color-gray-400);
+    }
+
+    .dark ::-webkit-scrollbar-thumb {
+        background: var(--color-gray-700);
+    }
+
+    .dark ::-webkit-scrollbar-thumb:hover {
+        background: var(--color-gray-600);
+    }
+}
