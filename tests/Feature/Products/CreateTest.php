@@ -36,7 +36,8 @@ test('it can create a product with all fields', function () {
     expect($product->category_id)->toBe($category->id)
         ->and($product->brand)->toBe('New Brand')
         ->and($product->weight)->toBe('500.5g')
-        ->and($product->upc)->toBe('1234567890');
+        ->and($product->upc)->toBe('1234567890')
+        ->and($product->sale_price)->toBeNull();
 });
 
 test('it validates required fields', function () {

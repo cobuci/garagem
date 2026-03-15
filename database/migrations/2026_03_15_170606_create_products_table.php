@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('weight');
             $table->string('upc')->unique()->nullable();
             $table->integer('stock_quantity')->default(0);
-            $table->integer('unit_cost')->nullable();
-            $table->integer('sale_price')->nullable();
+            $table->bigInteger('unit_cost')->nullable();
+            $table->bigInteger('sale_price')->nullable();
             $table->dateTime('expiration_date')->nullable();
             $table->timestamps();
             $table->softDeletes();

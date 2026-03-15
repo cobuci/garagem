@@ -11,6 +11,12 @@
                 <div>
                     <livewire:products.create/>
                 </div>
+                <div>
+                    <livewire:products.edit/>
+                </div>
+                <div>
+                    <livewire:products.delete/>
+                </div>
 
                 <x-button
                     sm
@@ -87,6 +93,7 @@
                     <th class="w-32 px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-700 whitespace-nowrap">{{ __('products.cost') }}</th>
                     <th class="w-32 px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-700 whitespace-nowrap">{{ __('products.sale') }}</th>
                     <th class="w-24 px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-700 whitespace-nowrap">{{ __('products.stock') }}</th>
+                    <th class="w-10 px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-700 whitespace-nowrap"></th>
                 </tr>
                 </thead>
                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
@@ -97,11 +104,11 @@
                         </td>
                         <td class="px-6 py-4">
                             <div
-                                class="text-sm font-medium text-gray-900 dark:text-white break-words">{{ $product->name }}</div>
+                                class="text-sm font-medium text-gray-900 dark:text-white truncate max-w-xs" title="{{ $product->name }}">{{ $product->name }}</div>
                         </td>
                         <td class="px-6 py-4">
                             <div
-                                class="text-sm text-gray-600 dark:text-gray-300 break-words">{{ $product->brand }}</div>
+                                class="text-sm text-gray-600 dark:text-gray-300 truncate max-w-xs" title="{{ $product->brand }}">{{ $product->brand }}</div>
                         </td>
                         <td class="px-6 py-4">
                             <div
@@ -123,10 +130,25 @@
                                     {{ $product->stock_quantity }}
                                 </span>
                         </td>
+                        <td class="px-6 py-4 text-right flex justify-end gap-2">
+                            <x-button
+                                xs
+                                flat
+                                icon="pencil"
+                                x-on:click="$dispatch('product:edit', { product: {{ $product->id }} })"
+                            />
+                            <x-button
+                                xs
+                                flat
+                                negative
+                                icon="trash"
+                                x-on:click="$dispatch('product:delete', { product: {{ $product->id }} })"
+                            />
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
+                        <td colspan="8" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
                             {{ __('products.empty') }}
                         </td>
                     </tr>
