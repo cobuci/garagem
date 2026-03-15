@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Products\Create;
 use App\Livewire\Products\Index;
 use App\Models\Category;
 use App\Models\Product;
@@ -26,7 +27,8 @@ test('it renders the products index page for authenticated users', function () {
     actingAs($this->user)
         ->get(route('products.index'))
         ->assertOk()
-        ->assertSeeLivewire(Index::class);
+        ->assertSeeLivewire(Index::class)
+        ->assertSeeLivewire(Create::class);
 });
 
 test('it defaults to latest products tab (ID 0) on mount', function () {
