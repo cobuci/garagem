@@ -9,11 +9,14 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
+use WireUi\Traits\WireUiActions;
 
 class Index extends Component
 {
+    use WireUiActions;
     use WithPagination;
 
     public ?int $selectedCategoryId = null;
@@ -45,7 +48,7 @@ class Index extends Component
         ];
     }
 
-    #[Computed]
+    #[Computed, On('product:created')]
     public function products(): LengthAwarePaginator|Paginator|\Illuminate\Support\Collection
     {
         if ($this->selectedCategoryId === 0) {

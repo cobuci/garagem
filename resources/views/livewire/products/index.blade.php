@@ -6,16 +6,22 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('products.subtitle') }}</p>
             </div>
 
-            <x-button
-                sm
-                outline
-                x-on:click="showPrices = !showPrices"
-                class="flex items-center gap-2"
-            >
+            <div class="flex items-center gap-2">
+                <div>
+                    <livewire:products.create />
+                </div>
+
+                <x-button
+                    sm
+                    outline
+                    x-on:click="showPrices = !showPrices"
+                    class="flex items-center gap-2"
+                >
                 <x-icon x-show="showPrices" name="eye-slash" class="w-4 h-4" />
                 <x-icon x-show="!showPrices" name="eye" class="w-4 h-4" />
                 <span x-text="showPrices ? '{{ __('products.hide_prices') }}' : '{{ __('products.show_prices') }}'"></span>
-            </x-button>
+                </x-button>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -49,15 +55,15 @@
                     {{ __('products.latest_products') }}
                 </button>
                 @foreach($this->categories as $category)
-                    <button
-                        wire:click="selectCategory({{ $category->id }})"
-                        class="py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors duration-200 flex items-center gap-2 {{ $selectedCategoryId === $category->id ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' }}"
-                    >
-                        @if($category->icon)
-                            <x-icon :name="$category->icon" class="w-4 h-4" />
-                        @endif
-                        {{ $category->name }}
-                    </button>
+                <button
+                    wire:click="selectCategory({{ $category->id }})"
+                    class="py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors duration-200 flex items-center gap-2 {{ $selectedCategoryId === $category->id ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' }}"
+                >
+                    @if($category->icon && view()->exists("components.wireui.icons.outline.{$category->icon}"))
+                        <x-icon :name="$category->icon" class="w-4 h-4" />
+                    @endif
+                    {{ $category->name }}
+                </button>
                 @endforeach
             </div>
         </div>
