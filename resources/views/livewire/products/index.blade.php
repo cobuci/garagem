@@ -9,6 +9,9 @@
 
             <div class="flex items-center gap-2 sm:justify-end">
                 <div>
+                    <livewire:products.purchase/>
+                </div>
+                <div>
                     <livewire:products.create/>
                 </div>
                 <div>
