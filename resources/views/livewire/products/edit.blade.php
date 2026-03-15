@@ -19,9 +19,9 @@
                     <div class="grid grid-cols-2 gap-4">
                         <x-number
                             label="{{ __('products.weight') }}"
-                            placeholder="0,00"
+                            placeholder="0"
                             wire:model.defer="form.weightValue"
-                            step="0.001"
+                            step="1"
                         />
 
                         <x-select

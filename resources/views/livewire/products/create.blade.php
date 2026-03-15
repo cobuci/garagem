@@ -10,41 +10,41 @@
         <div class="flex flex-col h-full">
             <div class="flex-1 overflow-y-auto">
                 <div class="grid grid-cols-1 gap-4">
-                    <x-native-select
+                    <x-select
                         label="{{ __('products.category') }}"
                         placeholder="{{ __('products.category') }}"
                         wire:model.defer="form.categoryId"
-                    >
-                        <option value="">{{ __('products.category') }}</option>
-                        @foreach($this->categories as $category)
-                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                        @endforeach
-                    </x-native-select>
+                        :options="$this->categories"
+                        option-label="name"
+                        option-value="id"
+                    />
 
                     <x-input label="{{ __('products.name') }}" placeholder="{{ __('products.name') }}" wire:model.defer="form.name" />
 
                     <x-input label="{{ __('products.brand') }}" placeholder="{{ __('products.brand') }}" wire:model.defer="form.brand" />
 
                     <div class="grid grid-cols-2 gap-4">
-                        <x-input
-                            type="number"
-                            step="0.01"
+                        <x-number
                             label="{{ __('products.weight') }}"
-                            placeholder="0.00"
+                            placeholder="0"
                             wire:model.defer="form.weightValue"
+                            step="1"
                         />
 
-                        <x-native-select
+                        <x-select
                             label="{{ __('products.weight_type') }}"
                             placeholder="{{ __('products.weight_type') }}"
                             wire:model.defer="form.weightType"
-                        >
-                            <option value="ml">{{ __('products.ml') }}</option>
-                            <option value="l">{{ __('products.l') }}</option>
-                            <option value="g">{{ __('products.g') }}</option>
-                            <option value="kg">{{ __('products.kg') }}</option>
-                            <option value="unit">{{ __('products.unit') }}</option>
-                        </x-native-select>
+                            :options="[
+                                ['name' => __('products.ml'), 'id' => 'ml'],
+                                ['name' => __('products.l'), 'id' => 'l'],
+                                ['name' => __('products.g'), 'id' => 'g'],
+                                ['name' => __('products.kg'), 'id' => 'kg'],
+                                ['name' => __('products.unit'), 'id' => 'unit'],
+                            ]"
+                            option-label="name"
+                            option-value="id"
+                        />
                     </div>
 
                     <x-input label="{{ __('products.upc') }}" placeholder="{{ __('products.upc') }}" wire:model.defer="form.upc" />
