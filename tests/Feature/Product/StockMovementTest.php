@@ -26,7 +26,6 @@ it('calculates average cost correctly on first purchase', function () {
 });
 
 it('calculates weighted average cost correctly on subsequent purchases', function () {
-    // Initial state: 10 units @ $50.00 = $500.00 total cost
     $product = Product::factory()->create([
         'stock_quantity' => 10,
         'unit_cost'      => 50.00,
@@ -35,10 +34,6 @@ it('calculates weighted average cost correctly on subsequent purchases', functio
 
     $action = new StockMovementAction;
 
-    // New purchase: 10 units @ $70.00 = $700.00
-    // Total cost: $500 + $700 = $1200
-    // Total quantity: 10 + 10 = 20
-    // Expected average cost: $1200 / 20 = $60.00
     $action->add([
         'product_id' => $product->id,
         'quantity'   => 10,
@@ -52,7 +47,6 @@ it('calculates weighted average cost correctly on subsequent purchases', functio
         ->and((float) $product->unit_cost)->toBe(60.00)
         ->and((float) $product->sale_price)->toBe(100.00);
 
-    // Check if purchase was recorded
     expect(ProductPurchase::where('product_id', $product->id)->count())->toBe(1);
 });
 
