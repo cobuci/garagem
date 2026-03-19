@@ -5,9 +5,13 @@ namespace App\Actions\Product;
 use App\Models\Product;
 use App\Models\ProductPurchase;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class StockMovementAction
 {
+    /**
+     * @throws Throwable
+     */
     public function add(array $data): Product
     {
         return DB::transaction(function () use ($data) {
@@ -48,6 +52,9 @@ class StockMovementAction
         });
     }
 
+    /**
+     * @throws Throwable
+     */
     public function remove(int $productId, int $quantity): Product
     {
         return DB::transaction(function () use ($productId, $quantity) {
