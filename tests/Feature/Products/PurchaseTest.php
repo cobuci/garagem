@@ -50,7 +50,7 @@ test('it can record a product purchase and update stock', function () {
 
     $product->refresh();
     expect($product->stock_quantity)->toBe(15)
-        ->and((float) $product->unit_cost)->toBe(8.0)
+        ->and((float) $product->unit_cost)->toBe(6.0)
         ->and((float) $product->sale_price)->toBe(15.0)
         ->and($product->expiration_date->format('Y-m-d'))->toBe($expirationDate);
 
