@@ -33,10 +33,12 @@ class Purchase extends Component
 
     public function updatedPurchaseDrawer($value): void
     {
-        if (! $value) {
-            $this->form->reset();
-            $this->form->invoiceDate = now()->format('Y-m-d');
+        if ($value) {
+            return;
         }
+
+        $this->form->reset();
+        $this->form->invoiceDate = now()->format('Y-m-d');
     }
 
     #[Computed]
@@ -78,11 +80,6 @@ class Purchase extends Component
     public function updatedFormTotalCost(): void
     {
         $this->form->updatedTotalCost();
-    }
-
-    public function updatedFormSalePrice(): void
-    {
-        //
     }
 
     #[Computed]

@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Forms\Products;
 
+use App\Actions\Product\StockMovementAction;
 use App\Models\Product;
-use App\Models\ProductPurchase;
 use Livewire\Form;
 
 class PurchaseForm extends Form
@@ -51,14 +51,16 @@ class PurchaseForm extends Form
 
     public function updatedProductId($id): void
     {
-        if ($id) {
-            $product = Product::find($id);
-            $this->salePrice = $product?->sale_price ?? 0;
-            $this->unitCost = $product?->unit_cost ?? 0;
-            $this->updatedUnitCost();
-        } else {
+        if (! $id) {
             $this->salePrice = 0;
+
+            return;
         }
+
+        $product = Product::find($id);
+        $this->salePrice = $product->sale_price ?? 0;
+        $this->unitCost = $product->unit_cost ?? 0;
+        $this->updatedUnitCost();
     }
 
     public function updatedQuantity(): void
@@ -87,26 +89,15 @@ class PurchaseForm extends Form
     {
         $this->validate();
 
-        ProductPurchase::create([
-            'product_id'   => $this->productId,
-            'unit_cost'    => $this->unitCost,
-            'total_cost'   => $this->totalCost,
-            'quantity'     => $this->quantity,
-            'invoice_date' => $this->invoiceDate,
-            'payment_date' => $this->paymentDate,
-            'due_date'     => $this->dueDate,
+        (new StockMovementAction)->add([
+            'product_id'      => $this->productId,
+            'unit_cost'       => (float) $this->unitCost,
+            'sale_price'      => (float) $this->salePrice,
+            'quantity'        => (int) $this->quantity,
+            'invoice_date'    => $this->invoiceDate,
+            'payment_date'    => $this->paymentDate,
+            'due_date'        => $this->dueDate,
+            'expiration_date' => $this->expirationDate,
         ]);
-
-        $product = Product::find($this->productId);
-        $product->increment('stock_quantity', $this->quantity);
-
-        $product->update([
-            'unit_cost'  => $this->unitCost,
-            'sale_price' => $this->salePrice,
-        ]);
-
-        if ($this->expirationDate) {
-            $product->update(['expiration_date' => $this->expirationDate]);
-        }
     }
 }
