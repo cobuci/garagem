@@ -6,6 +6,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
 use function Pest\Laravel\assertAuthenticatedAs;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertGuest;
 use function Pest\Laravel\get;
 
 use Spatie\OneTimePasswords\Models\OneTimePassword;
@@ -13,6 +15,8 @@ use Spatie\OneTimePasswords\Models\OneTimePassword;
 uses(RefreshDatabase::class);
 
 it('renders the login page', function () {
+    app()->setLocale('en');
+
     get(route('login'))
         ->assertOk()
         ->assertSee('Welcome back');
@@ -48,7 +52,7 @@ it('sends an otp to an existing user and moves to step 2', function () {
         ->assertHasNoErrors()
         ->assertDispatched('wireui:notification');
 
-    \Pest\Laravel\assertDatabaseHas('one_time_passwords', [
+    assertDatabaseHas('one_time_passwords', [
         'authenticatable_id'   => $user->id,
         'authenticatable_type' => User::class,
     ]);
@@ -123,7 +127,7 @@ it('fails to authenticate user with incorrect otp', function () {
         ->assertHasErrors(['otp'])
         ->assertDispatched('wireui:notification');
 
-    \Pest\Laravel\assertGuest();
+    assertGuest();
 });
 
 it('can go back to email step', function () {

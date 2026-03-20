@@ -260,7 +260,6 @@
 
                     <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
                          <div class="flex items-center gap-4">
-                             <x-toggle label="{{ __('sales.gift') }}" wire:model="form.isGift" sm />
                              <x-select
                                 label="{{ __('sales.status') }}"
                                 wire:model="form.status"
@@ -275,6 +274,7 @@
                                 sm
                                 class="!rounded-lg !w-28"
                             />
+                             <x-toggle label="{{ __('sales.gift') }}" wire:model="form.isGift" sm />
                          </div>
 
                          @if(in_array($form->paymentMethod, ['credit_card', 'debit_card']))
