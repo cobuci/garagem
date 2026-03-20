@@ -5,6 +5,7 @@ use App\Livewire\Customers\Show as CustomersShow;
 use App\Livewire\Dashboard\Index;
 use App\Livewire\Login;
 use App\Livewire\Products\Index as ProductsIndex;
+use App\Livewire\Settings\Index as SettingsIndex;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', Login::class)->middleware('guest')->name('login');
@@ -14,4 +15,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/customers', CustomersIndex::class)->name('customers.index');
     Route::get('/customers/{customer}', CustomersShow::class)->name('customers.show');
     Route::get('/products', ProductsIndex::class)->name('products.index');
+    Route::get('/settings', SettingsIndex::class)->name('settings.index');
 });
