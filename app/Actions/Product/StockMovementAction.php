@@ -2,6 +2,7 @@
 
 namespace App\Actions\Product;
 
+use App\Models\AccountBalance;
 use App\Models\Product;
 use App\Models\ProductPurchase;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +18,7 @@ class StockMovementAction
         return DB::transaction(function () use ($data) {
             $product = Product::lockForUpdate()->findOrFail($data['product_id']);
 
-            ProductPurchase::create([
+            $purchase = ProductPurchase::create([
                 'product_id'   => $product->id,
                 'unit_cost'    => $data['unit_cost'],
                 'total_cost'   => $data['unit_cost'] * $data['quantity'],
@@ -25,7 +26,13 @@ class StockMovementAction
                 'invoice_date' => $data['invoice_date'] ?? null,
                 'payment_date' => $data['payment_date'] ?? null,
                 'due_date'     => $data['due_date'] ?? null,
+                'is_paid'      => $data['payment_date'] !== null,
             ]);
+
+            if ($purchase->is_paid) {
+                $balance = AccountBalance::singleton();
+                $balance->decrement('current_balance', $purchase->getRawOriginal('total_cost'));
+            }
 
             $currentStock = $product->stock_quantity ?? 0;
             $currentUnitCost = $product->unit_cost ?? 0;
