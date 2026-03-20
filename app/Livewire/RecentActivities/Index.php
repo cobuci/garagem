@@ -9,6 +9,7 @@ use App\Models\FinancialTransaction;
 use App\Models\ProductPurchase;
 use App\Models\Sale;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -22,11 +23,17 @@ class Index extends Component
 
     public string $type = 'all';
 
-    public ?float $amount = null;
+    public ?string $amount = null;
 
     public string $description = '';
 
     public string $adjustmentType = 'add';
+
+    public bool $showAdjustmentModal = false;
+
+    public bool $showConfirmCancelModal = false;
+
+    public ?int $transactionToCancel = null;
 
     public function updatingType(): void
     {
@@ -38,17 +45,15 @@ class Index extends Component
     {
         return FinancialTransaction::query()
             ->when($this->type !== 'all', function ($query) {
-                if ($this->type === 'sale') {
-                    return $query->where('type', TransactionType::Sale);
-                }
-                if ($this->type === 'purchase') {
-                    return $query->where('type', TransactionType::Purchase);
-                }
-                if ($this->type === 'cancelled_sale') {
-                    return $query->where('type', TransactionType::CancelledSale);
-                }
-                if ($this->type === 'manual_adjustment') {
-                    return $query->where('type', TransactionType::ManualAdjustment);
+                $typeMap = [
+                    'sale'              => TransactionType::Sale,
+                    'purchase'          => TransactionType::Purchase,
+                    'cancelled_sale'    => TransactionType::CancelledSale,
+                    'manual_adjustment' => TransactionType::ManualAdjustment,
+                ];
+
+                if (isset($typeMap[$this->type])) {
+                    return $query->where('type', $typeMap[$this->type]);
                 }
             })
             ->orderBy('transaction_date', 'desc')
@@ -77,7 +82,7 @@ class Index extends Component
         $this->adjustmentType = $type;
         $this->amount = null;
         $this->description = '';
-        $this->js('$openModal(\'adjustmentModal\')');
+        $this->showAdjustmentModal = true;
     }
 
     public function saveAdjustment(): void
@@ -87,8 +92,9 @@ class Index extends Component
             'description' => 'required|string|max:255',
         ]);
 
-        $amountInCents = (int) round($this->amount * 100);
-        $finalAmount = $this->adjustmentType === 'add' ? $amountInCents : -$amountInCents;
+        $amountInCents = (int) round((float) $this->amount * 100);
+        $isAdd = $this->adjustmentType === 'add';
+        $finalAmount = $isAdd ? $amountInCents : -$amountInCents;
 
         FinancialTransaction::query()->create([
             'type'             => TransactionType::ManualAdjustment,
@@ -98,16 +104,61 @@ class Index extends Component
         ]);
 
         $balance = AccountBalance::singleton();
-        if ($this->adjustmentType === 'add') {
+
+        if ($isAdd) {
             $balance->increment('current_balance', $amountInCents);
-        } else {
+        }
+
+        if (! $isAdd) {
             $balance->decrement('current_balance', $amountInCents);
         }
 
-        $this->js('$closeModal(\'adjustmentModal\')');
+        $this->showAdjustmentModal = false;
         $this->notification()->success(
             title: __('finance.adjustment_success_title'),
             description: __('finance.adjustment_success_description'),
+        );
+    }
+
+    public function confirmCancelAdjustment(int $id): void
+    {
+        $this->transactionToCancel = $id;
+        $this->showConfirmCancelModal = true;
+    }
+
+    public function cancelAdjustment(): void
+    {
+        if (! $this->transactionToCancel) {
+            return;
+        }
+
+        $transaction = FinancialTransaction::findOrFail($this->transactionToCancel);
+
+        if ($transaction->type !== TransactionType::ManualAdjustment) {
+            return;
+        }
+
+        DB::transaction(function () use ($transaction) {
+            $balance = AccountBalance::singleton();
+            $amountToRevert = abs($transaction->amount);
+
+            if ($transaction->amount > 0) {
+                $balance->decrement('current_balance', $amountToRevert);
+            }
+
+            if ($transaction->amount <= 0) {
+                $balance->increment('current_balance', $amountToRevert);
+            }
+
+            $transaction->delete();
+        });
+
+        $this->showConfirmCancelModal = false;
+        $this->transactionToCancel = null;
+
+        $this->notification()->success(
+            title: __('finance.cancel_success_title'),
+            description: __('finance.cancel_success_description'),
         );
     }
 

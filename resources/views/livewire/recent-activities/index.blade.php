@@ -53,7 +53,7 @@
         <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
             <div class="flex items-center gap-2">
                 <x-icon name="list-bullet" class="w-5 h-5 text-gray-400" />
-                <h3 class="font-bold text-gray-900 dark:text-white">{{ __('finance.table.title') ?? __('finance.recent_activities') }}</h3>
+                <h3 class="font-bold text-gray-900 dark:text-white">{{ __('finance.table.title') }}</h3>
             </div>
         </div>
 
@@ -99,15 +99,26 @@
                             </div>
                         </div>
                     </div>
-                    <div class="text-right">
-                        <p @class([
-                            'text-sm font-extrabold',
-                            'text-emerald-600 dark:text-emerald-400' => $transaction->amount > 0,
-                            'text-red-600 dark:text-red-400' => $transaction->amount < 0,
-                            'text-gray-900 dark:text-white' => $transaction->amount == 0,
-                        ])>
-                            {{ $transaction->amount > 0 ? '+' : '' }} R$ {{ number_format(abs($transaction->amount) / 100, 2, ',', '.') }}
-                        </p>
+                    <div class="flex items-center gap-4">
+                        <div class="text-right">
+                            <p @class([
+                                'text-sm font-extrabold',
+                                'text-emerald-600 dark:text-emerald-400' => $transaction->amount > 0,
+                                'text-red-600 dark:text-red-400' => $transaction->amount < 0,
+                                'text-gray-900 dark:text-white' => $transaction->amount == 0,
+                            ])>
+                                {{ $transaction->amount > 0 ? '+' : '' }} R$ {{ number_format(abs($transaction->amount) / 100, 2, ',', '.') }}
+                            </p>
+                        </div>
+                        @if($transaction->type === \App\Enums\TransactionType::ManualAdjustment)
+                            <x-button
+                                xs
+                                icon="trash"
+                                negative
+                                wire:click="confirmCancelAdjustment({{ $transaction->id }})"
+                                title="{{ __('finance.adjustment_modal.cancel') }}"
+                            />
+                        @endif
                     </div>
                 </div>
             @empty
@@ -126,26 +137,6 @@
         @endif
     </div>
 
-    <x-modal name="adjustmentModal" blur>
-        <x-card title="{{ $adjustmentType === 'add' ? __('finance.adjustment_modal.title_add') : __('finance.adjustment_modal.title_remove') }}">
-            <div class="grid grid-cols-1 gap-4">
-                <x-input
-                    label="{{ __('finance.adjustment_modal.amount') }}"
-                    placeholder="0,00"
-                    wire:model="amount"
-                    type="number"
-                    step="0.01"
-                    prefix="R$"
-                />
-                <x-textarea label="{{ __('finance.adjustment_modal.description') }}" wire:model="description" />
-            </div>
-
-            <x-slot name="footer">
-                <div class="flex justify-end gap-x-4">
-                    <x-button flat label="{{ __('finance.adjustment_modal.cancel') }}" x-on:click="close" />
-                    <x-button primary label="{{ __('finance.adjustment_modal.confirm') }}" wire:click="saveAdjustment" />
-                </div>
-            </x-slot>
-        </x-card>
-    </x-modal>
+    @include('livewire.recent-activities.components.adjustment-modal')
+    @include('livewire.recent-activities.components.confirm-cancel-modal')
 </div>
