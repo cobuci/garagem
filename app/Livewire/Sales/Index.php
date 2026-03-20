@@ -25,6 +25,8 @@ class Index extends Component
 
     public bool $showConfirmPaymentModal = false;
 
+    public bool $showConfirmCancelModal = false;
+
     public function filterByStatus(?string $status): void
     {
         $this->status = $status;
@@ -86,6 +88,28 @@ class Index extends Component
             $this->showDetailsModal = false;
             $this->showConfirmPaymentModal = false;
             $this->notification()->success(__('sales.mark_as_paid_success'));
+        }
+    }
+
+    public function confirmCancelSale(int $saleId): void
+    {
+        $this->selectedSaleId = $saleId;
+        $this->showConfirmCancelModal = true;
+    }
+
+    public function cancelSale(): void
+    {
+        if (! $this->selectedSaleId) {
+            return;
+        }
+
+        $sale = Sale::query()->find($this->selectedSaleId);
+
+        if ($sale instanceof Sale && $sale->status !== SaleStatus::Cancelled) {
+            $sale->update(['status' => SaleStatus::Cancelled]);
+            $this->showDetailsModal = false;
+            $this->showConfirmCancelModal = false;
+            $this->notification()->success(__('sales.cancel_sale_success'));
         }
     }
 

@@ -5,4 +5,5 @@
 
     @include('livewire.sales.components.details-modal', ['selectedSale' => $this->selectedSale])
     @include('livewire.sales.components.confirm-payment-modal', ['selectedSale' => $this->selectedSale])
+    @include('livewire.sales.components.confirm-cancel-modal', ['selectedSale' => $this->selectedSale])
 </div>

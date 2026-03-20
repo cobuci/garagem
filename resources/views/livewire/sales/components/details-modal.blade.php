@@ -79,11 +79,18 @@
     @endif
 
     <x-slot name="footer">
-        <div class="flex justify-end gap-x-4">
-            <x-button flat label="{{ __('sales.cancel') }}" x-on:click="close" />
-            @if($selectedSale && $selectedSale->status === \App\Enums\SaleStatus::Pending)
-                <x-button primary label="{{ __('sales.mark_as_paid') }}" wire:click="confirmMarkAsPaid({{ $selectedSale->id }})" />
-            @endif
+        <div class="flex justify-between items-center w-full">
+            <div>
+                @if($selectedSale && $selectedSale->status !== \App\Enums\SaleStatus::Cancelled)
+                    <x-button negative outline label="{{ __('sales.cancel_sale') }}" wire:click="confirmCancelSale({{ $selectedSale->id }})" />
+                @endif
+            </div>
+            <div class="flex gap-x-4">
+                <x-button flat label="{{ __('sales.close') }}" x-on:click="close" />
+                @if($selectedSale && $selectedSale->status === \App\Enums\SaleStatus::Pending)
+                    <x-button primary label="{{ __('sales.mark_as_paid') }}" wire:click="confirmMarkAsPaid({{ $selectedSale->id }})" />
+                @endif
+            </div>
         </div>
     </x-slot>
 </x-modal-card>
