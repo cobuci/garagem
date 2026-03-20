@@ -2,7 +2,7 @@
 
 return [
     'title'       => 'Bills Payable',
-    'description' => 'Supplier and product payment management',
+    'description' => 'Management of supplier and product payments',
     'summary'     => [
         'total_due'  => 'Total Due',
         'overdue'    => 'Total Overdue',
@@ -23,16 +23,16 @@ return [
         'paid_at'     => 'Paid on :date',
         'overdue'     => 'Overdue',
         'pending'     => 'Pending',
-        'no_records'  => 'No records found.',
+        'no_records'  => 'No bills found.',
     ],
     'actions' => [
         'pay'                         => 'Pay',
-        'confirm_payment'             => 'Confirm payment for this account?',
+        'confirm_payment'             => 'Confirm payment for this bill?',
         'payment_success_title'       => 'Bills Payable',
-        'payment_success_description' => 'Payment registered successfully!',
+        'payment_success_description' => 'Payment recorded successfully!',
         'confirm_modal'               => [
             'title'       => 'Confirm Payment',
-            'description' => 'You are about to register the payment for:',
+            'description' => 'You are about to record the payment for:',
             'product'     => 'Product',
             'value'       => 'Value',
             'due_date'    => 'Due Date',

@@ -4,7 +4,7 @@ return [
     'general'       => 'Geral',
     'sales'         => 'Vendas',
     'dashboard'     => 'Dashboard',
-    'orders'        => 'Pedidos',
+    'orders'        => 'Vender',
     'customers'     => 'Clientes',
     'reports'       => 'Relatórios',
     'inventory'     => 'Estoque',
