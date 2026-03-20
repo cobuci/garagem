@@ -38,9 +38,7 @@ class Index extends Component
     {
         return Sale::query()
             ->with(['customer', 'items.product'])
-            ->when($this->status, function (Builder $query) {
-                $query->where('status', $this->status);
-            })
+            ->when($this->status, fn (Builder $query) => $query->where('status', $this->status))
             ->latest()
             ->paginate(10);
     }
@@ -83,12 +81,20 @@ class Index extends Component
 
         $sale = Sale::query()->find($this->selectedSaleId);
 
-        if ($sale instanceof Sale && $sale->status === SaleStatus::Pending) {
-            $sale->update(['status' => SaleStatus::Paid]);
-            $this->showDetailsModal = false;
-            $this->showConfirmPaymentModal = false;
-            $this->notification()->success(__('sales.mark_as_paid_success'));
+        if (! $sale instanceof Sale) {
+            return;
         }
+
+        if ($sale->status !== SaleStatus::Pending) {
+            $this->notification()->error(__('sales.only_pending_can_be_paid'));
+
+            return;
+        }
+
+        $sale->update(['status' => SaleStatus::Paid]);
+        $this->showDetailsModal = false;
+        $this->showConfirmPaymentModal = false;
+        $this->notification()->success(__('sales.mark_as_paid_success'));
     }
 
     public function confirmCancelSale(int $saleId): void
@@ -105,12 +111,20 @@ class Index extends Component
 
         $sale = Sale::query()->find($this->selectedSaleId);
 
-        if ($sale instanceof Sale && $sale->status !== SaleStatus::Cancelled) {
-            $sale->update(['status' => SaleStatus::Cancelled]);
-            $this->showDetailsModal = false;
-            $this->showConfirmCancelModal = false;
-            $this->notification()->success(__('sales.cancel_sale_success'));
+        if (! $sale instanceof Sale) {
+            return;
         }
+
+        if ($sale->status === SaleStatus::Cancelled) {
+            $this->notification()->error(__('sales.already_cancelled'));
+
+            return;
+        }
+
+        $sale->update(['status' => SaleStatus::Cancelled]);
+        $this->showDetailsModal = false;
+        $this->showConfirmCancelModal = false;
+        $this->notification()->success(__('sales.cancel_sale_success'));
     }
 
     public function render(): View

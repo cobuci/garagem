@@ -62,6 +62,8 @@ return [
     'confirm_cancel_desc'        => 'Tem certeza que deseja cancelar esta venda? Esta ação retornará os itens ao estoque e ajustará o saldo se a venda estiver paga.',
     'yes_cancel_sale'            => 'Sim, cancelar venda',
     'cancel_sale_success'        => 'Venda cancelada com sucesso!',
+    'only_pending_can_be_paid'   => 'Apenas vendas pendentes podem ser marcadas como pagas.',
+    'already_cancelled'          => 'Esta venda já está cancelada.',
     'items_to_restore'           => 'Itens a retornar',
     'close'                      => 'Fechar',
     'items'                      => 'Itens',

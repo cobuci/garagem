@@ -62,6 +62,8 @@ return [
     'confirm_cancel_desc'        => 'Are you sure you want to cancel this sale? This action will return the items to stock and adjust the balance if the sale is paid.',
     'yes_cancel_sale'            => 'Yes, cancel sale',
     'cancel_sale_success'        => 'Sale cancelled successfully!',
+    'only_pending_can_be_paid'   => 'Only pending sales can be marked as paid.',
+    'already_cancelled'          => 'This sale is already cancelled.',
     'items_to_restore'           => 'Items to return',
     'close'                      => 'Close',
     'items'                      => 'Items',
