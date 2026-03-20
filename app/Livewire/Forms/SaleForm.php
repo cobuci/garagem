@@ -129,8 +129,12 @@ class SaleForm extends Form
 
     public function store(): void
     {
-        DB::transaction(function () {
-            $sale = Sale::create([
+        if (empty($this->items)) {
+            return;
+        }
+
+        DB::transaction(function (): void {
+            $sale = Sale::query()->create([
                 'customer_id'          => $this->customerId,
                 'total_amount'         => $this->totalAmount() / 100,
                 'discount_amount'      => $this->discountInCents() / 100,
@@ -152,8 +156,8 @@ class SaleForm extends Form
                     'subtotal'   => ($item['unit_price'] * $item['quantity']) / 100,
                 ]);
 
-                $product = Product::find($item['id']);
-                if ($product && $product->stock_quantity !== null) {
+                $product = Product::query()->find($item['id']);
+                if ($product instanceof Product && $product->stock_quantity !== null) {
                     $product->decrement('stock_quantity', $item['quantity']);
                 }
             }

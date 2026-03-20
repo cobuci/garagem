@@ -57,4 +57,20 @@ class Sale extends Model
     {
         return $this->hasMany(SaleItem::class);
     }
+
+    public function totalCost(): float
+    {
+        return (float) $this->items->sum(fn (SaleItem $item) => (float) $item->getRawOriginal('unit_cost') * $item->quantity) / 100;
+    }
+
+    public function profit(): float
+    {
+        $totalAmount = (float) $this->getRawOriginal('total_amount');
+
+        if ($this->is_gift) {
+            return -$this->totalCost();
+        }
+
+        return ($totalAmount / 100) - $this->totalCost();
+    }
 }
