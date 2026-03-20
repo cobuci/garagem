@@ -67,6 +67,12 @@ class Index extends Component
         $this->js('$openModal(\'confirmPaymentModal\')');
     }
 
+    public function confirmCancellation(int $id): void
+    {
+        $this->selectedBill = ProductPurchase::with('product')->findOrFail($id);
+        $this->js('$openModal(\'confirmCancellationModal\')');
+    }
+
     public function markAsPaid(): void
     {
         if (! $this->selectedBill || $this->selectedBill->is_paid) {
@@ -89,6 +95,33 @@ class Index extends Component
         $this->notification()->success(
             title: __('bills_payable.actions.payment_success_title'),
             description: __('bills_payable.actions.payment_success_description'),
+        );
+    }
+
+    public function cancelBill(): void
+    {
+        if (! $this->selectedBill) {
+            return;
+        }
+
+        DB::transaction(function () {
+            if ($this->selectedBill->is_paid) {
+                $balance = AccountBalance::singleton();
+                $balance->increment('current_balance', $this->selectedBill->getRawOriginal('total_cost'));
+            }
+
+            $product = $this->selectedBill->product;
+            $product->decrement('stock_quantity', $this->selectedBill->quantity);
+
+            $this->selectedBill->delete();
+        });
+
+        $this->js('$closeModal(\'confirmCancellationModal\')');
+        $this->selectedBill = null;
+
+        $this->notification()->success(
+            title: __('bills_payable.actions.cancel_success_title'),
+            description: __('bills_payable.actions.cancel_success_description'),
         );
     }
 
