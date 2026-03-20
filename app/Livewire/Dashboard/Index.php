@@ -49,24 +49,20 @@ class Index extends Component
         $today = Carbon::today();
         $yesterday = Carbon::yesterday();
 
-        $sales = Sale::query()
-            ->selectRaw('SUM(CASE WHEN DATE(created_at) = ? THEN total_amount ELSE 0 END) as today_sales', [$today->toDateString()])
-            ->selectRaw('SUM(CASE WHEN DATE(created_at) = ? THEN total_amount ELSE 0 END) as yesterday_sales', [$yesterday->toDateString()])
-            ->whereIn(DB::raw('DATE(created_at)'), [$today->toDateString(), $yesterday->toDateString()])
-            ->where('status', SaleStatus::Paid)
-            ->first();
-
-        $profits = SaleItem::query()
-            ->whereHas('sale', fn (Builder $q) => $q->whereIn(DB::raw('DATE(created_at)'), [$today->toDateString(), $yesterday->toDateString()])->where('status', SaleStatus::Paid))
+        $metrics = SaleItem::query()
+            ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
+            ->selectRaw('SUM(CASE WHEN DATE(sales.created_at) = ? THEN subtotal ELSE 0 END) as today_sales', [$today->toDateString()])
+            ->selectRaw('SUM(CASE WHEN DATE(sales.created_at) = ? THEN subtotal ELSE 0 END) as yesterday_sales', [$yesterday->toDateString()])
             ->selectRaw('SUM(CASE WHEN DATE(sales.created_at) = ? THEN subtotal - (unit_cost * quantity) ELSE 0 END) as today_profit', [$today->toDateString()])
             ->selectRaw('SUM(CASE WHEN DATE(sales.created_at) = ? THEN subtotal - (unit_cost * quantity) ELSE 0 END) as yesterday_profit', [$yesterday->toDateString()])
-            ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
+            ->whereIn(DB::raw('DATE(sales.created_at)'), [$today->toDateString(), $yesterday->toDateString()])
+            ->where('sales.status', SaleStatus::Paid)
             ->first();
 
-        $salesToday = $sales->today_sales ?? 0;
-        $salesYesterday = $sales->yesterday_sales ?? 0;
-        $profitToday = $profits->today_profit ?? 0;
-        $profitYesterday = $profits->yesterday_profit ?? 0;
+        $salesToday = $metrics->today_sales ?? 0;
+        $salesYesterday = $metrics->yesterday_sales ?? 0;
+        $profitToday = $metrics->today_profit ?? 0;
+        $profitYesterday = $metrics->yesterday_profit ?? 0;
 
         return [
             'sales'           => $salesToday / 100,
@@ -83,18 +79,10 @@ class Index extends Component
         $currentMonth = Carbon::now();
         $previousMonth = Carbon::now()->subMonth();
 
-        $sales = Sale::query()
-            ->selectRaw('SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? THEN total_amount ELSE 0 END) as current_sales', [$currentMonth->month, $currentMonth->year])
-            ->selectRaw('SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? THEN total_amount ELSE 0 END) as previous_sales', [$previousMonth->month, $previousMonth->year])
-            ->where(function (Builder $q) use ($currentMonth, $previousMonth) {
-                $q->where(fn (Builder $sq) => $sq->whereMonth('created_at', $currentMonth->month)->whereYear('created_at', $currentMonth->year))
-                    ->orWhere(fn (Builder $sq) => $sq->whereMonth('created_at', $previousMonth->month)->whereYear('created_at', $previousMonth->year));
-            })
-            ->where('status', SaleStatus::Paid)
-            ->first();
-
-        $profits = SaleItem::query()
+        $metrics = SaleItem::query()
             ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
+            ->selectRaw('SUM(CASE WHEN MONTH(sales.created_at) = ? AND YEAR(sales.created_at) = ? THEN subtotal ELSE 0 END) as current_sales', [$currentMonth->month, $currentMonth->year])
+            ->selectRaw('SUM(CASE WHEN MONTH(sales.created_at) = ? AND YEAR(sales.created_at) = ? THEN subtotal ELSE 0 END) as previous_sales', [$previousMonth->month, $previousMonth->year])
             ->selectRaw('SUM(CASE WHEN MONTH(sales.created_at) = ? AND YEAR(sales.created_at) = ? THEN subtotal - (unit_cost * quantity) ELSE 0 END) as current_profit', [$currentMonth->month, $currentMonth->year])
             ->selectRaw('SUM(CASE WHEN MONTH(sales.created_at) = ? AND YEAR(sales.created_at) = ? THEN subtotal - (unit_cost * quantity) ELSE 0 END) as previous_profit', [$previousMonth->month, $previousMonth->year])
             ->where('sales.status', SaleStatus::Paid)
@@ -104,10 +92,10 @@ class Index extends Component
             })
             ->first();
 
-        $salesMonth = $sales->current_sales ?? 0;
-        $salesLastMonth = $sales->previous_sales ?? 0;
-        $profitMonth = $profits->current_profit ?? 0;
-        $profitLastMonth = $profits->previous_profit ?? 0;
+        $salesMonth = $metrics->current_sales ?? 0;
+        $salesLastMonth = $metrics->previous_sales ?? 0;
+        $profitMonth = $metrics->current_profit ?? 0;
+        $profitLastMonth = $metrics->previous_profit ?? 0;
 
         return [
             'sales'           => $salesMonth / 100,
@@ -123,17 +111,9 @@ class Index extends Component
     {
         $startDate = Carbon::now()->subMonths(5)->startOfMonth();
 
-        $sales = Sale::query()
-            ->selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, SUM(total_amount) as total')
-            ->where('created_at', '>=', $startDate)
-            ->where('status', SaleStatus::Paid)
-            ->groupBy('year', 'month')
-            ->get()
-            ->keyBy(fn ($item) => "{$item->getAttribute('year')}-{$item->getAttribute('month')}");
-
-        $profits = SaleItem::query()
+        $metrics = SaleItem::query()
             ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
-            ->selectRaw('MONTH(sales.created_at) as month, YEAR(sales.created_at) as year, SUM(subtotal - (unit_cost * quantity)) as total')
+            ->selectRaw('MONTH(sales.created_at) as month, YEAR(sales.created_at) as year, SUM(subtotal) as total_sales, SUM(subtotal - (unit_cost * quantity)) as total_profit')
             ->where('sales.created_at', '>=', $startDate)
             ->where('sales.status', SaleStatus::Paid)
             ->groupBy('year', 'month')
@@ -149,8 +129,8 @@ class Index extends Component
             $key = "{$date->year}-{$date->month}";
 
             $labels[] = $date->translatedFormat('M');
-            $salesData[] = round(($sales->get($key)->total ?? 0) / 100, 2);
-            $profitData[] = round(($profits->get($key)->total ?? 0) / 100, 2);
+            $salesData[] = round(($metrics->get($key)->total_sales ?? 0) / 100, 2);
+            $profitData[] = round(($metrics->get($key)->total_profit ?? 0) / 100, 2);
         }
 
         return [
