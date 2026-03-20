@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Casts\MoneyCast;
+use App\Enums\TransactionType;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -32,6 +33,25 @@ class ProductPurchase extends Model
             'due_date'     => 'date',
             'is_paid'      => 'boolean',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::updated(function (ProductPurchase $purchase) {
+            if ($purchase->wasChanged('is_paid') && $purchase->is_paid) {
+                $totalCost = $purchase->getAttributes()['total_cost'] ?? 0;
+                AccountBalance::singleton()->decrement('current_balance', (int) $totalCost);
+
+                FinancialTransaction::query()->create([
+                    'type'             => TransactionType::Purchase,
+                    'amount'           => -(int) $totalCost,
+                    'description'      => "Purchase of {$purchase->product->name}",
+                    'reference_id'     => $purchase->id,
+                    'reference_type'   => ProductPurchase::class,
+                    'transaction_date' => now(),
+                ]);
+            }
+        });
     }
 
     public function product(): BelongsTo
