@@ -12,6 +12,11 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use WireUi\Traits\WireUiActions;
 
+/**
+ * @property-read LengthAwarePaginator $sales
+ * @property-read float $totalPendingAmount
+ * @property-read ?Sale $selectedSale
+ */
 class Index extends Component
 {
     use WireUiActions;

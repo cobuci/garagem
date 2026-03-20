@@ -5,12 +5,31 @@ namespace App\Models;
 use App\Casts\MoneyCast;
 use App\Enums\SaleStatus;
 use Database\Factories\SaleFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @property int        $id
+ * @property ?int       $customer_id
+ * @property string     $payment_method
+ * @property float      $total_amount
+ * @property float      $discount_amount
+ * @property float      $fee_amount
+ * @property float      $fee_percentage
+ * @property bool       $pass_fee_to_customer
+ * @property float      $net_amount
+ * @property bool       $is_gift
+ * @property SaleStatus $status
+ * @property ?Carbon    $created_at
+ * @property ?Carbon    $updated_at
+ * @property-read ?Customer $customer
+ * @property-read Collection<int, SaleItem> $items
+ */
 class Sale extends Model
 {
     /** @use HasFactory<SaleFactory> */
@@ -79,7 +98,7 @@ class Sale extends Model
 
     public function totalCost(): float
     {
-        return (float) $this->items->sum(fn (SaleItem $item) => (float) $item->getRawOriginal('unit_cost') * $item->quantity) / 100;
+        return (float) $this->items->sum(fn (SaleItem $item): float => (float) $item->getRawOriginal('unit_cost') * $item->quantity) / 100;
     }
 
     public function profit(): float

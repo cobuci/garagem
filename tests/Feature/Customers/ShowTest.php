@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\Customers;
 
+use App\Enums\SaleStatus;
 use App\Livewire\Customers\Show;
 use App\Models\Customer;
+use App\Models\Sale;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -25,20 +27,118 @@ it('can render customer show page', function () {
         ->assertSeeLivewire(Show::class);
 });
 
-it('shows customer name and fake purchase statistics', function () {
+it('shows customer name and real purchase statistics', function () {
     $customer = Customer::factory()->create(['name' => 'John Doe']);
+
+    $sale1 = Sale::factory()->create([
+        'customer_id' => $customer->id,
+        'status'      => SaleStatus::Paid,
+    ]);
+    $sale1->update(['total_amount' => 150]);
+
+    $sale2 = Sale::factory()->create([
+        'customer_id' => $customer->id,
+        'status'      => SaleStatus::Pending,
+    ]);
+    $sale2->update(['total_amount' => 75]);
 
     Livewire::test(Show::class, ['customer' => $customer])
         ->assertSee('John Doe')
-        ->assertSee('R$ 1.500,00')
-        ->assertSee('R$ 750,00')
-        ->assertSee('5');
+        ->assertSee('150,00')
+        ->assertSee('75,00')
+        ->assertSee('2');
 });
 
-it('lists fake customer orders', function () {
+it('lists customer orders ordered by status (pending first)', function () {
     $customer = Customer::factory()->create();
 
+    $paidSale = Sale::factory()->create([
+        'customer_id' => $customer->id,
+        'status'      => SaleStatus::Paid,
+        'created_at'  => now()->subDay(),
+    ]);
+
+    $pendingSale = Sale::factory()->create([
+        'customer_id' => $customer->id,
+        'status'      => SaleStatus::Pending,
+        'created_at'  => now(),
+    ]);
+
+    $test = Livewire::test(Show::class, ['customer' => $customer]);
+
+    $orders = $test->get('orders');
+    expect($orders->first()->id)->toBe($pendingSale->id)
+        ->and($orders->last()->id)->toBe($paidSale->id);
+});
+
+it('can filter customer orders', function () {
+    $customer = Customer::factory()->create();
+
+    $paidSale = Sale::factory()->create([
+        'customer_id' => $customer->id,
+        'status'      => SaleStatus::Paid,
+    ]);
+    $paidSale->update(['total_amount' => 111]);
+
+    $pendingSale = Sale::factory()->create([
+        'customer_id' => $customer->id,
+        'status'      => SaleStatus::Pending,
+    ]);
+    $pendingSale->update(['total_amount' => 222]);
+
+    $test = Livewire::test(Show::class, ['customer' => $customer])
+        ->assertSee('111,00')
+        ->assertSee('222,00');
+
+    $test->set('status', 'paid');
+    expect($test->get('orders')->count())->toBe(1);
+
+    $test->set('status', 'pending');
+    expect($test->get('orders')->count())->toBe(1);
+});
+
+it('paginates customer orders', function () {
+    $customer = Customer::factory()->create();
+    Sale::factory()->count(10)->create(['customer_id' => $customer->id]);
+
+    $test = Livewire::test(Show::class, ['customer' => $customer]);
+
+    expect($test->get('orders')->count())->toBe(5);
+});
+
+it('can show sale details', function () {
+    $customer = Customer::factory()->create();
+    $sale = Sale::factory()->create(['customer_id' => $customer->id]);
+
     Livewire::test(Show::class, ['customer' => $customer])
-        ->assertSee('R$ 100,00')
-        ->assertSee('R$ 500,00');
+        ->call('showDetails', $sale->id)
+        ->assertSet('showDetailsModal', true)
+        ->assertSet('selectedSaleId', $sale->id);
+});
+
+it('can cancel a sale', function () {
+    $customer = Customer::factory()->create();
+    $sale = Sale::factory()->create([
+        'customer_id' => $customer->id,
+        'status'      => SaleStatus::Pending,
+    ]);
+
+    Livewire::test(Show::class, ['customer' => $customer])
+        ->call('confirmCancelSale', $sale->id)
+        ->assertSet('showConfirmCancelModal', true)
+        ->call('cancelSale')
+        ->assertSet('showConfirmCancelModal', false);
+
+    expect($sale->fresh()->status)->toBe(SaleStatus::Cancelled);
+});
+
+it('does not show the cancel button in the table', function () {
+    $customer = Customer::factory()->create();
+    Sale::factory()->create([
+        'customer_id' => $customer->id,
+        'status'      => SaleStatus::Pending,
+    ]);
+
+    Livewire::test(Show::class, ['customer' => $customer])
+        ->assertDontSeeHtml('wire:click="confirmCancelSale');
 });
