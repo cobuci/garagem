@@ -32,20 +32,30 @@
                 >
             </div>
 
-            <div class="mt-3">
-                <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-2 mb-1">
+        <div class="mt-3">
+                <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-3 mb-2 p-0.5 shadow-inner">
                     <div
-                        class="bg-amber-500 h-2 rounded-full transition-all duration-500"
+                        class="bg-gradient-to-r from-amber-400 to-amber-600 h-2 rounded-full transition-all duration-1000 ease-out shadow-sm"
                         style="width: {{ $goalMetrics['percent'] }}%"
                     ></div>
                 </div>
-                <p class="text-[10px] font-bold uppercase tracking-tight {{ $goalMetrics['reached'] ? 'text-emerald-600' : 'text-gray-400' }}">
-                    @if($goalMetrics['reached'])
-                        {{ __('dashboard.goal_reached') }}
-                    @else
-                        {{ __('dashboard.remaining_to_goal', ['amount' => 'R$ ' . number_format($goalMetrics['remaining'], 2, ',', '.')]) }}
+                <div class="flex items-center justify-between">
+                    <p class="text-[10px] font-bold uppercase tracking-tight {{ $goalMetrics['reached'] ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400' }}">
+                        @if($goalMetrics['reached'])
+                            <span class="flex items-center gap-1">
+                                <x-icon name="check-circle" class="w-3 h-3" />
+                                {{ __('dashboard.goal_reached') }}
+                            </span>
+                        @else
+                            {{ __('dashboard.remaining_to_goal', ['amount' => 'R$ ' . number_format($goalMetrics['remaining'], 2, ',', '.')]) }}
+                        @endif
+                    </p>
+                    @if(!$goalMetrics['reached'])
+                        <p class="text-[10px] font-bold text-gray-400 uppercase">
+                            {{ number_format($goalMetrics['percent'], 0) }}%
+                        </p>
                     @endif
-                </p>
+                </div>
             </div>
         </div>
     </div>
