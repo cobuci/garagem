@@ -26,7 +26,7 @@ class SaleForm extends Form
 
     public function addItem(int $productId): void
     {
-        $product = Product::find($productId);
+        $product = Product::query()->find($productId);
         if (! $product) {
             return;
         }
