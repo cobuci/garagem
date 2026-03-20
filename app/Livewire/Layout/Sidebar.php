@@ -39,6 +39,12 @@ class Sidebar extends Component
                         'route'  => 'bills-payable.index',
                         'active' => request()->routeIs('bills-payable.*'),
                     ],
+                    [
+                        'label'  => __('sidebar.recent_activities'),
+                        'icon'   => 'list-bullet',
+                        'route'  => 'recent-activities.index',
+                        'active' => request()->routeIs('recent-activities.*'),
+                    ],
                 ],
             ],
             [
@@ -52,7 +58,7 @@ class Sidebar extends Component
                     ],
                     [
                         'label'  => __('sidebar.orders'),
-                        'icon'   => 'list-bullet',
+                        'icon'   => 'shopping-cart',
                         'route'  => 'sales.index',
                         'active' => request()->routeIs('sales.index'),
                     ],

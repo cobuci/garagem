@@ -7,6 +7,7 @@ use App\Livewire\Dashboard\Index;
 use App\Livewire\Login;
 use App\Livewire\Orders\Index as OrdersIndex;
 use App\Livewire\Products\Index as ProductsIndex;
+use App\Livewire\RecentActivities\Index as RecentActivitiesIndex;
 use App\Livewire\Sales\Create as SalesCreate;
 use App\Livewire\Sales\Index as SalesIndex;
 use App\Livewire\Settings\Index as SettingsIndex;
@@ -23,5 +24,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/sales/create', SalesCreate::class)->name('sales.create');
     Route::get('/orders', OrdersIndex::class)->name('orders.index');
     Route::get('/bills-payable', BillsPayableIndex::class)->name('bills-payable.index');
+    Route::get('/recent-activities', RecentActivitiesIndex::class)->name('recent-activities.index');
     Route::get('/settings', SettingsIndex::class)->name('settings.index');
 });
