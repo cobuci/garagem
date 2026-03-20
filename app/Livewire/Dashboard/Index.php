@@ -49,26 +49,29 @@ class Index extends Component
         $today = Carbon::today();
         $yesterday = Carbon::yesterday();
 
-        $salesToday = Sale::whereDate('created_at', $today)
+        $sales = Sale::query()
+            ->selectRaw('SUM(CASE WHEN DATE(created_at) = ? THEN total_amount ELSE 0 END) as today_sales', [$today->toDateString()])
+            ->selectRaw('SUM(CASE WHEN DATE(created_at) = ? THEN total_amount ELSE 0 END) as yesterday_sales', [$yesterday->toDateString()])
+            ->whereIn(DB::raw('DATE(created_at)'), [$today->toDateString(), $yesterday->toDateString()])
             ->where('status', SaleStatus::Paid)
-            ->sum('total_amount');
+            ->first();
 
-        $salesYesterday = Sale::whereDate('created_at', $yesterday)
-            ->where('status', SaleStatus::Paid)
-            ->sum('total_amount');
+        $profits = SaleItem::query()
+            ->whereHas('sale', fn (Builder $q) => $q->whereIn(DB::raw('DATE(created_at)'), [$today->toDateString(), $yesterday->toDateString()])->where('status', SaleStatus::Paid))
+            ->selectRaw('SUM(CASE WHEN DATE(sales.created_at) = ? THEN subtotal - (unit_cost * quantity) ELSE 0 END) as today_profit', [$today->toDateString()])
+            ->selectRaw('SUM(CASE WHEN DATE(sales.created_at) = ? THEN subtotal - (unit_cost * quantity) ELSE 0 END) as yesterday_profit', [$yesterday->toDateString()])
+            ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
+            ->first();
 
-        $profitToday = SaleItem::whereHas('sale', fn (Builder $q) => $q->whereDate('created_at', $today)->where('status', SaleStatus::Paid))
-            ->select(DB::raw('SUM(subtotal - (unit_cost * quantity)) as profit'))
-            ->first()->profit ?? 0;
-
-        $profitYesterday = SaleItem::whereHas('sale', fn (Builder $q) => $q->whereDate('created_at', $yesterday)->where('status', SaleStatus::Paid))
-            ->select(DB::raw('SUM(subtotal - (unit_cost * quantity)) as profit'))
-            ->first()->profit ?? 0;
+        $salesToday = $sales->today_sales ?? 0;
+        $salesYesterday = $sales->yesterday_sales ?? 0;
+        $profitToday = $profits->today_profit ?? 0;
+        $profitYesterday = $profits->yesterday_profit ?? 0;
 
         return [
             'sales'           => $salesToday / 100,
             'previous_sales'  => $salesYesterday / 100,
-            'percent'         => $this->calculatePercentage($salesToday, $salesYesterday),
+            'percent'         => $this->calculatePercentage((float) $salesToday, (float) $salesYesterday),
             'profit'          => $profitToday / 100,
             'previous_profit' => $profitYesterday / 100,
         ];
@@ -77,44 +80,91 @@ class Index extends Component
     #[Computed]
     public function monthlyMetrics(): array
     {
-        $month = Carbon::now()->startOfMonth();
-        $lastMonth = Carbon::now()->subMonth()->startOfMonth();
+        $currentMonth = Carbon::now();
+        $previousMonth = Carbon::now()->subMonth();
 
-        $salesMonth = Sale::whereMonth('created_at', $month->month)
-            ->whereYear('created_at', $month->year)
+        $sales = Sale::query()
+            ->selectRaw('SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? THEN total_amount ELSE 0 END) as current_sales', [$currentMonth->month, $currentMonth->year])
+            ->selectRaw('SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? THEN total_amount ELSE 0 END) as previous_sales', [$previousMonth->month, $previousMonth->year])
+            ->where(function (Builder $q) use ($currentMonth, $previousMonth) {
+                $q->where(fn (Builder $sq) => $sq->whereMonth('created_at', $currentMonth->month)->whereYear('created_at', $currentMonth->year))
+                    ->orWhere(fn (Builder $sq) => $sq->whereMonth('created_at', $previousMonth->month)->whereYear('created_at', $previousMonth->year));
+            })
             ->where('status', SaleStatus::Paid)
-            ->sum('total_amount');
+            ->first();
 
-        $salesLastMonth = Sale::whereMonth('created_at', $lastMonth->month)
-            ->whereYear('created_at', $lastMonth->year)
-            ->where('status', SaleStatus::Paid)
-            ->sum('total_amount');
+        $profits = SaleItem::query()
+            ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
+            ->selectRaw('SUM(CASE WHEN MONTH(sales.created_at) = ? AND YEAR(sales.created_at) = ? THEN subtotal - (unit_cost * quantity) ELSE 0 END) as current_profit', [$currentMonth->month, $currentMonth->year])
+            ->selectRaw('SUM(CASE WHEN MONTH(sales.created_at) = ? AND YEAR(sales.created_at) = ? THEN subtotal - (unit_cost * quantity) ELSE 0 END) as previous_profit', [$previousMonth->month, $previousMonth->year])
+            ->where('sales.status', SaleStatus::Paid)
+            ->where(function (Builder $q) use ($currentMonth, $previousMonth) {
+                $q->where(fn (Builder $sq) => $sq->whereMonth('sales.created_at', $currentMonth->month)->whereYear('sales.created_at', $currentMonth->year))
+                    ->orWhere(fn (Builder $sq) => $sq->whereMonth('sales.created_at', $previousMonth->month)->whereYear('sales.created_at', $previousMonth->year));
+            })
+            ->first();
 
-        $profitMonth = SaleItem::whereHas('sale', fn (Builder $q) => $q->whereMonth('created_at', $month->month)
-            ->whereYear('created_at', $month->year)
-            ->where('status', SaleStatus::Paid))
-            ->select(DB::raw('SUM(subtotal - (unit_cost * quantity)) as profit'))
-            ->first()->profit ?? 0;
-
-        $profitLastMonth = SaleItem::whereHas('sale', fn (Builder $q) => $q->whereMonth('created_at', $lastMonth->month)
-            ->whereYear('created_at', $lastMonth->year)
-            ->where('status', SaleStatus::Paid))
-            ->select(DB::raw('SUM(subtotal - (unit_cost * quantity)) as profit'))
-            ->first()->profit ?? 0;
+        $salesMonth = $sales->current_sales ?? 0;
+        $salesLastMonth = $sales->previous_sales ?? 0;
+        $profitMonth = $profits->current_profit ?? 0;
+        $profitLastMonth = $profits->previous_profit ?? 0;
 
         return [
             'sales'           => $salesMonth / 100,
             'previous_sales'  => $salesLastMonth / 100,
-            'percent'         => $this->calculatePercentage($salesMonth, $salesLastMonth),
+            'percent'         => $this->calculatePercentage((float) $salesMonth, (float) $salesLastMonth),
             'profit'          => $profitMonth / 100,
             'previous_profit' => $profitLastMonth / 100,
         ];
     }
 
     #[Computed]
+    public function chartData(): array
+    {
+        $startDate = Carbon::now()->subMonths(5)->startOfMonth();
+
+        $sales = Sale::query()
+            ->selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, SUM(total_amount) as total')
+            ->where('created_at', '>=', $startDate)
+            ->where('status', SaleStatus::Paid)
+            ->groupBy('year', 'month')
+            ->get()
+            ->keyBy(fn ($item) => "{$item->getAttribute('year')}-{$item->getAttribute('month')}");
+
+        $profits = SaleItem::query()
+            ->join('sales', 'sale_items.sale_id', '=', 'sales.id')
+            ->selectRaw('MONTH(sales.created_at) as month, YEAR(sales.created_at) as year, SUM(subtotal - (unit_cost * quantity)) as total')
+            ->where('sales.created_at', '>=', $startDate)
+            ->where('sales.status', SaleStatus::Paid)
+            ->groupBy('year', 'month')
+            ->get()
+            ->keyBy(fn ($item) => "{$item->getAttribute('year')}-{$item->getAttribute('month')}");
+
+        $labels = [];
+        $salesData = [];
+        $profitData = [];
+
+        for ($i = 5; $i >= 0; $i--) {
+            $date = Carbon::now()->subMonths($i);
+            $key = "{$date->year}-{$date->month}";
+
+            $labels[] = $date->translatedFormat('M');
+            $salesData[] = round(($sales->get($key)->total ?? 0) / 100, 2);
+            $profitData[] = round(($profits->get($key)->total ?? 0) / 100, 2);
+        }
+
+        return [
+            'labels' => $labels,
+            'sales'  => $salesData,
+            'profit' => $profitData,
+        ];
+    }
+
+    #[Computed]
     public function goalMetrics(): array
     {
-        $monthlySales = $this->monthlyMetrics['sales'];
+        $monthlyMetrics = $this->monthlyMetrics();
+        $monthlySales = $monthlyMetrics['sales'];
         $target = $this->targetBalance;
 
         $percent = $target > 0 ? min(100, ($monthlySales / $target) * 100) : 0;
