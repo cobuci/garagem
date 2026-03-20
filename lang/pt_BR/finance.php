@@ -26,6 +26,7 @@ return [
         'type'        => 'Tipo',
         'description' => 'Descrição',
         'amount'      => 'Valor',
+        'title'       => 'Histórico de Atividades',
         'no_records'  => 'Nenhuma transação encontrada.',
     ],
     'actions' => [
@@ -35,11 +36,15 @@ return [
     'adjustment_modal' => [
         'title_add'    => 'Adicionar Saldo',
         'title_remove' => 'Remover Saldo',
-        'amount'       => 'Valor (em centavos)',
+        'amount'       => 'Valor',
         'description'  => 'Descrição/Motivo',
         'confirm'      => 'Salvar Ajuste',
         'cancel'       => 'Cancelar',
     ],
     'adjustment_success_title'       => 'Saldo Atualizado',
     'adjustment_success_description' => 'A movimentação de saldo foi registrada com sucesso.',
+    'cancel_adjustment_title'        => 'Cancelar Ajuste',
+    'cancel_adjustment_description'  => 'Tem certeza que deseja cancelar este ajuste? O valor será revertido no saldo.',
+    'cancel_success_title'           => 'Ajuste Cancelado',
+    'cancel_success_description'     => 'O ajuste foi cancelado e o saldo revertido com sucesso.',
 ];

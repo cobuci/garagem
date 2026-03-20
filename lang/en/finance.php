@@ -26,6 +26,7 @@ return [
         'type'        => 'Type',
         'description' => 'Description',
         'amount'      => 'Amount',
+        'title'       => 'Activity History',
         'no_records'  => 'No transactions found.',
     ],
     'actions' => [
@@ -35,11 +36,15 @@ return [
     'adjustment_modal' => [
         'title_add'    => 'Add Balance',
         'title_remove' => 'Remove Balance',
-        'amount'       => 'Amount (in cents)',
+        'amount'       => 'Amount',
         'description'  => 'Description/Reason',
         'confirm'      => 'Save Adjustment',
         'cancel'       => 'Cancel',
     ],
     'adjustment_success_title'       => 'Balance Updated',
     'adjustment_success_description' => 'The balance movement was successfully recorded.',
+    'cancel_adjustment_title'        => 'Cancel Adjustment',
+    'cancel_adjustment_description'  => 'Are you sure you want to cancel this adjustment? The amount will be reverted in the balance.',
+    'cancel_success_title'           => 'Adjustment Cancelled',
+    'cancel_success_description'     => 'The adjustment was cancelled and the balance reverted successfully.',
 ];
