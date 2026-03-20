@@ -2,7 +2,9 @@
 
 namespace App\Actions\Product;
 
+use App\Enums\TransactionType;
 use App\Models\AccountBalance;
+use App\Models\FinancialTransaction;
 use App\Models\Product;
 use App\Models\ProductPurchase;
 use Illuminate\Support\Facades\DB;
@@ -30,8 +32,16 @@ class StockMovementAction
             ]);
 
             if ($purchase->is_paid) {
-                $balance = AccountBalance::singleton();
-                $balance->decrement('current_balance', $purchase->getRawOriginal('total_cost'));
+                FinancialTransaction::query()->create([
+                    'type'             => TransactionType::Purchase,
+                    'amount'           => -(int) $purchase->getRawOriginal('total_cost'),
+                    'description'      => "Purchase of {$product->name}",
+                    'reference_id'     => $purchase->id,
+                    'reference_type'   => ProductPurchase::class,
+                    'transaction_date' => now(),
+                ]);
+
+                AccountBalance::singleton()->decrement('current_balance', $purchase->getRawOriginal('total_cost'));
             }
 
             $currentStock = $product->stock_quantity ?? 0;

@@ -38,7 +38,7 @@ class ProductPurchase extends Model
     protected static function booted(): void
     {
         static::updated(function (ProductPurchase $purchase) {
-            if ($purchase->wasChanged('is_paid') && $purchase->is_paid) {
+            if ($purchase->wasChanged('is_paid') && $purchase->is_paid && ! $purchase->wasRecentlyCreated) {
                 $totalCost = $purchase->getAttributes()['total_cost'] ?? 0;
                 AccountBalance::singleton()->decrement('current_balance', (int) $totalCost);
 
@@ -46,6 +46,22 @@ class ProductPurchase extends Model
                     'type'             => TransactionType::Purchase,
                     'amount'           => -(int) $totalCost,
                     'description'      => "Purchase of {$purchase->product->name}",
+                    'reference_id'     => $purchase->id,
+                    'reference_type'   => ProductPurchase::class,
+                    'transaction_date' => now(),
+                ]);
+            }
+        });
+
+        static::deleted(function (ProductPurchase $purchase) {
+            if ($purchase->is_paid) {
+                $totalCost = $purchase->getAttributes()['total_cost'] ?? 0;
+                AccountBalance::singleton()->increment('current_balance', (int) $totalCost);
+
+                FinancialTransaction::query()->create([
+                    'type'             => TransactionType::Purchase,
+                    'amount'           => (int) $totalCost,
+                    'description'      => "Cancelled purchase: {$purchase->product->name}",
                     'reference_id'     => $purchase->id,
                     'reference_type'   => ProductPurchase::class,
                     'transaction_date' => now(),
