@@ -55,6 +55,7 @@ return [
         'temp_min'        => 'Mín',
         'temp_max'        => 'Máx',
         'precipitation'   => 'Chuva',
+        'no_location'     => 'Localização não definida',
     ],
     'add_sale' => 'Nova Venda',
 ];

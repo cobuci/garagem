@@ -2,6 +2,7 @@
 
 return [
     'title'    => 'Configurações Gerais',
+    'settings' => 'Configurações',
     'subtitle' => 'Gerencie as configurações e informações do seu estabelecimento.',
     'sections' => [
         'fees' => [

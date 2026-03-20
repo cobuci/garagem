@@ -2,6 +2,7 @@
 
 return [
     'title'    => 'General Settings',
+    'settings' => 'Settings',
     'subtitle' => 'Manage your establishment\'s settings and information.',
     'sections' => [
         'fees' => [
