@@ -26,7 +26,7 @@ class StockMovementAction
                 'invoice_date' => $data['invoice_date'] ?? null,
                 'payment_date' => $data['payment_date'] ?? null,
                 'due_date'     => $data['due_date'] ?? null,
-                'is_paid'      => $data['payment_date'] !== null,
+                'is_paid'      => ($data['payment_date'] ?? null) !== null,
             ]);
 
             if ($purchase->is_paid) {
