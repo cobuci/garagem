@@ -40,12 +40,12 @@
             </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2 mb-4">
-            <x-button sm :outline="$type !== 'all'" :primary="$type === 'all'" wire:click="$set('type', 'all')" label="{{ __('finance.filters.all') }}" />
-            <x-button sm :outline="$type !== 'sale'" :primary="$type === 'sale'" wire:click="$set('type', 'sale')" label="{{ __('finance.filters.sale') }}" />
-            <x-button sm :outline="$type !== 'purchase'" :primary="$type === 'purchase'" wire:click="$set('type', 'purchase')" label="{{ __('finance.filters.purchase') }}" />
-            <x-button sm :outline="$type !== 'cancelled_sale'" :primary="$type === 'cancelled_sale'" wire:click="$set('type', 'cancelled_sale')" label="{{ __('finance.filters.cancelled_sale') }}" />
-            <x-button sm :outline="$type !== 'manual_adjustment'" :primary="$type === 'manual_adjustment'" wire:click="$set('type', 'manual_adjustment')" label="{{ __('finance.filters.manual_adjustment') }}" />
+        <div class="flex flex-nowrap items-center gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
+            <x-button sm :outline="$type !== 'all'" :primary="$type === 'all'" wire:click="$set('type', 'all')" label="{{ __('finance.filters.all') }}" class="flex-none whitespace-nowrap" />
+            <x-button sm :outline="$type !== 'sale'" :primary="$type === 'sale'" wire:click="$set('type', 'sale')" label="{{ __('finance.filters.sale') }}" class="flex-none whitespace-nowrap" />
+            <x-button sm :outline="$type !== 'purchase'" :primary="$type === 'purchase'" wire:click="$set('type', 'purchase')" label="{{ __('finance.filters.purchase') }}" class="flex-none whitespace-nowrap" />
+            <x-button sm :outline="$type !== 'cancelled_sale'" :primary="$type === 'cancelled_sale'" wire:click="$set('type', 'cancelled_sale')" label="{{ __('finance.filters.cancelled_sale') }}" class="flex-none whitespace-nowrap" />
+            <x-button sm :outline="$type !== 'manual_adjustment'" :primary="$type === 'manual_adjustment'" wire:click="$set('type', 'manual_adjustment')" label="{{ __('finance.filters.manual_adjustment') }}" class="flex-none whitespace-nowrap" />
         </div>
     </div>
 
@@ -59,10 +59,10 @@
 
         <div class="divide-y divide-gray-50 dark:divide-gray-700/50 overflow-y-auto flex-1">
             @forelse ($this->transactions as $transaction)
-                <div class="px-6 py-4 flex items-center justify-between hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors group">
-                    <div class="flex items-center space-x-4">
+                <div class="px-4 sm:px-6 py-4 flex items-center justify-between hover:bg-gray-50/50 dark:hover:bg-gray-700/30 transition-colors group">
+                    <div class="flex items-center space-x-3 sm:space-x-4 min-w-0 flex-1">
                         <div @class([
-                            'w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110',
+                            'w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex-none flex items-center justify-center transition-transform group-hover:scale-110',
                             'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' => $transaction->type === \App\Enums\TransactionType::Sale,
                             'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400' => in_array($transaction->type, [\App\Enums\TransactionType::Purchase, \App\Enums\TransactionType::CancelledSale]),
                             'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' => $transaction->type === \App\Enums\TransactionType::ManualAdjustment,
@@ -72,37 +72,37 @@
                                 \App\Enums\TransactionType::Purchase => 'shopping-cart',
                                 \App\Enums\TransactionType::CancelledSale => 'x-circle',
                                 \App\Enums\TransactionType::ManualAdjustment => 'adjustments-horizontal',
-                            } }}" class="w-6 h-6" />
+                            } }}" class="w-5 h-5 sm:w-6 sm:h-6" />
                         </div>
-                        <div>
-                            <p class="text-sm font-bold text-gray-900 dark:text-white">
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-bold text-gray-900 dark:text-white truncate">
                                 {{ $transaction->description }}
                             </p>
-                            <div class="flex items-center gap-2 mt-0.5">
+                            <div class="flex items-center gap-1.5 mt-0.5 overflow-hidden">
                                 <span @class([
-                                    'px-1.5 py-0.5 rounded text-[10px] font-bold uppercase',
+                                    'px-1 sm:px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-bold uppercase flex-none',
                                     'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400' => $transaction->type === \App\Enums\TransactionType::Sale,
                                     'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400' => in_array($transaction->type, [\App\Enums\TransactionType::Purchase, \App\Enums\TransactionType::CancelledSale]),
                                     'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-400' => $transaction->type === \App\Enums\TransactionType::ManualAdjustment,
                                 ])>
                                     {{ $transaction->type->label() }}
                                 </span>
-                                <span class="text-gray-300 dark:text-gray-600">•</span>
-                                <span class="text-xs font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                                    <x-icon name="clock" class="w-3 h-3" />
-                                    {{ $transaction->transaction_date->diffForHumans() }}
+                                <span class="text-gray-300 dark:text-gray-600 flex-none">•</span>
+                                <span class="text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1 truncate">
+                                    <x-icon name="clock" class="w-3 h-3 flex-none" />
+                                    <span class="truncate">{{ $transaction->transaction_date->diffForHumans() }}</span>
                                 </span>
-                                <span class="text-gray-300 dark:text-gray-600">•</span>
-                                <span class="text-[10px] font-semibold text-gray-400 uppercase">
+                                <span class="hidden sm:inline text-gray-300 dark:text-gray-600 flex-none">•</span>
+                                <span class="hidden sm:inline text-[10px] font-semibold text-gray-400 uppercase flex-none">
                                     {{ $transaction->transaction_date->format('d/m/Y H:i') }}
                                 </span>
                             </div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-4">
-                        <div class="text-right">
+                    <div class="flex items-center gap-2 sm:gap-4 ml-3 flex-none">
+                        <div class="text-right flex-none">
                             <p @class([
-                                'text-sm font-extrabold',
+                                'text-sm font-extrabold whitespace-nowrap',
                                 'text-emerald-600 dark:text-emerald-400' => $transaction->amount > 0,
                                 'text-red-600 dark:text-red-400' => $transaction->amount < 0,
                                 'text-gray-900 dark:text-white' => $transaction->amount == 0,
@@ -117,6 +117,7 @@
                                 negative
                                 wire:click="confirmCancelAdjustment({{ $transaction->id }})"
                                 title="{{ __('finance.adjustment_modal.cancel') }}"
+                                class="p-1"
                             />
                         @endif
                     </div>
