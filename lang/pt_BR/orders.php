@@ -1,7 +1,9 @@
 <?php
 
 return [
-    'history'        => 'Histórico de Compras',
+    'history'        => 'Histórico de Vendas',
+    'title'          => 'Vendas Realizadas',
+    'empty_state'    => 'Nenhuma venda encontrada no histórico.',
     'date'           => 'Data',
     'total'          => 'Total',
     'paid'           => 'Pago',

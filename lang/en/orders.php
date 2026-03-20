@@ -1,7 +1,9 @@
 <?php
 
 return [
-    'history'        => 'Purchase History',
+    'history'        => 'Sales History',
+    'title'          => 'Completed Sales',
+    'empty_state'    => 'No sales found in history.',
     'date'           => 'Date',
     'total'          => 'Total',
     'paid'           => 'Paid',
