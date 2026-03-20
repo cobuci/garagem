@@ -28,6 +28,12 @@ return [
     'finish_sale'                => 'Finalizar Venda',
     'sale_success'               => 'Venda realizada com sucesso!',
     'at_least_one_product'       => 'Adicione pelo menos um produto.',
+    'gift_applied'               => 'Brinde Aplicado',
+    'fee_deduction'              => 'Desconto (Taxa)',
+    'net_amount'                 => 'Valor Líquido',
+    'brand'                      => 'Marca',
+    'weight'                     => 'Peso',
+    'in_cart'                    => 'no carrinho',
     'payments'                   => [
         'money'       => 'Dinheiro',
         'credit_card' => 'Crédito',

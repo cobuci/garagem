@@ -28,6 +28,12 @@ return [
     'finish_sale'                => 'Finish Sale',
     'sale_success'               => 'Sale completed successfully!',
     'at_least_one_product'       => 'Add at least one product.',
+    'gift_applied'               => 'Gift Applied',
+    'fee_deduction'              => 'Deduction (Fee)',
+    'net_amount'                 => 'Net Amount',
+    'brand'                      => 'Brand',
+    'weight'                     => 'Weight',
+    'in_cart'                    => 'in cart',
     'payments'                   => [
         'money'       => 'Cash',
         'credit_card' => 'Credit Card',
