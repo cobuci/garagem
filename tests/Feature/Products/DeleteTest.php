@@ -28,7 +28,7 @@ test('it can delete a product with correct confirmation', function () {
         ->dispatch('product:delete', product: $product->id)
         ->assertSet('product.id', $product->id)
         ->assertSet('deleteModal', true)
-        ->set('confirmation', 'delete')
+        ->set('confirmation', __('products.delete_word'))
         ->call('destroy')
         ->assertSet('deleteModal', false)
         ->assertDispatched('product:updated');

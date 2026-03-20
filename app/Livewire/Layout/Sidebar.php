@@ -28,10 +28,16 @@ class Sidebar extends Component
                 'title' => __('sidebar.sales'),
                 'items' => [
                     [
+                        'label'  => __('sidebar.pos'),
+                        'icon'   => 'shopping-bag',
+                        'route'  => 'sales.create',
+                        'active' => request()->routeIs('sales.*'),
+                    ],
+                    [
                         'label'  => __('sidebar.orders'),
-                        'icon'   => 'shopping-cart',
-                        'route'  => '#',
-                        'active' => false,
+                        'icon'   => 'list-bullet',
+                        'route'  => 'orders.index',
+                        'active' => request()->routeIs('orders.*'),
                     ],
                     [
                         'label'  => __('sidebar.customers'),
