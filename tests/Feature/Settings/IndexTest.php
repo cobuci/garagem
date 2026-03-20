@@ -39,8 +39,8 @@ it('can update card fees', function () {
         ->assertHasNoErrors();
 
     $settings = Setting::singleton();
-    expect((float)$settings->credit_card_fee)->toBe(3.5)
-        ->and((float)$settings->debit_card_fee)->toBe(1.5);
+    expect((float) $settings->credit_card_fee)->toBe(3.5)
+        ->and((float) $settings->debit_card_fee)->toBe(1.5);
 });
 
 it('can update address settings', function () {

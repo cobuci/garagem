@@ -27,14 +27,14 @@ class SettingsForm extends Form
     public function rules(): array
     {
         return [
-            'store_name'      => 'nullable|string|max:255',
-            'credit_card_fee' => 'required|numeric|min:0|max:100',
-            'debit_card_fee'  => 'required|numeric|min:0|max:100',
-            'address'         => 'nullable|string|max:255',
-            'city'            => 'nullable|string|max:255',
-            'state'           => 'nullable|string|max:255',
-            'zip_code'        => 'nullable|string|max:20',
-            'locale'          => 'required|string|in:en,pt_BR',
+            'store_name'      => ['nullable', 'string', 'max:255'],
+            'credit_card_fee' => ['required', 'numeric', 'min:0', 'max:100'],
+            'debit_card_fee'  => ['required', 'numeric', 'min:0', 'max:100'],
+            'address'         => ['nullable', 'string', 'max:255'],
+            'city'            => ['nullable', 'string', 'max:255'],
+            'state'           => ['nullable', 'string', 'max:255'],
+            'zip_code'        => ['nullable', 'string', 'max:20'],
+            'locale'          => ['required', 'string'],
         ];
     }
 
