@@ -35,7 +35,7 @@
     $currentColor = $colors[$color] ?? $colors['blue'];
 @endphp
 
-<div class="relative overflow-hidden bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 group hover:shadow-md transition-shadow duration-300">
+<div class="relative overflow-hidden bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 group hover:shadow-md transition-shadow duration-300 h-full">
     <div @class(["absolute -right-4 -top-4 w-24 h-24 rounded-full group-hover:scale-110 transition-transform duration-500", $currentColor['blob']])></div>
     <div class="relative">
         <div class="flex items-center justify-between mb-4">

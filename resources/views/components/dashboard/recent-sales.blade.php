@@ -1,6 +1,6 @@
 @props(['sales'])
 
-<div class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+<div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
     <div class="px-6 py-5 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
         <div class="flex items-center gap-2">
             <x-icon name="list-bullet" class="w-5 h-5 text-gray-400" />
@@ -49,10 +49,10 @@
             </div>
         @empty
             <div class="p-12 text-center">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 dark:bg-gray-900 mb-4">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 dark:bg-gray-900 mb-4 transition-transform hover:scale-110">
                     <x-icon name="inbox" class="w-8 h-8 text-gray-300 dark:text-gray-600" />
                 </div>
-                <p class="text-gray-500 dark:text-gray-400 font-medium">Nenhuma venda registrada recentemente.</p>
+                <p class="text-gray-500 dark:text-gray-400 font-medium">{{ __('dashboard.no_recent_sales') }}</p>
             </div>
         @endforelse
     </div>

@@ -1,8 +1,7 @@
 <div>
     <x-dashboard.header :name="auth()->user()->name ?? auth()->user()->email" />
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        {{-- Total Balance Card --}}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <x-dashboard.stats-card
             :title="__('dashboard.total_balance')"
             :value="$this->totalBalance"
@@ -10,13 +9,6 @@
             color="blue"
         />
 
-        {{-- Monthly Goal Card --}}
-        <x-dashboard.goal-card
-            :target-balance="$targetBalance"
-            :goal-metrics="$this->goalMetrics"
-        />
-
-        {{-- Daily Sales Card --}}
         <x-dashboard.stats-card
             :title="__('dashboard.sales_today')"
             :value="$this->dailyMetrics['sales']"
@@ -27,7 +19,6 @@
             color="emerald"
         />
 
-        {{-- Monthly Sales Card --}}
         <x-dashboard.stats-card
             :title="__('dashboard.sales_month')"
             :value="$this->monthlyMetrics['sales']"
@@ -39,23 +30,34 @@
         />
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-        {{-- Sales Overview Chart --}}
-        <x-dashboard.chart-card :chart-data="$this->chartData" />
+    <div class="mb-8">
+        <x-dashboard.goal-card
+            :target-balance="$targetBalance"
+            :goal-metrics="$this->goalMetrics"
+        />
+    </div>
 
-        {{-- Quick Stats / Info --}}
-        <x-dashboard.performance-summary :chart-data="$this->chartData" />
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <div class="lg:col-span-2">
+            <x-dashboard.chart-card :chart-data="$this->chartData" />
+        </div>
+
+        <div class="space-y-6">
+            <x-dashboard.performance-summary :chart-data="$this->chartData" />
+        </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {{-- Recent Activities --}}
-        <x-dashboard.recent-sales :sales="$this->recentSales" />
+        <div class="lg:col-span-2">
+            <x-dashboard.recent-sales :sales="$this->recentSales" />
+        </div>
 
-        {{-- Quick Stats / Mini Cards --}}
-        <x-dashboard.performance-indicators
-            :daily-metrics="$this->dailyMetrics"
-            :monthly-metrics="$this->monthlyMetrics"
-            :chart-data="$this->chartData"
-        />
+        <div>
+            <x-dashboard.performance-indicators
+                :daily-metrics="$this->dailyMetrics"
+                :monthly-metrics="$this->monthlyMetrics"
+                :chart-data="$this->chartData"
+            />
+        </div>
     </div>
 </div>
