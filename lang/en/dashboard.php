@@ -55,6 +55,7 @@ return [
         'temp_min'        => 'Min',
         'temp_max'        => 'Max',
         'precipitation'   => 'Rain',
+        'no_location'     => 'Location not defined',
     ],
     'add_sale' => 'New Sale',
 ];

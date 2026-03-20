@@ -84,3 +84,12 @@ it('handles error if weather cannot be loaded and no history exists', function (
         ->assertSet('hasError', true)
         ->assertSee(__('dashboard.weather.error'));
 });
+
+it('shows no location if city is not set', function () {
+    Setting::query()->update(['city' => null]);
+
+    Livewire::test(WeatherCard::class)
+        ->call('loadWeather')
+        ->assertSet('noLocation', true)
+        ->assertSee(__('dashboard.weather.no_location'));
+});

@@ -3,8 +3,10 @@
 namespace Tests\Feature\Dashboard;
 
 use App\Enums\SaleStatus;
+use App\Enums\TransactionType;
 use App\Livewire\Dashboard\Index;
 use App\Models\AccountBalance;
+use App\Models\FinancialTransaction;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\User;
@@ -233,13 +235,27 @@ it('can update target balance', function () {
     expect(AccountBalance::singleton()->target_balance)->toEqual(2500.00);
 });
 
-it('lists the 6 most recent sales', function () {
-    Sale::factory()->count(10)->create(['status' => SaleStatus::Paid]);
+it('lists the 5 most recent activities', function () {
+    FinancialTransaction::query()->create([
+        'type'             => TransactionType::Sale,
+        'amount'           => 1000,
+        'description'      => 'Test Activity',
+        'transaction_date' => now(),
+    ]);
+
+    for ($i = 0; $i < 9; $i++) {
+        FinancialTransaction::query()->create([
+            'type'             => TransactionType::ManualAdjustment,
+            'amount'           => 100,
+            'description'      => "Adjustment $i",
+            'transaction_date' => now()->subMinutes($i + 1),
+        ]);
+    }
 
     $component = Livewire::test(Index::class);
-    $recentSales = $component->get('recentSales');
+    $recentActivities = $component->get('recentActivities');
 
-    expect($recentSales)->toHaveCount(6);
+    expect($recentActivities)->toHaveCount(5);
 });
 
 it('handles zero sales gracefully in percentage calculations', function () {

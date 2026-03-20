@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Casts\MoneyCast;
 use App\Enums\SaleStatus;
+use App\Enums\TransactionType;
 use Database\Factories\SaleFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -57,6 +58,15 @@ class Sale extends Model
             if ($sale->status === SaleStatus::Paid) {
                 $netAmount = $sale->getAttributes()['net_amount'] ?? 0;
                 AccountBalance::singleton()->increment('current_balance', (int) $netAmount);
+
+                FinancialTransaction::query()->create([
+                    'type'             => TransactionType::Sale,
+                    'amount'           => $netAmount,
+                    'description'      => "Sale #{$sale->id}",
+                    'reference_id'     => $sale->id,
+                    'reference_type'   => Sale::class,
+                    'transaction_date' => now(),
+                ]);
             }
         });
 
@@ -65,6 +75,15 @@ class Sale extends Model
                 if ($sale->status === SaleStatus::Paid) {
                     $netAmount = $sale->getAttributes()['net_amount'] ?? 0;
                     AccountBalance::singleton()->increment('current_balance', (int) $netAmount);
+
+                    FinancialTransaction::query()->create([
+                        'type'             => TransactionType::Sale,
+                        'amount'           => $netAmount,
+                        'description'      => "Sale #{$sale->id}",
+                        'reference_id'     => $sale->id,
+                        'reference_type'   => Sale::class,
+                        'transaction_date' => now(),
+                    ]);
                 }
 
                 if ($sale->status === SaleStatus::Cancelled) {
@@ -79,6 +98,15 @@ class Sale extends Model
                         if ($sale->getOriginal('status') === SaleStatus::Paid) {
                             $netAmount = $sale->getAttributes()['net_amount'] ?? 0;
                             AccountBalance::singleton()->decrement('current_balance', (int) $netAmount);
+
+                            FinancialTransaction::query()->create([
+                                'type'             => TransactionType::CancelledSale,
+                                'amount'           => -(int) $netAmount,
+                                'description'      => "Sale #{$sale->id} cancelled",
+                                'reference_id'     => $sale->id,
+                                'reference_type'   => Sale::class,
+                                'transaction_date' => now(),
+                            ]);
                         }
                     });
                 }

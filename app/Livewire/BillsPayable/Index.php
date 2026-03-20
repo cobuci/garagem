@@ -2,7 +2,6 @@
 
 namespace App\Livewire\BillsPayable;
 
-use App\Models\AccountBalance;
 use App\Models\ProductPurchase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -84,9 +83,6 @@ class Index extends Component
                 'is_paid'      => true,
                 'payment_date' => now(),
             ]);
-
-            $balance = AccountBalance::singleton();
-            $balance->decrement('current_balance', $this->selectedBill->getRawOriginal('total_cost'));
         });
 
         $this->js('$closeModal(\'confirmPaymentModal\')');
@@ -105,11 +101,6 @@ class Index extends Component
         }
 
         DB::transaction(function () {
-            if ($this->selectedBill->is_paid) {
-                $balance = AccountBalance::singleton();
-                $balance->increment('current_balance', $this->selectedBill->getRawOriginal('total_cost'));
-            }
-
             $product = $this->selectedBill->product;
             $product->decrement('stock_quantity', $this->selectedBill->quantity);
 

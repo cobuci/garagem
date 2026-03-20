@@ -17,6 +17,8 @@ class WeatherCard extends Component
 
     public bool $hasError = false;
 
+    public bool $noLocation = false;
+
     public function mount(): void
     {
         $this->loadWeather();
@@ -25,10 +27,12 @@ class WeatherCard extends Component
     public function loadWeather(bool $force = false): void
     {
         $this->hasError = false;
+        $this->noLocation = false;
         $city = Setting::singleton()->city;
 
         if (empty($city)) {
             $this->weather = null;
+            $this->noLocation = true;
 
             return;
         }

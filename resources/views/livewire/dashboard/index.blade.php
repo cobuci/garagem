@@ -49,7 +49,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div class="lg:col-span-2">
-            <x-dashboard.recent-sales :sales="$this->recentSales" />
+            <x-dashboard.recent-activities :activities="$this->recentActivities" />
         </div>
 
         <div>

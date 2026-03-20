@@ -4,7 +4,7 @@ namespace App\Livewire\Dashboard;
 
 use App\Enums\SaleStatus;
 use App\Models\AccountBalance;
-use App\Models\Sale;
+use App\Models\FinancialTransaction;
 use App\Models\SaleItem;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -35,11 +35,12 @@ class Index extends Component
     }
 
     #[Computed]
-    public function recentSales(): Collection
+    public function recentActivities(): Collection
     {
-        return Sale::with(['customer', 'items.product'])
-            ->latest()
-            ->limit(6)
+        return FinancialTransaction::query()
+            ->latest('transaction_date')
+            ->latest('id')
+            ->limit(5)
             ->get();
     }
 

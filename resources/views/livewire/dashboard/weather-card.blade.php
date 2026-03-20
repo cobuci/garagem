@@ -5,6 +5,12 @@
                 class="flex items-center gap-3 bg-white/50 dark:bg-gray-800/50 backdrop-blur-md px-4 py-2 rounded-2xl border border-gray-100/50 dark:border-gray-700/50 shadow-sm transition-all hover:shadow-md hover:scale-105 cursor-pointer"
                 x-on:click="$openModal('weatherHistoryModal')"
             >
+                <div class="flex items-center gap-3 pr-3 mr-3 border-r border-gray-200 dark:border-gray-700">
+                    <span class="inline-flex items-center text-sm font-bold text-gray-700 dark:text-gray-200 transition-all">
+                        <span class="w-1.5 h-1.5 mr-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                        {{ now()->translatedFormat('d M, Y') }}
+                    </span>
+                </div>
                 <div class="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-sm">
                     <x-icon :name="$this->icon" class="h-6 w-6 text-white" />
                 </div>
@@ -104,6 +110,29 @@
                 <x-button flat label="{{ __('products.cancel') }}" x-on:click="$closeModal('weatherHistoryModal')" />
             </x-slot>
         </x-modal-card>
+    @endif
+
+    @if($noLocation)
+        <div class="flex items-center gap-4 group">
+            <div class="flex items-center gap-3 bg-white/50 dark:bg-gray-800/50 backdrop-blur-md px-4 py-2 rounded-2xl border border-gray-100/50 dark:border-gray-700/50 shadow-sm transition-all hover:shadow-md hover:scale-105">
+                <div class="flex items-center gap-3 pr-3 mr-3 border-r border-gray-200 dark:border-gray-700">
+                    <span class="inline-flex items-center text-sm font-bold text-gray-700 dark:text-gray-200 transition-all">
+                        <span class="w-1.5 h-1.5 mr-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                        {{ now()->translatedFormat('d M, Y') }}
+                    </span>
+                </div>
+                <div class="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-sm">
+                    <x-icon name="map-pin" class="h-6 w-6 text-white" />
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-tight">{{ __('dashboard.weather.no_location') }}</span>
+                    <a href="{{ route('settings.index') }}" wire:navigate class="text-[10px] font-bold text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 uppercase tracking-tight flex items-center gap-1 mt-0.5 transition-colors">
+                        {{ __('settings.settings') }}
+                        <x-icon name="arrow-right" class="h-3 w-3" />
+                    </a>
+                </div>
+            </div>
+        </div>
     @endif
 
     @if($hasError)
