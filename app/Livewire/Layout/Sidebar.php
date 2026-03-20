@@ -56,6 +56,12 @@ class Sidebar extends Component
                         'route'  => 'products.index',
                         'active' => request()->routeIs('products.*'),
                     ],
+                    [
+                        'label'  => __('sidebar.bills_payable'),
+                        'icon'   => 'banknotes',
+                        'route'  => 'bills-payable.index',
+                        'active' => request()->routeIs('bills-payable.*'),
+                    ],
                 ],
             ],
         ];

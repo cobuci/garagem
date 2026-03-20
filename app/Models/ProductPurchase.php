@@ -3,9 +3,21 @@
 namespace App\Models;
 
 use App\Casts\MoneyCast;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int     $id
+ * @property int     $product_id
+ * @property int     $quantity
+ * @property int     $unit_cost
+ * @property int     $total_cost
+ * @property ?Carbon $invoice_date
+ * @property ?Carbon $payment_date
+ * @property ?Carbon $due_date
+ * @property bool    $is_paid
+ */
 class ProductPurchase extends Model
 {
     protected $guarded = ['id'];
@@ -18,6 +30,7 @@ class ProductPurchase extends Model
             'invoice_date' => 'date',
             'payment_date' => 'date',
             'due_date'     => 'date',
+            'is_paid'      => 'boolean',
         ];
     }
 
