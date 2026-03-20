@@ -38,5 +38,14 @@ return [
             'due_date'    => 'Due Date',
             'confirm'     => 'Confirm Payment',
         ],
+        'cancel'                     => 'Cancel',
+        'confirm_cancellation'       => 'Confirm cancellation of this bill?',
+        'cancel_success_title'       => 'Bill Cancelled',
+        'cancel_success_description' => 'The bill has been cancelled and stock adjusted.',
+        'cancel_modal'               => [
+            'title'       => 'Cancel Bill',
+            'description' => 'Are you sure you want to cancel this bill? Stock will be reduced and, if the bill is already paid, the balance will be reversed.',
+            'confirm'     => 'Confirm Cancellation',
+        ],
     ],
 ];

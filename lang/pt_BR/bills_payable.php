@@ -38,5 +38,14 @@ return [
             'due_date'    => 'Vencimento',
             'confirm'     => 'Confirmar Pagamento',
         ],
+        'cancel'                     => 'Cancelar',
+        'confirm_cancellation'       => 'Confirmar cancelamento desta conta?',
+        'cancel_success_title'       => 'Conta Cancelada',
+        'cancel_success_description' => 'A conta foi cancelada e o estoque ajustado.',
+        'cancel_modal'               => [
+            'title'       => 'Cancelar Conta',
+            'description' => 'Tem certeza que deseja cancelar esta conta? O estoque será reduzido e, se a conta já estiver paga, o saldo será estornado.',
+            'confirm'     => 'Confirmar Cancelamento',
+        ],
     ],
 ];
