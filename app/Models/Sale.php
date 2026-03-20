@@ -20,11 +20,32 @@ class Sale extends Model
     protected function casts(): array
     {
         return [
-            'total_amount'    => MoneyCast::class,
-            'discount_amount' => MoneyCast::class,
-            'is_gift'         => 'boolean',
-            'status'          => SaleStatus::class,
+            'total_amount'         => MoneyCast::class,
+            'discount_amount'      => MoneyCast::class,
+            'fee_amount'           => MoneyCast::class,
+            'fee_percentage'       => 'float',
+            'pass_fee_to_customer' => 'boolean',
+            'net_amount'           => MoneyCast::class,
+            'is_gift'              => 'boolean',
+            'status'               => SaleStatus::class,
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::created(function (Sale $sale) {
+            if ($sale->status === SaleStatus::Paid) {
+                $netAmount = $sale->getAttributes()['net_amount'] ?? 0;
+                AccountBalance::singleton()->increment('current_balance', (int) $netAmount);
+            }
+        });
+
+        static::updated(function (Sale $sale) {
+            if ($sale->wasChanged('status') && $sale->status === SaleStatus::Paid) {
+                $netAmount = $sale->getAttributes()['net_amount'] ?? 0;
+                AccountBalance::singleton()->increment('current_balance', (int) $netAmount);
+            }
+        });
     }
 
     public function customer(): BelongsTo
