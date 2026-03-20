@@ -1,15 +1,38 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
       x-data="{
-        darkMode: localStorage.getItem('darkMode') === 'true'
+        darkMode: localStorage.getItem('darkMode') === 'true' ||
+                 (!('darkMode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
       }"
-      x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))"
+      x-init="
+          $watch('darkMode', val => {
+              localStorage.setItem('darkMode', val);
+              if (val) {
+                  document.documentElement.classList.add('dark');
+              } else {
+                  document.documentElement.classList.remove('dark');
+              }
+          })
+      "
       :class="{ 'dark': darkMode }">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <title>{{ $title ?? config('app.name') }}</title>
+
+        <script>
+            function applyDarkMode() {
+                if (localStorage.getItem('darkMode') === 'true' ||
+                    (!('darkMode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            }
+            applyDarkMode();
+            document.addEventListener('livewire:navigated', applyDarkMode);
+        </script>
 
         <wireui:scripts />
         @vite(['resources/css/app.css', 'resources/js/app.js'])
