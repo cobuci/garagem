@@ -37,7 +37,7 @@ return [
     'delete'             => 'Excluir Produto',
     'delete_confirm'     => 'Tem certeza que deseja excluir o produto :product?',
     'delete_instruction' => 'Para confirmar a exclusão, digite a palavra :word abaixo.',
-    'delete_word'        => 'delete',
+    'delete_word'        => 'excluir',
     'success_deleted'    => 'Produto excluído com sucesso!',
     'delete_incorrect'   => 'A palavra de confirmação está incorreta.',
     'add_stock'          => 'Adicionar Estoque',
