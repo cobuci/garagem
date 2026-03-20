@@ -8,6 +8,7 @@ use App\Livewire\Login;
 use App\Livewire\Orders\Index as OrdersIndex;
 use App\Livewire\Products\Index as ProductsIndex;
 use App\Livewire\Sales\Create as SalesCreate;
+use App\Livewire\Sales\Index as SalesIndex;
 use App\Livewire\Settings\Index as SettingsIndex;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/customers', CustomersIndex::class)->name('customers.index');
     Route::get('/customers/{customer}', CustomersShow::class)->name('customers.show');
     Route::get('/products', ProductsIndex::class)->name('products.index');
+    Route::get('/sales', SalesIndex::class)->name('sales.index');
     Route::get('/sales/create', SalesCreate::class)->name('sales.create');
     Route::get('/orders', OrdersIndex::class)->name('orders.index');
     Route::get('/bills-payable', BillsPayableIndex::class)->name('bills-payable.index');

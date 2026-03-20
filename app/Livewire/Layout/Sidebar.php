@@ -31,13 +31,13 @@ class Sidebar extends Component
                         'label'  => __('sidebar.pos'),
                         'icon'   => 'shopping-bag',
                         'route'  => 'sales.create',
-                        'active' => request()->routeIs('sales.*'),
+                        'active' => request()->routeIs('sales.create'),
                     ],
                     [
                         'label'  => __('sidebar.orders'),
                         'icon'   => 'list-bullet',
-                        'route'  => 'orders.index',
-                        'active' => request()->routeIs('orders.*'),
+                        'route'  => 'sales.index',
+                        'active' => request()->routeIs('sales.index'),
                     ],
                     [
                         'label'  => __('sidebar.customers'),

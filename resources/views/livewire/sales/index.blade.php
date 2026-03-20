@@ -1,0 +1,9 @@
+<div class="space-y-6 flex flex-col min-h-0 w-full max-w-full">
+    @include('livewire.sales.components.stats', ['totalPendingAmount' => $this->totalPendingAmount])
+    @include('livewire.sales.components.filters', ['status' => $status])
+    @include('livewire.sales.components.table', ['sales' => $this->sales])
+
+    @include('livewire.sales.components.details-modal', ['selectedSale' => $this->selectedSale])
+    @include('livewire.sales.components.confirm-payment-modal', ['selectedSale' => $this->selectedSale])
+    @include('livewire.sales.components.confirm-cancel-modal', ['selectedSale' => $this->selectedSale])
+</div>
