@@ -122,3 +122,56 @@ it('shows correct summary values', function () {
         ->assertSet('summary.overdue', 100.00)
         ->assertSet('summary.next_month', 200.00);
 });
+
+it('can cancel a pending bill and decrement stock', function () {
+    $this->actingAs($this->user);
+    $product = Product::factory()->create(['stock_quantity' => 10]);
+    $purchase = ProductPurchase::create([
+        'product_id' => $product->id,
+        'quantity'   => 5,
+        'unit_cost'  => 100.00,
+        'total_cost' => 500.00,
+        'due_date'   => now()->addDays(5)->toDateString(),
+        'is_paid'    => false,
+    ]);
+
+    Livewire::test(Index::class)
+        ->call('confirmCancellation', $purchase->id)
+        ->assertSet('selectedBill.id', $purchase->id)
+        ->call('cancelBill')
+        ->assertHasNoErrors()
+        ->assertSet('selectedBill', null);
+
+    expect(ProductPurchase::find($purchase->id))->toBeNull();
+    $product->refresh();
+    expect($product->stock_quantity)->toBe(5);
+
+    $this->balance->refresh();
+    expect($this->balance->getRawOriginal('current_balance'))->toBe(100000); // 1000.00 unchanged
+});
+
+it('can cancel a paid bill, decrement stock and restore balance', function () {
+    $this->actingAs($this->user);
+    $product = Product::factory()->create(['stock_quantity' => 10]);
+    $purchase = ProductPurchase::create([
+        'product_id'   => $product->id,
+        'quantity'     => 5,
+        'unit_cost'    => 100.00,
+        'total_cost'   => 500.00,
+        'payment_date' => now()->toDateString(),
+        'due_date'     => now()->toDateString(),
+        'is_paid'      => true,
+    ]);
+
+    Livewire::test(Index::class)
+        ->call('confirmCancellation', $purchase->id)
+        ->call('cancelBill')
+        ->assertHasNoErrors();
+
+    expect(ProductPurchase::find($purchase->id))->toBeNull();
+    $product->refresh();
+    expect($product->stock_quantity)->toBe(5);
+
+    $this->balance->refresh();
+    expect($this->balance->getRawOriginal('current_balance'))->toBe(150000); // 1000.00 + 500.00
+});
