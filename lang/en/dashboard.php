@@ -19,4 +19,8 @@ return [
     'today'             => 'Today',
     'month'             => 'This Month',
     'sales'             => 'Sales',
+    'monthly_goal'      => 'Monthly Goal',
+    'set_goal'          => 'Set Monthly Goal',
+    'goal_reached'      => 'Goal reached!',
+    'remaining_to_goal' => ':amount remaining',
 ];

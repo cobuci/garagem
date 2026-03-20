@@ -19,4 +19,8 @@ return [
     'today'             => 'Hoje',
     'month'             => 'Este Mês',
     'sales'             => 'Vendas',
+    'monthly_goal'      => 'Meta Mensal',
+    'set_goal'          => 'Definir Meta Mensal',
+    'goal_reached'      => 'Meta alcançada!',
+    'remaining_to_goal' => 'Faltam :amount',
 ];

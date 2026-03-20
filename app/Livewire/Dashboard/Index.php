@@ -16,6 +16,18 @@ use Livewire\Component;
 
 class Index extends Component
 {
+    public float $targetBalance;
+
+    public function mount(): void
+    {
+        $this->targetBalance = AccountBalance::singleton()->target_balance;
+    }
+
+    public function updateTargetBalance(): void
+    {
+        AccountBalance::singleton()->update(['target_balance' => $this->targetBalance]);
+    }
+
     #[Computed]
     public function totalBalance(): float
     {
@@ -96,6 +108,23 @@ class Index extends Component
             'percent'         => $this->calculatePercentage($salesMonth, $salesLastMonth),
             'profit'          => $profitMonth / 100,
             'previous_profit' => $profitLastMonth / 100,
+        ];
+    }
+
+    #[Computed]
+    public function goalMetrics(): array
+    {
+        $monthlySales = $this->monthlyMetrics['sales'];
+        $target = $this->targetBalance;
+
+        $percent = $target > 0 ? min(100, ($monthlySales / $target) * 100) : 0;
+        $remaining = max(0, $target - $monthlySales);
+
+        return [
+            'target'    => $target,
+            'percent'   => $percent,
+            'remaining' => $remaining,
+            'reached'   => $monthlySales >= $target && $target > 0,
         ];
     }
 
