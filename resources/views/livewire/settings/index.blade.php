@@ -33,11 +33,21 @@
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('settings.sections.general.title') }}</h2>
                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('settings.sections.general.description') }}</p>
             </div>
-            <div class="p-6">
+            <div class="p-6 space-y-6">
                 <x-input
                     wire:model="form.store_name"
                     label="{{ __('settings.sections.general.store_name') }}"
                     placeholder="{{ __('settings.sections.general.store_name_placeholder') }}"
+                />
+
+                <x-select
+                    wire:model="form.skipped_categories"
+                    label="{{ __('Categorias Ignoradas') }}"
+                    placeholder="{{ __('Selecione as categorias que não entrarão nos cálculos') }}"
+                    multiselect
+                    :options="$this->categories"
+                    option-label="name"
+                    option-value="id"
                 />
             </div>
         </div>

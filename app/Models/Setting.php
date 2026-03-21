@@ -18,6 +18,7 @@ use Illuminate\Support\Carbon;
  * @property ?string $zip_code
  * @property ?Carbon $created_at
  * @property ?Carbon $updated_at
+ * @property array   $skipped_categories
  */
 class Setting extends Model
 {
@@ -25,6 +26,13 @@ class Setting extends Model
     use HasFactory;
 
     protected $guarded = ['id'];
+
+    protected function casts(): array
+    {
+        return [
+            'skipped_categories' => 'array',
+        ];
+    }
 
     public static function singleton(): self
     {
