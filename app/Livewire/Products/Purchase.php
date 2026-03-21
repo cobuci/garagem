@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Products;
 
+use App\Enums\Permission;
 use App\Livewire\Forms\Products\PurchaseForm;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
@@ -14,6 +16,7 @@ use WireUi\Traits\WireUiActions;
 
 class Purchase extends Component
 {
+    use AuthorizesRequests;
     use WireUiActions;
 
     public PurchaseForm $form;
@@ -28,6 +31,8 @@ class Purchase extends Component
     #[On('purchase:open')]
     public function openDrawer(): void
     {
+        $this->authorize(Permission::CreateProductPurchase->value);
+
         $this->purchaseDrawer = true;
     }
 
@@ -90,6 +95,8 @@ class Purchase extends Component
 
     public function save(): void
     {
+        $this->authorize(Permission::CreateProductPurchase->value);
+
         $this->form->store();
 
         $this->purchaseDrawer = false;

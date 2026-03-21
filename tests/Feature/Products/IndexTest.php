@@ -1,10 +1,15 @@
 <?php
 
+use App\Enums\Permission;
 use App\Livewire\Products\Create;
+use App\Livewire\Products\Delete;
+use App\Livewire\Products\Edit;
 use App\Livewire\Products\Index;
+use App\Livewire\Products\Purchase;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -14,7 +19,9 @@ use function Pest\Laravel\get;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    $this->seed(RolesAndPermissionsSeeder::class);
     $this->user = User::factory()->create();
+    $this->user->givePermissionTo(Permission::ViewProduct->value);
     config(['wireui.style.icon' => 'outline']);
 });
 
@@ -23,12 +30,47 @@ test('it redirects guests to login', function () {
         ->assertRedirect(route('login'));
 });
 
-test('it renders the products index page for authenticated users', function () {
+test('it returns 403 for users without permission', function () {
+    $user = User::factory()->create();
+
+    actingAs($user)
+        ->get(route('products.index'))
+        ->assertForbidden();
+});
+
+test('it renders the products index page for authorized users', function () {
     actingAs($this->user)
         ->get(route('products.index'))
         ->assertOk()
-        ->assertSeeLivewire(Index::class)
-        ->assertSeeLivewire(Create::class);
+        ->assertSeeLivewire(Index::class);
+});
+
+test('it shows action components only to users with permissions', function () {
+    $userWithViewOnly = User::factory()->create();
+    $userWithViewOnly->givePermissionTo(Permission::ViewProduct->value);
+
+    actingAs($userWithViewOnly)
+        ->get(route('products.index'))
+        ->assertDontSeeLivewire(Create::class)
+        ->assertDontSeeLivewire(Edit::class)
+        ->assertDontSeeLivewire(Delete::class)
+        ->assertDontSeeLivewire(Purchase::class);
+
+    $userWithAllPermissions = User::factory()->create();
+    $userWithAllPermissions->givePermissionTo([
+        Permission::ViewProduct->value,
+        Permission::CreateProduct->value,
+        Permission::EditProduct->value,
+        Permission::DeleteProduct->value,
+        Permission::CreateProductPurchase->value,
+    ]);
+
+    actingAs($userWithAllPermissions)
+        ->get(route('products.index'))
+        ->assertSeeLivewire(Create::class)
+        ->assertSeeLivewire(Edit::class)
+        ->assertSeeLivewire(Delete::class)
+        ->assertSeeLivewire(Purchase::class);
 });
 
 test('it defaults to latest products tab (ID 0) on mount', function () {

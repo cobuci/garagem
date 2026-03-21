@@ -1,17 +1,30 @@
 <?php
 
+use App\Enums\Permission;
 use App\Livewire\Products\Create;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    $this->seed(RolesAndPermissionsSeeder::class);
     $this->user = User::factory()->create();
+    $this->user->givePermissionTo(Permission::CreateProduct->value);
     config(['wireui.style.icon' => 'outline']);
+});
+
+test('it returns 403 when creating a product without permission', function () {
+    $userWithoutPermission = User::factory()->create();
+
+    Livewire::actingAs($userWithoutPermission)
+        ->test(Create::class)
+        ->call('create')
+        ->assertForbidden();
 });
 
 test('it can create a product with all fields', function () {

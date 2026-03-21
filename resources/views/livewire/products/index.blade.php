@@ -8,18 +8,29 @@
             </div>
 
             <div class="flex items-center gap-2 sm:justify-end">
-                <div>
-                    <livewire:products.purchase/>
-                </div>
-                <div>
-                    <livewire:products.create/>
-                </div>
-                <div>
-                    <livewire:products.edit/>
-                </div>
-                <div>
-                    <livewire:products.delete/>
-                </div>
+                @can(\App\Enums\Permission::CreateProductPurchase->value)
+                    <div>
+                        <livewire:products.purchase/>
+                    </div>
+                @endcan
+
+                @can(\App\Enums\Permission::CreateProduct->value)
+                    <div>
+                        <livewire:products.create/>
+                    </div>
+                @endcan
+
+                @can(\App\Enums\Permission::EditProduct->value)
+                    <div>
+                        <livewire:products.edit/>
+                    </div>
+                @endcan
+
+                @can(\App\Enums\Permission::DeleteProduct->value)
+                    <div>
+                        <livewire:products.delete/>
+                    </div>
+                @endcan
 
                 <x-button
                     sm
@@ -134,19 +145,24 @@
                                 </span>
                         </td>
                         <td class="px-6 py-4 text-right flex justify-end gap-2">
-                            <x-button
-                                xs
-                                flat
-                                icon="pencil"
-                                x-on:click="$dispatch('product:edit', { product: {{ $product->id }} })"
-                            />
-                            <x-button
-                                xs
-                                flat
-                                negative
-                                icon="trash"
-                                x-on:click="$dispatch('product:delete', { product: {{ $product->id }} })"
-                            />
+                            @can(\App\Enums\Permission::EditProduct->value)
+                                <x-button
+                                    xs
+                                    flat
+                                    icon="pencil"
+                                    x-on:click="$dispatch('product:edit', { product: {{ $product->id }} })"
+                                />
+                            @endcan
+
+                            @can(\App\Enums\Permission::DeleteProduct->value)
+                                <x-button
+                                    xs
+                                    flat
+                                    negative
+                                    icon="trash"
+                                    x-on:click="$dispatch('product:delete', { product: {{ $product->id }} })"
+                                />
+                            @endcan
                         </td>
                     </tr>
                 @empty

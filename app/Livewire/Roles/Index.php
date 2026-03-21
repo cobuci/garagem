@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Roles;
 
+use App\Enums\Permission as PermissionEnum;
 use App\Livewire\Forms\Roles\RoleForm;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
@@ -17,6 +19,7 @@ use WireUi\Traits\WireUiActions;
  */
 class Index extends Component
 {
+    use AuthorizesRequests;
     use WireUiActions;
 
     public RoleForm $form;
@@ -29,6 +32,8 @@ class Index extends Component
 
     public function mount(): void
     {
+        $this->authorize(PermissionEnum::ViewRole->value);
+
         if ($this->roles->count() > 0) {
             $this->selectRole($this->roles->first()->id);
         }
@@ -60,6 +65,8 @@ class Index extends Component
 
     public function savePermissions(): void
     {
+        $this->authorize(PermissionEnum::EditRole->value);
+
         $role = Role::findById($this->selectedRoleId);
 
         if ($role->name === 'admin') {
@@ -83,6 +90,8 @@ class Index extends Component
 
     public function saveRole(): void
     {
+        $this->authorize(PermissionEnum::CreateRole->value);
+
         $role = $this->form->store();
 
         $this->showDrawer = false;

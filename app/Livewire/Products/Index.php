@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Products;
 
+use App\Enums\Permission;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Pagination\Paginator;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
@@ -16,6 +18,7 @@ use WireUi\Traits\WireUiActions;
 
 class Index extends Component
 {
+    use AuthorizesRequests;
     use WireUiActions;
     use WithPagination;
 
@@ -23,6 +26,8 @@ class Index extends Component
 
     public function mount(): void
     {
+        $this->authorize(Permission::ViewProduct->value);
+
         $this->selectedCategoryId = 0;
     }
 

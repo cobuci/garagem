@@ -48,4 +48,8 @@ enum Permission: string
     case CreateAccountBalance = 'create account_balance';
     case EditAccountBalance = 'edit account_balance';
     case DeleteAccountBalance = 'delete account_balance';
+    case ViewRole = 'view role';
+    case CreateRole = 'create role';
+    case EditRole = 'edit role';
+    case DeleteRole = 'delete role';
 }

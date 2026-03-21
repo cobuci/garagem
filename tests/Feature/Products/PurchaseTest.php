@@ -1,20 +1,36 @@
 <?php
 
-namespace Tests\Feature\Products;
-
+use App\Enums\Permission;
 use App\Livewire\Products\Purchase;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductPurchase;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    $this->seed(RolesAndPermissionsSeeder::class);
     $this->user = User::factory()->create();
+    $this->user->givePermissionTo(Permission::CreateProductPurchase->value);
     config(['wireui.style.icon' => 'outline']);
+});
+
+test('it returns 403 when purchasing a product without permission', function () {
+    $userWithoutPermission = User::factory()->create();
+
+    Livewire::actingAs($userWithoutPermission)
+        ->test(Purchase::class)
+        ->call('openDrawer')
+        ->assertForbidden();
+
+    Livewire::actingAs($userWithoutPermission)
+        ->test(Purchase::class)
+        ->call('save')
+        ->assertForbidden();
 });
 
 test('it can record a product purchase and update stock', function () {

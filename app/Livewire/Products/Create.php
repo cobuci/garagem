@@ -2,9 +2,11 @@
 
 namespace App\Livewire\Products;
 
+use App\Enums\Permission;
 use App\Livewire\Forms\Products\ProductForm;
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -12,6 +14,7 @@ use WireUi\Traits\WireUiActions;
 
 class Create extends Component
 {
+    use AuthorizesRequests;
     use WireUiActions;
 
     public ProductForm $form;
@@ -26,6 +29,8 @@ class Create extends Component
 
     public function create(): void
     {
+        $this->authorize(Permission::CreateProduct->value);
+
         $this->form->store();
 
         $this->createDrawer = false;
