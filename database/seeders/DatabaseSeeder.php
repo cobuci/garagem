@@ -26,11 +26,5 @@ class DatabaseSeeder extends Seeder
             'name'  => 'Common User',
             'email' => 'user@example.com',
         ])->assignRole('user');
-
-        $this->call([
-            CustomerSeeder::class,
-            CategoryProductSeeder::class,
-            SaleSeeder::class,
-        ]);
     }
 }
