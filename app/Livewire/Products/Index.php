@@ -25,11 +25,14 @@ class Index extends Component
 
     public ?int $selectedCategoryId = null;
 
+    public array $skippedCategories = [];
+
     public function mount(): void
     {
         $this->authorize(Permission::ViewProduct->value);
 
         $this->selectedCategoryId = 0;
+        $this->skippedCategories = Setting::singleton()->skipped_categories ?? [];
     }
 
     #[Computed]
@@ -41,10 +44,8 @@ class Index extends Component
     #[Computed]
     public function stats(): array
     {
-        $skippedCategories = Setting::singleton()->skipped_categories ?? [];
-
         $stats = Product::query()
-            ->when(! empty($skippedCategories), fn ($query) => $query->whereNotIn('category_id', $skippedCategories))
+            ->when(! empty($this->skippedCategories), fn ($query) => $query->whereNotIn('category_id', $this->skippedCategories))
             ->where('stock_quantity', '>', 0)
             ->selectRaw('SUM(unit_cost * stock_quantity) as total_cost')
             ->selectRaw('SUM(sale_price * stock_quantity) as total_sale')
