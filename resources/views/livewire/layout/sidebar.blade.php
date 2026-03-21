@@ -34,6 +34,10 @@
                             <x-icon name="cog-6-tooth" class="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
                             {{ __('sidebar.settings') }}
                         </a>
+                        <a href="{{ route('roles.index') }}" wire:navigate class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                            <x-icon name="shield-check" class="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
+                            {{ __('sidebar.roles') }}
+                        </a>
                         <button wire:click="logout" class="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 border-none bg-transparent cursor-pointer">
                             <x-icon name="arrow-left-on-rectangle" class="mr-3 h-5 w-5 text-red-400" />
                             {{ __('sidebar.logout') }}
@@ -122,6 +126,10 @@
                         <a href="{{ route('settings.index') }}" wire:navigate class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
                             <x-icon name="cog-6-tooth" class="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
                             {{ __('sidebar.settings') }}
+                        </a>
+                        <a href="{{ route('roles.index') }}" wire:navigate class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <x-icon name="shield-check" class="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
+                            {{ __('sidebar.roles') }}
                         </a>
                         <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
                         <button wire:click="logout" class="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 border-none bg-transparent cursor-pointer">
