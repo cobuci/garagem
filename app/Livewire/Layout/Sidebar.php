@@ -22,6 +22,23 @@ class Sidebar extends Component
                         'route'  => 'dashboard',
                         'active' => request()->routeIs('dashboard'),
                     ],
+                    [
+                        'label'  => __('sidebar.recent_activities'),
+                        'icon'   => 'list-bullet',
+                        'route'  => 'recent-activities.index',
+                        'active' => request()->routeIs('recent-activities.*'),
+                    ],
+                ],
+            ],
+            [
+                'title' => __('sidebar.customers_category'),
+                'items' => [
+                    [
+                        'label'  => __('sidebar.customers'),
+                        'icon'   => 'users',
+                        'route'  => 'customers.index',
+                        'active' => request()->routeIs('customers.*'),
+                    ],
                 ],
             ],
             [
@@ -33,22 +50,10 @@ class Sidebar extends Component
                         'route'  => 'products.index',
                         'active' => request()->routeIs('products.*'),
                     ],
-                    [
-                        'label'  => __('sidebar.bills_payable'),
-                        'icon'   => 'banknotes',
-                        'route'  => 'bills-payable.index',
-                        'active' => request()->routeIs('bills-payable.*'),
-                    ],
-                    [
-                        'label'  => __('sidebar.recent_activities'),
-                        'icon'   => 'list-bullet',
-                        'route'  => 'recent-activities.index',
-                        'active' => request()->routeIs('recent-activities.*'),
-                    ],
                 ],
             ],
             [
-                'title' => __('sidebar.sales'),
+                'title' => __('sidebar.finance'),
                 'items' => [
                     [
                         'label'  => __('sidebar.pos'),
@@ -63,11 +68,16 @@ class Sidebar extends Component
                         'active' => request()->routeIs('sales.index'),
                     ],
                     [
-                        'label'  => __('sidebar.customers'),
-                        'icon'   => 'users',
-                        'route'  => 'customers.index',
-                        'active' => request()->routeIs('customers.*'),
+                        'label'  => __('sidebar.bills_payable'),
+                        'icon'   => 'banknotes',
+                        'route'  => 'bills-payable.index',
+                        'active' => request()->routeIs('bills-payable.*'),
                     ],
+                ],
+            ],
+            [
+                'title' => __('sidebar.reports_category'),
+                'items' => [
                     [
                         'label'  => __('sidebar.reports'),
                         'icon'   => 'chart-bar',

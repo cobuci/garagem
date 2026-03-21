@@ -19,8 +19,10 @@ it('renders the sidebar component', function () {
     Livewire::test('layout.sidebar')
         ->assertSee('Custom Store')
         ->assertSee(__('sidebar.dashboard'))
-        ->assertSee(__('sidebar.sales'))
-        ->assertSee(__('sidebar.settings'))
+        ->assertSee(__('sidebar.customers_category'))
+        ->assertSee(__('sidebar.finance'))
+        ->assertSee(__('sidebar.pos'))
+        ->assertSee(__('sidebar.orders'))
         ->assertSee(__('sidebar.logout'))
         ->assertSee(__('sidebar.dark_mode'));
 });
