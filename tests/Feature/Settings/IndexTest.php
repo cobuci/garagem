@@ -72,11 +72,11 @@ it('can update language preference', function () {
 
     Livewire::test(Index::class)
         ->set('form.locale', 'en')
-        ->call('save')
         ->assertRedirect(route('settings.index'));
 
     $this->user->refresh();
     expect($this->user->locale)->toBe('en');
+    expect(session()->get('locale'))->toBe('en');
 });
 
 it('applies user locale from session or user model', function () {

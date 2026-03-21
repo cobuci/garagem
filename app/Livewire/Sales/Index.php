@@ -3,9 +3,11 @@
 namespace App\Livewire\Sales;
 
 use App\Enums\SaleStatus;
+use App\Jobs\GenerateInvoiceJob;
 use App\Models\Sale;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -130,6 +132,22 @@ class Index extends Component
         $this->showDetailsModal = false;
         $this->showConfirmCancelModal = false;
         $this->notification()->success(__('sales.cancel_sale_success'));
+    }
+
+    public function downloadInvoice(int $saleId)
+    {
+        $sale = Sale::find($saleId);
+
+        if (! $sale) {
+            return;
+        }
+
+        if ($sale->invoice_status === 'ready' && $sale->invoice_path && Storage::exists($sale->invoice_path)) {
+            return Storage::download($sale->invoice_path, "{$sale->id}.pdf");
+        }
+
+        $sale->update(['invoice_status' => 'generating']);
+        GenerateInvoiceJob::dispatch($sale);
     }
 
     public function render(): View

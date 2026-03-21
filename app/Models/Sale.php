@@ -26,6 +26,8 @@ use Illuminate\Support\Facades\DB;
  * @property float      $net_amount
  * @property bool       $is_gift
  * @property SaleStatus $status
+ * @property string     $invoice_status
+ * @property ?string    $invoice_path
  * @property ?Carbon    $created_at
  * @property ?Carbon    $updated_at
  * @property-read ?Customer $customer
