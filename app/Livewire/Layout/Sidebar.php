@@ -71,8 +71,8 @@ class Sidebar extends Component
                     [
                         'label'  => __('sidebar.reports'),
                         'icon'   => 'chart-bar',
-                        'route'  => '#',
-                        'active' => false,
+                        'route'  => 'reports.index',
+                        'active' => request()->routeIs('reports.*'),
                     ],
                 ],
             ],

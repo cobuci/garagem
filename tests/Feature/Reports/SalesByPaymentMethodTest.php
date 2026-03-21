@@ -1,0 +1,111 @@
+<?php
+
+namespace Tests\Feature\Reports;
+
+use App\Enums\SaleStatus;
+use App\Livewire\Reports\SalesByPaymentMethod;
+use App\Models\Product;
+use App\Models\Sale;
+use App\Models\User;
+use Illuminate\Support\Carbon;
+use Livewire\Livewire;
+
+use function Pest\Laravel\actingAs;
+
+test('it can load sales by payment method for the last 30 days', function () {
+    $user = User::factory()->create();
+    actingAs($user);
+
+    Sale::query()->delete();
+
+    $product = Product::factory()->create();
+
+    $sale1 = Sale::factory()->create([
+        'status'          => SaleStatus::Paid,
+        'payment_method'  => 'pix',
+        'discount_amount' => 0,
+        'created_at'      => now(),
+    ]);
+    $sale1->items()->delete();
+    $sale1->items()->create([
+        'product_id' => $product->id,
+        'quantity'   => 1,
+        'unit_price' => 15000,
+        'unit_cost'  => 10000,
+        'subtotal'   => 15000,
+    ]);
+    $sale1->update(['total_amount' => 15000]);
+
+    $sale2 = Sale::factory()->create([
+        'status'          => SaleStatus::Paid,
+        'payment_method'  => 'credit_card',
+        'discount_amount' => 0,
+        'created_at'      => now(),
+    ]);
+    $sale2->items()->delete();
+    $sale2->items()->create([
+        'product_id' => $product->id,
+        'quantity'   => 1,
+        'unit_price' => 20000,
+        'unit_cost'  => 10000,
+        'subtotal'   => 20000,
+    ]);
+    $sale2->update(['total_amount' => 20000]);
+
+    Livewire::test(SalesByPaymentMethod::class)
+        ->assertSet('period', 'last_30_days')
+        ->assertSet('chartData.series', [200.0, 150.0])
+        ->assertSet('chartData.labels', [
+            __('reports.payment_methods.credit_card'),
+            __('reports.payment_methods.pix'),
+        ]);
+});
+
+test('it filters by period for payment methods', function () {
+    $user = User::factory()->create();
+    actingAs($user);
+
+    Sale::query()->delete();
+
+    $product = Product::factory()->create();
+
+    // Sale today
+    $sale1 = Sale::factory()->create([
+        'status'          => SaleStatus::Paid,
+        'payment_method'  => 'pix',
+        'discount_amount' => 0,
+        'created_at'      => now(),
+    ]);
+    $sale1->items()->delete();
+    $sale1->items()->create([
+        'product_id' => $product->id,
+        'quantity'   => 1,
+        'unit_price' => 10000,
+        'unit_cost'  => 5000,
+        'subtotal'   => 10000,
+    ]);
+    $sale1->update(['total_amount' => 10000]);
+
+    // Sale 10 days ago
+    $sale2 = Sale::factory()->create([
+        'status'          => SaleStatus::Paid,
+        'payment_method'  => 'cash',
+        'discount_amount' => 0,
+        'created_at'      => Carbon::now()->subDays(10),
+    ]);
+    $sale2->items()->delete();
+    $sale2->items()->create([
+        'product_id' => $product->id,
+        'quantity'   => 1,
+        'unit_price' => 5000,
+        'unit_cost'  => 2500,
+        'subtotal'   => 5000,
+    ]);
+    $sale2->update(['total_amount' => 5000]);
+
+    Livewire::test(SalesByPaymentMethod::class)
+        ->set('period', 'today')
+        ->assertSet('chartData.series', [100.0])
+        ->set('period', 'last_30_days')
+        ->assertSet('chartData.series', [50.0, 100.0]);
+});

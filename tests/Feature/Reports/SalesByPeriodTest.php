@@ -1,0 +1,72 @@
+<?php
+
+namespace Tests\Feature\Reports;
+
+use App\Enums\SaleStatus;
+use App\Livewire\Reports\SalesByPeriod;
+use App\Models\Product;
+use App\Models\Sale;
+use App\Models\User;
+use Illuminate\Support\Carbon;
+use Livewire\Livewire;
+
+use function Pest\Laravel\actingAs;
+
+test('it can load sales data for the last 30 days', function () {
+    $user = User::factory()->create();
+    actingAs($user);
+
+    $product = Product::factory()->create();
+
+    Sale::query()->delete();
+
+    $sale = Sale::factory()->create([
+        'status'     => SaleStatus::Paid,
+        'created_at' => now(),
+    ]);
+
+    $sale->items()->delete();
+
+    $sale->items()->create([
+        'product_id' => $product->id,
+        'subtotal'   => 100, // 100.00
+        'unit_cost'  => 60, // 60.00
+        'quantity'   => 1,
+        'unit_price' => 100,
+    ]);
+
+    Livewire::test(SalesByPeriod::class)
+        ->assertSet('period', 'last_30_days')
+        ->assertSee('100') // Total Sales (100.00)
+        ->assertSee('40'); // Total Profit (100.00 - 60.00 = 40.00)
+});
+
+test('it can change the period and update data', function () {
+    $user = User::factory()->create();
+    actingAs($user);
+
+    $product = Product::factory()->create();
+
+    Sale::query()->delete();
+
+    $sale = Sale::factory()->create([
+        'status'     => SaleStatus::Paid,
+        'created_at' => Carbon::now()->subDays(10)->startOfDay(),
+    ]);
+
+    $sale->items()->delete();
+
+    $sale->items()->create([
+        'product_id' => $product->id,
+        'subtotal'   => 50,
+        'unit_cost'  => 30,
+        'quantity'   => 1,
+        'unit_price' => 50,
+    ]);
+
+    Livewire::test(SalesByPeriod::class)
+        ->set('period', 'today')
+        ->assertSet('chartData.sales', [])
+        ->set('period', 'last_30_days')
+        ->assertSet('chartData.sales', [50.0]);
+});
