@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Casts\MoneyCast;
 use App\Enums\TransactionType;
 use Carbon\Carbon;
+use Database\Factories\FinancialTransactionFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
@@ -19,6 +21,9 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 class FinancialTransaction extends Model
 {
+    /** @use HasFactory<FinancialTransactionFactory> */
+    use HasFactory;
+
     protected $guarded = ['id'];
 
     protected function casts(): array
