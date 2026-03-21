@@ -1,6 +1,8 @@
+@use(App\Enums\SaleStatus)
 @props(['sales'])
 
-<div class="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col min-h-0 w-full max-w-full">
+<div
+    class="flex-1 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col min-h-0 w-full max-w-full">
     <div class="overflow-x-auto flex-1 relative w-full max-w-full">
         <table class="w-full divide-y divide-gray-100 dark:divide-gray-700 border-separate border-spacing-0">
             <thead class="bg-gray-50 dark:bg-gray-900/50 sticky top-0 z-10">
@@ -9,7 +11,7 @@
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-700 whitespace-nowrap">{{ __('sales.cost') }}</th>
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-700 whitespace-nowrap">{{ __('sales.sale_value') }}</th>
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-700 whitespace-nowrap">
-                    @if($this->status === \App\Enums\SaleStatus::Pending->value)
+                    @if($this->status === SaleStatus::Pending->value)
                         {{ __('sales.estimated_profit') }}
                     @else
                         {{ __('sales.profit') }}
@@ -31,14 +33,14 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white font-medium">
                         R$ {{ number_format($sale->total_amount, 2, ',', '.') }}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm {{ $sale->profit() >= 0 ? ($sale->status === \App\Enums\SaleStatus::Pending ? 'text-gray-900 dark:text-white' : 'text-green-600 dark:text-green-400') : 'text-red-600 dark:text-red-400' }} font-medium">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm {{ $sale->profit() >= 0 ? ($sale->status === SaleStatus::Pending ? 'text-gray-900 dark:text-white' : 'text-green-600 dark:text-green-400') : 'text-red-600 dark:text-red-400' }} font-medium">
                         R$ {{ number_format($sale->profit(), 2, ',', '.') }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                         {{ $sale->created_at->format('d/m/Y') }}
                     </td>
                     <td class="px-6 py-4 text-right flex justify-end gap-2 text-nowrap">
-                        @if($sale->status === \App\Enums\SaleStatus::Pending)
+                        @if($sale->status === SaleStatus::Pending)
                             <x-button
                                 xs
                                 flat
