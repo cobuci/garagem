@@ -14,7 +14,7 @@
                 <div class="max-w-xs">
                     <x-select
                         label="{{ __('settings.sections.preferences.language') }}"
-                        wire:model="form.locale"
+                        wire:model.live="form.locale"
                         :options="[
                             ['name' => 'Português (Brasil)', 'id' => 'pt_BR'],
                             ['name' => 'English', 'id' => 'en'],

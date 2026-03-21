@@ -50,16 +50,12 @@ class SettingsForm extends Form
         $this->locale = $user->locale ?? 'pt_BR';
     }
 
-    public function update(User $user): bool
+    public function update(User $user): void
     {
         $this->validate();
 
         Setting::singleton()->update($this->except(['locale']));
 
-        $localeChanged = $this->locale !== $user->locale;
-
         $user->update(['locale' => $this->locale]);
-
-        return $localeChanged;
     }
 }

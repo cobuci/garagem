@@ -24,19 +24,22 @@ class Index extends Component
         $this->form->setSettings(Setting::singleton(), $this->user);
     }
 
+    public function updatedFormLocale(string $value): void
+    {
+        $this->user->update(['locale' => $value]);
+        session()->put('locale', $value);
+        app()->setLocale($value);
+
+        $this->redirect(route('settings.index'), navigate: true);
+    }
+
     public function save(): void
     {
-        $localeChanged = $this->form->update($this->user);
+        $this->form->update($this->user);
 
         $this->notification()->success(
             title: __('settings.actions.success'),
         );
-
-        if ($localeChanged) {
-            session()->put('locale', $this->form->locale);
-            app()->setLocale($this->form->locale);
-            $this->redirect(route('settings.index'), navigate: true);
-        }
     }
 
     public function render(): View
