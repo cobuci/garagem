@@ -12,6 +12,8 @@ class ExportReport extends Component
 {
     use WireUiActions;
 
+    public bool $showModal = false;
+
     public ?string $startDate = null;
 
     public ?string $endDate = null;
@@ -39,6 +41,8 @@ class ExportReport extends Component
             title: __('reports.export.success_title'),
             description: __('reports.export.success_description'),
         );
+
+        $this->showModal = false;
     }
 
     public function render(): View
