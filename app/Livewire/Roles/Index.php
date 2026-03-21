@@ -2,59 +2,96 @@
 
 namespace App\Livewire\Roles;
 
+use App\Livewire\Forms\Roles\RoleForm;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
-use Livewire\Attributes\Layout;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use WireUi\Traits\WireUiActions;
 
-#[Layout('layouts.app')]
+/**
+ * @property-read Collection $roles
+ */
 class Index extends Component
 {
     use WireUiActions;
 
-    public $roles;
+    public RoleForm $form;
 
-    public $permissions;
-
-    public $selectedRole;
+    public $selectedRoleId;
 
     public $rolePermissions = [];
 
+    public $showDrawer = false;
+
     public function mount(): void
     {
-        $this->roles = Role::all();
-        $this->permissions = Permission::all()->groupBy(function ($permission) {
-            $parts = explode(' ', $permission->name);
-
-            return $parts[count($parts) - 1];
-        })->all();
-
         if ($this->roles->count() > 0) {
             $this->selectRole($this->roles->first()->id);
         }
     }
 
-    public function selectRole(int $roleId): void
+    #[Computed]
+    public function roles(): Collection
     {
-        $this->selectedRole = Role::find($roleId);
-        $this->rolePermissions = $this->selectedRole->permissions->pluck('name')->all();
+        return Role::all();
     }
 
-    public function togglePermission(string $permissionName): void
+    #[Computed]
+    public function permissions(): array
     {
-        if (in_array($permissionName, $this->rolePermissions)) {
-            $this->selectedRole->revokePermissionTo($permissionName);
-            $this->rolePermissions = array_diff($this->rolePermissions, [$permissionName]);
-        } else {
-            $this->selectedRole->givePermissionTo($permissionName);
-            $this->rolePermissions[] = $permissionName;
+        return Permission::all()->groupBy(function ($permission) {
+            $parts = explode(' ', $permission->name);
+
+            return end($parts);
+        })->all();
+    }
+
+    public function selectRole(int $roleId): void
+    {
+        $this->selectedRoleId = $roleId;
+        $role = Role::findById($roleId);
+        $this->rolePermissions = $role->permissions->pluck('name')->toArray();
+        $this->resetErrorBag();
+    }
+
+    public function savePermissions(): void
+    {
+        $role = Role::findById($this->selectedRoleId);
+
+        if ($role->name === 'admin') {
+            $this->notification()->error(
+                title: __('Ação não permitida'),
+                description: __('A role Admin é imutável.'),
+            );
+
+            return;
         }
+
+        $role->syncPermissions($this->rolePermissions);
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $this->notification()->success(
             title: __('Roles updated'),
-            description: __('Permission updated successfully.'),
+            description: __('Permissions updated successfully.'),
+        );
+    }
+
+    public function saveRole(): void
+    {
+        $role = $this->form->store();
+
+        $this->showDrawer = false;
+
+        $this->selectRole($role->id);
+
+        $this->notification()->success(
+            title: __('Role created'),
+            description: __('New role created successfully.'),
         );
     }
 
