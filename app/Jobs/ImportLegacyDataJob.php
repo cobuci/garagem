@@ -3,9 +3,12 @@
 namespace App\Jobs;
 
 use App\Enums\Gender;
+use App\Enums\SaleStatus;
 use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Product;
+use App\Models\Sale;
+use App\Models\SaleItem;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -22,7 +25,14 @@ class ImportLegacyDataJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    public function __construct(public string $filePath) {}
+    public int $timeout = 0;
+
+    public int $tries = 1;
+
+    public function __construct(public string $filePath)
+    {
+        $this->onQueue('default');
+    }
 
     public function handle(): void
     {
@@ -30,99 +40,208 @@ class ImportLegacyDataJob implements ShouldQueue
             return;
         }
 
+        ini_set('memory_limit', '512M');
+
         $sql = Storage::get($this->filePath);
 
-        DB::transaction(function () use ($sql) {
-            $this->importCategories($sql);
-            $this->importProducts($sql);
-            $this->importCustomers($sql);
-        });
+        $this->importCategories($sql);
+        $this->importProducts($sql);
+        $this->importCustomers($sql);
+        $this->importSales($sql);
+        $this->importSaleItems($sql);
 
         Storage::delete($this->filePath);
     }
 
     protected function importCategories(string $sql): void
     {
-        if (! preg_match('/INSERT INTO `categories` \(`id`, `name`, `icon`, `created_at`, `updated_at`\) VALUES\s*(.*?);/s', $sql, $matches)) {
+        if (! preg_match('/INSERT INTO `categories` \(`id`, `name`, `icon`, `created_at`, `updated_at`\) VALUES\s*(.*?);/si', $sql, $matches)) {
             return;
         }
 
-        $rows = $this->splitSqlRows($matches[1]);
+        DB::transaction(function () use ($matches) {
+            $rows = $this->splitSqlRows($matches[1]);
 
-        foreach ($rows as $index => $row) {
-            $data = $this->parseSqlRow($row);
+            foreach ($rows as $index => $row) {
+                $data = $this->parseSqlRow($row);
 
-            if (count($data) < 5) {
-                continue;
+                if (count($data) < 5) {
+                    continue;
+                }
+
+                $id = (int) $data[0];
+                $name = $data[1];
+                $icon = isset($data[2]) ? $this->mapIcon($data[2]) : null;
+                $createdAt = $this->parseDate($data[3]);
+                $updatedAt = $this->parseDate($data[4]);
+
+                Category::updateOrCreate(
+                    ['id' => $id],
+                    [
+                        'name'       => $name,
+                        'icon'       => $icon,
+                        'sort_order' => $index + 1,
+                        'created_at' => $createdAt,
+                        'updated_at' => $updatedAt,
+                    ],
+                );
             }
-
-            $id = (int) $data[0];
-            $name = $data[1];
-            $icon = isset($data[2]) ? $this->mapIcon($data[2]) : null;
-            $createdAt = $this->parseDate($data[3]);
-            $updatedAt = $this->parseDate($data[4]);
-
-            Category::updateOrCreate(
-                ['id' => $id],
-                [
-                    'name'       => $name,
-                    'icon'       => $icon,
-                    'sort_order' => $index + 1,
-                    'created_at' => $createdAt,
-                    'updated_at' => $updatedAt,
-                ],
-            );
-        }
+        });
     }
 
     protected function importCustomers(string $sql): void
     {
-        if (! preg_match('/INSERT INTO `customers` \(`id`, `name`, `email`, `phone`, `gender`, `zipcode`, `street`, `number`, `district`, `created_at`, `updated_at`\) VALUES\s*(.*?);/s', $sql, $matches)) {
+        if (! preg_match('/INSERT INTO `customers` \(`id`, `name`, `email`, `phone`, `gender`, `zipcode`, `street`, `number`, `district`, `created_at`, `updated_at`\) VALUES\s*(.*?);/si', $sql, $matches)) {
             return;
         }
 
-        $rows = $this->splitSqlRows($matches[1]);
+        DB::transaction(function () use ($matches) {
+            $rows = $this->splitSqlRows($matches[1]);
 
-        foreach ($rows as $row) {
-            $data = $this->parseSqlRow($row);
+            foreach ($rows as $row) {
+                $data = $this->parseSqlRow($row);
 
-            if (count($data) < 11) {
-                continue;
+                if (count($data) < 11) {
+                    continue;
+                }
+
+                $id = (int) $data[0];
+                $name = $this->getUniqueCustomerName($data[1], $id);
+                $email = $this->cleanValue($data[2]);
+                $phone = $this->cleanValue($data[3]);
+                $genderRaw = strtoupper($data[4] ?? '');
+                $zipCode = $this->cleanValue($data[5]);
+                $street = $this->cleanValue($data[6]);
+                $address = $this->cleanValue($data[7]);
+                $neighborhood = $this->cleanValue($data[8]);
+                $createdAt = $this->parseDate($data[9]);
+                $updatedAt = $this->parseDate($data[10]);
+
+                $gender = match (true) {
+                    str_starts_with($genderRaw, 'M') => Gender::Male,
+                    str_starts_with($genderRaw, 'F') => Gender::Female,
+                    default                          => null,
+                };
+
+                Customer::updateOrCreate(
+                    ['id' => $id],
+                    [
+                        'name'         => $name,
+                        'email'        => $email,
+                        'phone'        => $phone,
+                        'gender'       => $gender,
+                        'zip_code'     => $zipCode,
+                        'street'       => $street,
+                        'address'      => $address,
+                        'neighborhood' => $neighborhood,
+                        'created_at'   => $createdAt,
+                        'updated_at'   => $updatedAt,
+                    ],
+                );
             }
+        });
+    }
 
-            $id = (int) $data[0];
-            $name = $this->getUniqueCustomerName($data[1], $id);
-            $email = $this->cleanValue($data[2]);
-            $phone = $this->cleanValue($data[3]);
-            $genderRaw = strtoupper($data[4] ?? '');
-            $zipCode = $this->cleanValue($data[5]);
-            $street = $this->cleanValue($data[6]);
-            $address = $this->cleanValue($data[7]);
-            $neighborhood = $this->cleanValue($data[8]);
-            $createdAt = $this->parseDate($data[9]);
-            $updatedAt = $this->parseDate($data[10]);
+    protected function importSales(string $sql): void
+    {
+        if (! preg_match_all('/INSERT INTO `sales` \(`id`, `order_id`, `cost`, `discount`, `price`, `customer_id`, `customer_name`, `payment_method`, `payment_status`, `created_at`, `updated_at`\) VALUES\s*(.*?);/si', $sql, $matches)) {
+            return;
+        }
 
-            $gender = match (true) {
-                str_starts_with($genderRaw, 'M') => Gender::Male,
-                str_starts_with($genderRaw, 'F') => Gender::Female,
-                default                          => null,
-            };
+        foreach ($matches[1] as $valuesBlock) {
+            DB::transaction(function () use ($valuesBlock) {
+                $rows = $this->splitSqlRows($valuesBlock);
 
-            Customer::updateOrCreate(
-                ['id' => $id],
-                [
-                    'name'         => $name,
-                    'email'        => $email,
-                    'phone'        => $phone,
-                    'gender'       => $gender,
-                    'zip_code'     => $zipCode,
-                    'street'       => $street,
-                    'address'      => $address,
-                    'neighborhood' => $neighborhood,
-                    'created_at'   => $createdAt,
-                    'updated_at'   => $updatedAt,
-                ],
-            );
+                foreach ($rows as $row) {
+                    $data = $this->parseSqlRow($row);
+
+                    if (count($data) < 11) {
+                        continue;
+                    }
+
+                    $id = (int) $data[0];
+                    $orderId = $data[1];
+                    // $cost = (float) $data[2]; // total cost of the sale
+                    $discount = $data[3] !== null && $data[3] !== 'NULL' ? (float) $data[3] : 0.00;
+                    $price = (float) $data[4];
+                    $customerId = $data[5] !== null && $data[5] !== 'NULL' ? (int) $data[5] : null;
+
+                    if ($customerId !== null && ! Customer::where('id', $customerId)->exists()) {
+                        $customerId = null;
+                    }
+
+                    $paymentMethod = $data[7];
+                    $paymentStatus = $data[8];
+                    $createdAt = $this->parseDate($data[9]);
+                    $updatedAt = $this->parseDate($data[10]);
+
+                    Sale::updateOrCreate(
+                        ['id' => $id],
+                        [
+                            'customer_id'     => $customerId,
+                            'payment_method'  => $paymentMethod,
+                            'total_amount'    => $price + $discount,
+                            'discount_amount' => $discount,
+                            'net_amount'      => $price,
+                            'status'          => $paymentStatus === '1' ? SaleStatus::Paid : SaleStatus::Pending,
+                            'created_at'      => $createdAt,
+                            'updated_at'      => $updatedAt,
+                            'legacy_order_id' => $orderId,
+                        ],
+                    );
+                }
+            });
+        }
+    }
+
+    protected function importSaleItems(string $sql): void
+    {
+        if (! preg_match_all('/INSERT INTO `orders` \(`id`, `order_id`, `product_id`, `product_name`, `product_brand`, `unit_cost`, `unit_price`, `weight`, `amount`\) VALUES\s*(.*?);/si', $sql, $matches)) {
+            return;
+        }
+
+        foreach ($matches[1] as $valuesBlock) {
+            DB::transaction(function () use ($valuesBlock) {
+                $rows = $this->splitSqlRows($valuesBlock);
+
+                foreach ($rows as $row) {
+                    $data = $this->parseSqlRow($row);
+
+                    if (count($data) < 9) {
+                        continue;
+                    }
+
+                    $legacyOrderId = $data[1];
+                    $productId = (int) $data[2];
+
+                    if (! Product::where('id', $productId)->exists()) {
+                        continue;
+                    }
+
+                    $unitCost = (float) $data[5];
+                    $unitPrice = (float) $data[6];
+                    $amount = (int) $data[8];
+
+                    $sale = Sale::where('legacy_order_id', $legacyOrderId)->first();
+
+                    if (! $sale) {
+                        continue;
+                    }
+
+                    SaleItem::updateOrCreate(
+                        [
+                            'sale_id'    => $sale->id,
+                            'product_id' => $productId,
+                        ],
+                        [
+                            'quantity'   => $amount,
+                            'unit_price' => $unitPrice,
+                            'unit_cost'  => $unitCost,
+                            'subtotal'   => $unitPrice * $amount,
+                        ],
+                    );
+                }
+            });
         }
     }
 
@@ -147,45 +266,47 @@ class ImportLegacyDataJob implements ShouldQueue
 
     protected function importProducts(string $sql): void
     {
-        if (! preg_match_all('/INSERT INTO `products` \(`id`, `name`, `brand`, `weight`, `cost`, `sale`, `amount`, `expiration_date`, `category_id`, `upc`\) VALUES\s*(.*?);/s', $sql, $allMatches)) {
+        if (! preg_match_all('/INSERT INTO `products` \(`id`, `name`, `brand`, `weight`, `cost`, `sale`, `amount`, `expiration_date`, `category_id`, `upc`\) VALUES\s*(.*?);/si', $sql, $allMatches)) {
             return;
         }
 
-        foreach ($allMatches[1] as $values) {
-            $rows = $this->splitSqlRows($values);
+        DB::transaction(function () use ($allMatches) {
+            foreach ($allMatches[1] as $values) {
+                $rows = $this->splitSqlRows($values);
 
-            foreach ($rows as $row) {
-                $data = $this->parseSqlRow($row);
+                foreach ($rows as $row) {
+                    $data = $this->parseSqlRow($row);
 
-                if (count($data) < 10) {
-                    continue;
+                    if (count($data) < 10) {
+                        continue;
+                    }
+
+                    $category_id = (int) $data[8];
+
+                    if (! Category::where('id', $category_id)->exists()) {
+                        Category::create([
+                            'id'   => $category_id,
+                            'name' => "Category {$category_id}",
+                        ]);
+                    }
+
+                    Product::updateOrCreate(
+                        ['id' => (int) $data[0]],
+                        [
+                            'category_id'     => $category_id,
+                            'name'            => $data[1],
+                            'brand'           => $data[2],
+                            'weight'          => $data[3],
+                            'upc'             => $this->cleanValue($data[9]),
+                            'stock_quantity'  => (int) $data[6],
+                            'unit_cost'       => (float) $data[4],
+                            'sale_price'      => (float) $data[5],
+                            'expiration_date' => $this->parseExpirationDate($data[7] ?? null),
+                        ],
+                    );
                 }
-
-                $category_id = (int) $data[8];
-
-                if (! Category::where('id', $category_id)->exists()) {
-                    Category::create([
-                        'id'   => $category_id,
-                        'name' => "Category {$category_id}",
-                    ]);
-                }
-
-                Product::updateOrCreate(
-                    ['id' => (int) $data[0]],
-                    [
-                        'category_id'     => $category_id,
-                        'name'            => $data[1],
-                        'brand'           => $data[2],
-                        'weight'          => $data[3],
-                        'upc'             => $this->cleanValue($data[9]),
-                        'stock_quantity'  => (int) $data[6],
-                        'unit_cost'       => (float) $data[4],
-                        'sale_price'      => (float) $data[5],
-                        'expiration_date' => $this->parseExpirationDate($data[7] ?? null),
-                    ],
-                );
             }
-        }
+        });
     }
 
     protected function parseExpirationDate(?string $value): ?Carbon
