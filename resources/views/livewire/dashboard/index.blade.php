@@ -1,6 +1,6 @@
 @use(App\Enums\Permission)
 <div>
-    <x-dashboard.header :name="auth()->user()->name ?? auth()->user()->email"/>
+    <x-dashboard.header :name="$this->user->name ?? $this->user->email"/>
 
     @can(Permission::ViewAccountBalance->value)
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

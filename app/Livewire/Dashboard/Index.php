@@ -2,10 +2,13 @@
 
 namespace App\Livewire\Dashboard;
 
+use App\Enums\Permission;
 use App\Enums\SaleStatus;
 use App\Models\AccountBalance;
 use App\Models\FinancialTransaction;
 use App\Models\SaleItem;
+use App\Models\User;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
@@ -16,27 +19,40 @@ use Livewire\Component;
 
 class Index extends Component
 {
+    public User $user;
+
     public float $targetBalance;
 
-    public function mount(): void
+    public function mount(#[CurrentUser] User $user): void
     {
+        $this->user = $user;
         $this->targetBalance = AccountBalance::singleton()->target_balance;
     }
 
     public function updateTargetBalance(): void
     {
+        $this->authorize(Permission::ViewFinancialTransaction->value);
+
         AccountBalance::singleton()->update(['target_balance' => $this->targetBalance]);
     }
 
     #[Computed]
     public function totalBalance(): float
     {
+        if (! $this->user->can(Permission::ViewFinancialTransaction->value)) {
+            return 0;
+        }
+
         return AccountBalance::singleton()->current_balance;
     }
 
     #[Computed]
     public function recentActivities(): Collection
     {
+        if (! $this->user->can(Permission::ViewFinancialTransaction->value)) {
+            return new Collection;
+        }
+
         return FinancialTransaction::query()
             ->latest('transaction_date')
             ->latest('id')
@@ -47,6 +63,16 @@ class Index extends Component
     #[Computed]
     public function dailyMetrics(): array
     {
+        if (! $this->user->can(Permission::ViewFinancialTransaction->value)) {
+            return [
+                'sales'           => 0,
+                'previous_sales'  => 0,
+                'percent'         => 0,
+                'profit'          => 0,
+                'previous_profit' => 0,
+            ];
+        }
+
         $today = Carbon::today();
         $yesterday = Carbon::yesterday();
 
@@ -77,6 +103,16 @@ class Index extends Component
     #[Computed]
     public function monthlyMetrics(): array
     {
+        if (! $this->user->can(Permission::ViewFinancialTransaction->value)) {
+            return [
+                'sales'           => 0,
+                'previous_sales'  => 0,
+                'percent'         => 0,
+                'profit'          => 0,
+                'previous_profit' => 0,
+            ];
+        }
+
         $currentMonth = Carbon::now();
         $previousMonth = Carbon::now()->subMonth();
 
@@ -110,6 +146,14 @@ class Index extends Component
     #[Computed]
     public function chartData(): array
     {
+        if (! $this->user->can(Permission::ViewFinancialTransaction->value)) {
+            return [
+                'labels' => [],
+                'sales'  => [],
+                'profit' => [],
+            ];
+        }
+
         $startDate = Carbon::now()->subMonths(5)->startOfMonth();
 
         $metrics = SaleItem::query()
@@ -159,11 +203,6 @@ class Index extends Component
         ];
     }
 
-    public function render(): View
-    {
-        return view('livewire.dashboard.index');
-    }
-
     private function calculatePercentage(float $current, float $previous): float
     {
         if ($previous == 0) {
@@ -171,5 +210,10 @@ class Index extends Component
         }
 
         return (($current - $previous) / $previous) * 100;
+    }
+
+    public function render(): View
+    {
+        return view('livewire.dashboard.index');
     }
 }
