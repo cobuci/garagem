@@ -30,14 +30,18 @@
                             <x-icon x-show="darkMode" name="sun" class="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" x-cloak />
                             <span x-text="darkMode ? '{{ __('sidebar.light_mode') }}' : '{{ __('sidebar.dark_mode') }}'"></span>
                         </button>
-                        <a href="{{ route('settings.index') }}" wire:navigate class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <x-icon name="cog-6-tooth" class="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
-                            {{ __('sidebar.settings') }}
-                        </a>
-                        <a href="{{ route('roles.index') }}" wire:navigate class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <x-icon name="shield-check" class="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
-                            {{ __('sidebar.roles') }}
-                        </a>
+                        @can(\App\Enums\Permission::ViewSetting->value)
+                            <a href="{{ route('settings.index') }}" wire:navigate class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <x-icon name="cog-6-tooth" class="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
+                                {{ __('sidebar.settings') }}
+                            </a>
+                        @endcan
+                        @can(\App\Enums\Permission::ViewUser->value)
+                            <a href="{{ route('roles.index') }}" wire:navigate class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <x-icon name="shield-check" class="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
+                                {{ __('sidebar.roles') }}
+                            </a>
+                        @endcan
 
                         @if(!app()->isProduction())
                             <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
@@ -139,14 +143,18 @@
                             <x-icon x-show="darkMode" name="sun" class="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" x-cloak />
                             <span x-text="darkMode ? '{{ __('sidebar.light_mode') }}' : '{{ __('sidebar.dark_mode') }}'"></span>
                         </button>
-                        <a href="{{ route('settings.index') }}" wire:navigate class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-                            <x-icon name="cog-6-tooth" class="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
-                            {{ __('sidebar.settings') }}
-                        </a>
-                        <a href="{{ route('roles.index') }}" wire:navigate class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
-                            <x-icon name="shield-check" class="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
-                            {{ __('sidebar.roles') }}
-                        </a>
+                        @can(\App\Enums\Permission::ViewSetting->value)
+                            <a href="{{ route('settings.index') }}" wire:navigate class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <x-icon name="cog-6-tooth" class="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
+                                {{ __('sidebar.settings') }}
+                            </a>
+                        @endcan
+                        @can(\App\Enums\Permission::ViewUser->value)
+                            <a href="{{ route('roles.index') }}" wire:navigate class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <x-icon name="shield-check" class="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
+                                {{ __('sidebar.roles') }}
+                            </a>
+                        @endcan
 
                         @if(!app()->isProduction())
                             <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
