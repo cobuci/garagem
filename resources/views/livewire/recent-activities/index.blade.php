@@ -6,8 +6,10 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('finance.description') }}</p>
             </div>
             <div class="flex items-center gap-2">
-                <x-button positive icon="plus" label="{{ __('finance.actions.add_balance') }}" wire:click="openAdjustmentModal('add')" />
-                <x-button negative icon="minus" label="{{ __('finance.actions.remove_balance') }}" wire:click="openAdjustmentModal('remove')" />
+                @can(\App\Enums\Permission::CreateFinancialTransaction->value)
+                    <x-button positive icon="plus" label="{{ __('finance.actions.add_balance') }}" wire:click="openAdjustmentModal('add')" />
+                    <x-button negative icon="minus" label="{{ __('finance.actions.remove_balance') }}" wire:click="openAdjustmentModal('remove')" />
+                @endcan
             </div>
         </div>
 
@@ -111,14 +113,16 @@
                             </p>
                         </div>
                         @if($transaction->type === \App\Enums\TransactionType::ManualAdjustment)
-                            <x-button
-                                xs
-                                icon="trash"
-                                negative
-                                wire:click="confirmCancelAdjustment({{ $transaction->id }})"
-                                title="{{ __('finance.adjustment_modal.cancel') }}"
-                                class="p-1"
-                            />
+                            @can(\App\Enums\Permission::DeleteFinancialTransaction->value)
+                                <x-button
+                                    xs
+                                    icon="trash"
+                                    negative
+                                    wire:click="confirmCancelAdjustment({{ $transaction->id }})"
+                                    title="{{ __('finance.adjustment_modal.cancel') }}"
+                                    class="p-1"
+                                />
+                            @endcan
                         @endif
                     </div>
                 </div>

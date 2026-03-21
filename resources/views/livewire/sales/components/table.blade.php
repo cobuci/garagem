@@ -41,14 +41,16 @@
                     </td>
                     <td class="px-6 py-4 text-right flex justify-end gap-2 text-nowrap">
                         @if($sale->status === SaleStatus::Pending)
-                            <x-button
-                                xs
-                                flat
-                                primary
-                                icon="check"
-                                label="{{ __('sales.mark_as_paid') }}"
-                                wire:click="confirmMarkAsPaid({{ $sale->id }})"
-                            />
+                            @can(\App\Enums\Permission::EditSale->value)
+                                <x-button
+                                    xs
+                                    flat
+                                    primary
+                                    icon="check"
+                                    label="{{ __('sales.mark_as_paid') }}"
+                                    wire:click="confirmMarkAsPaid({{ $sale->id }})"
+                                />
+                            @endcan
                         @endif
                         <x-button
                             xs

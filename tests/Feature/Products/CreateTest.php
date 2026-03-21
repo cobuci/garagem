@@ -1,24 +1,38 @@
 <?php
 
+use App\Enums\Permission;
 use App\Livewire\Products\Create;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    $this->seed(RolesAndPermissionsSeeder::class);
     $this->user = User::factory()->create();
+    $this->user->givePermissionTo(Permission::CreateProduct->value);
     config(['wireui.style.icon' => 'outline']);
+});
+
+test('it returns 403 when creating a product without permission', function () {
+    $userWithoutPermission = User::factory()->create();
+
+    Livewire::actingAs($userWithoutPermission)
+        ->test(Create::class, ['categories' => new Collection])
+        ->call('create')
+        ->assertForbidden();
 });
 
 test('it can create a product with all fields', function () {
     $category = Category::factory()->create();
 
     Livewire::actingAs($this->user)
-        ->test(Create::class)
+        ->test(Create::class, ['categories' => Category::all()])
         ->set('form.categoryId', $category->id)
         ->set('form.name', 'New Product')
         ->set('form.brand', 'New Brand')
@@ -42,7 +56,7 @@ test('it can create a product with all fields', function () {
 
 test('it validates required fields', function () {
     Livewire::actingAs($this->user)
-        ->test(Create::class)
+        ->test(Create::class, ['categories' => new Collection])
         ->set('form.weightType', '')
         ->call('create')
         ->assertHasErrors([
@@ -58,7 +72,7 @@ test('it validates unique upc', function () {
     Product::factory()->create(['upc' => 'DUPLICATE_UPC', 'category_id' => $category->id]);
 
     Livewire::actingAs($this->user)
-        ->test(Create::class)
+        ->test(Create::class, ['categories' => Category::all()])
         ->set('form.categoryId', $category->id)
         ->set('form.name', 'Product with Duplicate UPC')
         ->set('form.weightValue', 100)
@@ -69,7 +83,7 @@ test('it validates unique upc', function () {
 
 test('it validates weight value is numeric and positive', function () {
     Livewire::actingAs($this->user)
-        ->test(Create::class)
+        ->test(Create::class, ['categories' => new Collection])
         ->set('form.weightValue', 'not-numeric')
         ->call('create')
         ->assertHasErrors(['form.weightValue' => 'numeric'])
@@ -80,7 +94,7 @@ test('it validates weight value is numeric and positive', function () {
 
 test('it validates weight type is in allowed options', function () {
     Livewire::actingAs($this->user)
-        ->test(Create::class)
+        ->test(Create::class, ['categories' => new Collection])
         ->set('form.weightType', 'invalid-type')
         ->call('create')
         ->assertHasErrors(['form.weightType' => 'in']);
@@ -88,7 +102,7 @@ test('it validates weight type is in allowed options', function () {
 
 test('it validates max lengths for strings', function () {
     Livewire::actingAs($this->user)
-        ->test(Create::class)
+        ->test(Create::class, ['categories' => new Collection])
         ->set('form.name', str_repeat('a', 256))
         ->set('form.brand', str_repeat('b', 256))
         ->set('form.upc', str_repeat('c', 256))
@@ -102,7 +116,7 @@ test('it validates max lengths for strings', function () {
 
 test('it clears the form and closes the drawer on cancel', function () {
     Livewire::actingAs($this->user)
-        ->test(Create::class)
+        ->test(Create::class, ['categories' => new Collection])
         ->set('createDrawer', true)
         ->set('form.name', 'Temporary Name')
         ->set('createDrawer', false) // Simulator cancel (via x-on:click in UI)

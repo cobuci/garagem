@@ -11,15 +11,23 @@ use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
-test('it can request a system report', function () {
+use function Pest\Laravel\seed;
+
+beforeEach(function () {
+    seed(RolesAndPermissionsSeeder::class);
+});
+
+test('it can request a system report for authorized user', function () {
     Queue::fake();
     $user = User::factory()->create();
+    $user->assignRole('admin');
 
     Livewire::actingAs($user)
         ->test(ExportReport::class)
@@ -34,6 +42,15 @@ test('it can request a system report', function () {
             && $job->startDate === '2026-01-01'
             && $job->endDate === '2026-01-31';
     });
+});
+
+test('it denies requesting a system report for unauthorized user', function () {
+    Queue::fake();
+    $user = User::factory()->create();
+
+    Livewire::actingAs($user)
+        ->test(ExportReport::class)
+        ->assertForbidden();
 });
 
 test('it can generate the report PDF', function () {
@@ -69,6 +86,7 @@ test('it can generate the report PDF', function () {
 
 test('it validates the date range', function () {
     $user = User::factory()->create();
+    $user->assignRole('admin');
 
     Livewire::actingAs($user)
         ->test(ExportReport::class)

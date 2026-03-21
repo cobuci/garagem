@@ -2,9 +2,11 @@
 
 namespace App\Livewire\Customers;
 
+use App\Enums\Permission;
 use App\Enums\SaleStatus;
 use App\Models\Customer;
 use App\Models\Sale;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
@@ -21,6 +23,7 @@ use WireUi\Traits\WireUiActions;
  */
 class Show extends Component
 {
+    use AuthorizesRequests;
     use WireUiActions;
     use WithPagination;
 
@@ -36,8 +39,12 @@ class Show extends Component
 
     public bool $showConfirmCancelModal = false;
 
+    public bool $showDeleteModal = false;
+
     public function mount(Customer $customer): void
     {
+        $this->authorize(Permission::ViewCustomer->value);
+
         $this->customer = $customer;
     }
 
@@ -144,6 +151,17 @@ class Show extends Component
         $this->showDetailsModal = false;
         $this->showConfirmCancelModal = false;
         $this->notification()->success(__('sales.cancel_sale_success'));
+    }
+
+    public function delete(): void
+    {
+        $this->authorize(Permission::DeleteCustomer->value);
+
+        $this->customer->delete();
+
+        $this->notification()->success(__('customers.delete_success'));
+
+        $this->redirect(route('customers.index'), navigate: true);
     }
 
     public function render(): View

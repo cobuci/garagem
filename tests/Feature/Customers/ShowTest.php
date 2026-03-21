@@ -7,6 +7,7 @@ use App\Livewire\Customers\Show;
 use App\Models\Customer;
 use App\Models\Sale;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -15,11 +16,22 @@ use function Pest\Laravel\get;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    $this->seed(RolesAndPermissionsSeeder::class);
     $this->user = User::factory()->create();
+    $this->user->assignRole('admin');
     $this->actingAs($this->user);
 });
 
-it('can render customer show page', function () {
+it('cannot render customer show page without permission', function () {
+    $user = User::factory()->create();
+    $customer = Customer::factory()->create();
+
+    $this->actingAs($user)
+        ->get(route('customers.show', $customer))
+        ->assertForbidden();
+});
+
+it('can render customer show page with permission', function () {
     $customer = Customer::factory()->create();
 
     get(route('customers.show', $customer))
@@ -141,4 +153,25 @@ it('does not show the cancel button in the table', function () {
 
     Livewire::test(Show::class, ['customer' => $customer])
         ->assertDontSeeHtml('wire:click="confirmCancelSale');
+});
+
+it('only users with DeleteCustomer permission can delete a customer', function () {
+    $userWithoutPermission = User::factory()->create();
+    $userWithoutPermission->assignRole('user');
+
+    $customer = Customer::factory()->create();
+
+    Livewire::actingAs($userWithoutPermission)
+        ->test(Show::class, ['customer' => $customer])
+        ->call('delete')
+        ->assertForbidden();
+
+    expect(Customer::where('id', $customer->id)->exists())->toBeTrue();
+
+    Livewire::actingAs($this->user)
+        ->test(Show::class, ['customer' => $customer])
+        ->call('delete')
+        ->assertRedirect(route('customers.index'));
+
+    expect(Customer::where('id', $customer->id)->exists())->toBeFalse();
 });

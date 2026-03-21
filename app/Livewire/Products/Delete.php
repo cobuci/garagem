@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Products;
 
+use App\Enums\Permission;
 use App\Models\Product;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -10,6 +12,7 @@ use WireUi\Traits\WireUiActions;
 
 class Delete extends Component
 {
+    use AuthorizesRequests;
     use WireUiActions;
 
     public ?Product $product = null;
@@ -21,6 +24,8 @@ class Delete extends Component
     #[On('product:delete')]
     public function confirmDeletion(Product $product): void
     {
+        $this->authorize(Permission::DeleteProduct->value);
+
         $this->product = $product;
         $this->confirmation = '';
         $this->deleteModal = true;
@@ -28,6 +33,8 @@ class Delete extends Component
 
     public function destroy(): void
     {
+        $this->authorize(Permission::DeleteProduct->value);
+
         if ($this->confirmation !== __('products.delete_word')) {
             $this->notification()->error(
                 title: __('products.delete_incorrect'),

@@ -2,7 +2,9 @@
 
 namespace App\Livewire\BillsPayable;
 
+use App\Enums\Permission as PermissionEnum;
 use App\Models\ProductPurchase;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -12,6 +14,7 @@ use WireUi\Traits\WireUiActions;
 
 class Index extends Component
 {
+    use AuthorizesRequests;
     use WireUiActions;
 
     public string $search = '';
@@ -19,6 +22,11 @@ class Index extends Component
     public string $status = 'pending';
 
     public ?ProductPurchase $selectedBill = null;
+
+    public function mount(): void
+    {
+        $this->authorize(PermissionEnum::ViewProductPurchase->value);
+    }
 
     #[Computed]
     public function bills(): Collection
@@ -74,6 +82,8 @@ class Index extends Component
 
     public function markAsPaid(): void
     {
+        $this->authorize(PermissionEnum::EditProductPurchase->value);
+
         if (! $this->selectedBill || $this->selectedBill->is_paid) {
             return;
         }
@@ -96,6 +106,8 @@ class Index extends Component
 
     public function cancelBill(): void
     {
+        $this->authorize(PermissionEnum::DeleteProductPurchase->value);
+
         if (! $this->selectedBill) {
             return;
         }

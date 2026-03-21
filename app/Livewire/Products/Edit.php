@@ -2,33 +2,32 @@
 
 namespace App\Livewire\Products;
 
+use App\Enums\Permission;
 use App\Livewire\Forms\Products\ProductForm;
-use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\View\View;
-use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use WireUi\Traits\WireUiActions;
 
 class Edit extends Component
 {
+    use AuthorizesRequests;
     use WireUiActions;
 
     public ProductForm $form;
 
     public bool $editDrawer = false;
 
-    #[Computed]
-    public function categories(): Collection
-    {
-        return Category::orderBy('sort_order')->orderBy('name')->get();
-    }
+    public Collection $categories;
 
     #[On('product:edit')]
     public function edit(Product $product): void
     {
+        $this->authorize(Permission::EditProduct->value);
+
         $this->form->setProduct($product);
 
         $this->editDrawer = true;
@@ -36,6 +35,8 @@ class Edit extends Component
 
     public function update(): void
     {
+        $this->authorize(Permission::EditProduct->value);
+
         $this->form->update();
 
         $this->editDrawer = false;

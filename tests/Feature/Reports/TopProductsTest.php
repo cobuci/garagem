@@ -7,13 +7,20 @@ use App\Livewire\Reports\TopProducts;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Carbon;
 use Livewire\Livewire;
 
 use function Pest\Laravel\actingAs;
+use function Pest\Laravel\seed;
 
-test('it can load top products for the last 30 days', function () {
+beforeEach(function () {
+    seed(RolesAndPermissionsSeeder::class);
+});
+
+test('it can load top products for the last 30 days for authorized user', function () {
     $user = User::factory()->create();
+    $user->assignRole('admin');
     actingAs($user);
 
     Sale::query()->delete();
@@ -54,8 +61,9 @@ test('it can load top products for the last 30 days', function () {
         ->assertSet('chartData.revenue', [50000.0, 50000.0]);
 });
 
-test('it filters top products by period', function () {
+test('it filters top products by period for authorized user', function () {
     $user = User::factory()->create();
+    $user->assignRole('admin');
     actingAs($user);
 
     Sale::query()->delete();
@@ -99,4 +107,12 @@ test('it filters top products by period', function () {
         ->assertSet('chartData.quantity', [2])
         ->set('period', 'last_30_days')
         ->assertSet('chartData.quantity', [7]); // 2 + 5
+});
+
+test('it denies access to top products for unauthorized user', function () {
+    $user = User::factory()->create();
+    actingAs($user);
+
+    Livewire::test(TopProducts::class)
+        ->assertForbidden();
 });

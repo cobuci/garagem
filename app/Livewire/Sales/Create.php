@@ -2,11 +2,13 @@
 
 namespace App\Livewire\Sales;
 
+use App\Enums\Permission as PermissionEnum;
 use App\Livewire\Forms\SaleForm;
 use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -14,6 +16,7 @@ use WireUi\Traits\WireUiActions;
 
 class Create extends Component
 {
+    use AuthorizesRequests;
     use WireUiActions;
 
     public SaleForm $form;
@@ -21,6 +24,11 @@ class Create extends Component
     public ?int $selectedCategoryId = null;
 
     public string $search = '';
+
+    public function mount(): void
+    {
+        $this->authorize(PermissionEnum::CreateSale->value);
+    }
 
     #[Computed]
     public function categories(): Collection
@@ -102,6 +110,8 @@ class Create extends Component
 
     public function save(): void
     {
+        $this->authorize(PermissionEnum::CreateSale->value);
+
         if (empty($this->form->items)) {
             $this->notification()->error(__('sales.at_least_one_product'));
 

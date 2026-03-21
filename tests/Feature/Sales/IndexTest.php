@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Permission;
 use App\Enums\SaleStatus;
 use App\Jobs\GenerateInvoiceJob;
 use App\Livewire\Sales\Index;
@@ -7,13 +8,24 @@ use App\Models\AccountBalance;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
 use function Pest\Laravel\actingAs;
 
+uses(RefreshDatabase::class);
+
 beforeEach(function () {
+    $this->seed(RolesAndPermissionsSeeder::class);
+    $this->user = User::factory()->create();
+    $this->user->givePermissionTo([
+        Permission::ViewSale->value,
+        Permission::EditSale->value,
+    ]);
+
     AccountBalance::query()->delete();
     AccountBalance::create([
         'current_balance' => 0,
@@ -21,14 +33,24 @@ beforeEach(function () {
     ]);
 });
 
+test('it returns 403 when viewing sales without permission', function () {
+    $userWithoutPermission = User::factory()->create();
+
+    actingAs($userWithoutPermission)
+        ->get(route('sales.index'))
+        ->assertForbidden();
+
+    Livewire::actingAs($userWithoutPermission)
+        ->test(Index::class)
+        ->assertForbidden();
+});
+
 test('can filter sales by status', function () {
-    $user = User::factory()->create();
     Sale::factory()->create(['status' => SaleStatus::Paid]);
     Sale::factory()->create(['status' => SaleStatus::Pending]);
 
-    actingAs($user);
-
-    Livewire::test(Index::class)
+    Livewire::actingAs($this->user)
+        ->test(Index::class)
         ->assertSet('status', 'pending')
         ->call('filterByStatus', 'paid')
         ->assertSet('status', 'paid')
@@ -43,27 +65,45 @@ test('can filter sales by status', function () {
 });
 
 test('can show sale details', function () {
-    $user = User::factory()->create();
     $sale = Sale::factory()->create();
 
-    actingAs($user);
-
-    Livewire::test(Index::class)
+    Livewire::actingAs($this->user)
+        ->test(Index::class)
         ->call('showDetails', $sale->id)
         ->assertSet('selectedSaleId', $sale->id)
         ->assertSet('showDetailsModal', true)
         ->assertSet('selectedSale.id', $sale->id);
 });
 
+test('it returns 403 when marking as paid without permission', function () {
+    $userWithoutPermission = User::factory()->create();
+    $userWithoutPermission->givePermissionTo(Permission::ViewSale->value);
+    $sale = Sale::factory()->create(['status' => SaleStatus::Pending]);
+
+    Livewire::actingAs($userWithoutPermission)
+        ->test(Index::class)
+        ->call('markAsPaid')
+        ->assertForbidden();
+});
+
+test('it returns 403 when cancelling sale without permission', function () {
+    $userWithoutPermission = User::factory()->create();
+    $userWithoutPermission->givePermissionTo(Permission::ViewSale->value);
+    $sale = Sale::factory()->create(['status' => SaleStatus::Pending]);
+
+    Livewire::actingAs($userWithoutPermission)
+        ->test(Index::class)
+        ->call('cancelSale')
+        ->assertForbidden();
+});
+
 test('cannot mark an already paid sale as paid', function () {
-    $user = User::factory()->create();
     $sale = Sale::factory()->create([
         'status' => SaleStatus::Paid,
     ]);
 
-    actingAs($user);
-
-    Livewire::test(Index::class)
+    Livewire::actingAs($this->user)
+        ->test(Index::class)
         ->call('confirmMarkAsPaid', $sale->id)
         ->call('markAsPaid')
         ->assertHasNoErrors()
@@ -73,14 +113,12 @@ test('cannot mark an already paid sale as paid', function () {
 });
 
 test('cannot cancel an already cancelled sale', function () {
-    $user = User::factory()->create();
     $sale = Sale::factory()->create([
         'status' => SaleStatus::Cancelled,
     ]);
 
-    actingAs($user);
-
-    Livewire::test(Index::class)
+    Livewire::actingAs($this->user)
+        ->test(Index::class)
         ->call('confirmCancelSale', $sale->id)
         ->call('cancelSale')
         ->assertHasNoErrors();
@@ -89,7 +127,6 @@ test('cannot cancel an already cancelled sale', function () {
 });
 
 test('can mark a pending sale as paid and update balance', function () {
-    $user = User::factory()->create();
     $sale = Sale::factory()->create([
         'status'     => SaleStatus::Pending,
         'net_amount' => 100.00,
@@ -97,9 +134,8 @@ test('can mark a pending sale as paid and update balance', function () {
 
     expect(AccountBalance::singleton()->current_balance)->toEqual(0);
 
-    actingAs($user);
-
-    Livewire::test(Index::class)
+    Livewire::actingAs($this->user)
+        ->test(Index::class)
         ->call('confirmMarkAsPaid', $sale->id)
         ->assertSet('selectedSaleId', $sale->id)
         ->assertSet('showConfirmPaymentModal', true)
@@ -113,8 +149,6 @@ test('can mark a pending sale as paid and update balance', function () {
 });
 
 test('mark as paid correctly adds net_amount to balance (considering fees)', function () {
-    $user = User::factory()->create();
-
     $sale = Sale::factory()->create([
         'status'               => SaleStatus::Pending,
         'total_amount'         => 100.00,
@@ -126,9 +160,8 @@ test('mark as paid correctly adds net_amount to balance (considering fees)', fun
 
     expect(AccountBalance::singleton()->current_balance)->toEqual(0);
 
-    actingAs($user);
-
-    Livewire::test(Index::class)
+    Livewire::actingAs($this->user)
+        ->test(Index::class)
         ->call('confirmMarkAsPaid', $sale->id)
         ->call('markAsPaid');
 
@@ -136,8 +169,6 @@ test('mark as paid correctly adds net_amount to balance (considering fees)', fun
 });
 
 test('mark as paid with gift sale adds zero to balance', function () {
-    $user = User::factory()->create();
-
     $sale = Sale::factory()->create([
         'status'       => SaleStatus::Pending,
         'total_amount' => 0,
@@ -147,9 +178,8 @@ test('mark as paid with gift sale adds zero to balance', function () {
 
     expect(AccountBalance::singleton()->current_balance)->toEqual(0);
 
-    actingAs($user);
-
-    Livewire::test(Index::class)
+    Livewire::actingAs($this->user)
+        ->test(Index::class)
         ->call('confirmMarkAsPaid', $sale->id)
         ->call('markAsPaid');
 
@@ -157,14 +187,12 @@ test('mark as paid with gift sale adds zero to balance', function () {
 });
 
 test('displays total pending amount', function () {
-    $user = User::factory()->create();
     Sale::factory()->create(['status' => SaleStatus::Pending, 'net_amount' => 50.00]);
     Sale::factory()->create(['status' => SaleStatus::Pending, 'net_amount' => 30.00]);
     Sale::factory()->create(['status' => SaleStatus::Paid, 'net_amount' => 100.00]);
 
-    actingAs($user);
-
-    Livewire::test(Index::class)
+    Livewire::actingAs($this->user)
+        ->test(Index::class)
         ->assertSet('totalPendingAmount', 80.00);
 });
 
@@ -257,7 +285,6 @@ test('profit calculation considers fees passed to customer', function () {
 });
 
 test('can cancel a pending sale and restore stock', function () {
-    $user = User::factory()->create();
     $product = Product::factory()->create(['stock_quantity' => 10]);
 
     $sale = Sale::create([
@@ -279,9 +306,8 @@ test('can cancel a pending sale and restore stock', function () {
     $product->decrement('stock_quantity', 2);
     expect($product->fresh()->stock_quantity)->toBe(8);
 
-    actingAs($user);
-
-    Livewire::test(Index::class)
+    Livewire::actingAs($this->user)
+        ->test(Index::class)
         ->call('confirmCancelSale', $sale->id)
         ->assertSet('selectedSaleId', $sale->id)
         ->assertSet('showConfirmCancelModal', true)
@@ -295,7 +321,6 @@ test('can cancel a pending sale and restore stock', function () {
 });
 
 test('can cancel a paid sale, restore stock and decrement balance', function () {
-    $user = User::factory()->create();
     $product = Product::factory()->create(['stock_quantity' => 10]);
 
     $sale = Sale::create([
@@ -318,9 +343,8 @@ test('can cancel a paid sale, restore stock and decrement balance', function () 
     expect(AccountBalance::singleton()->current_balance)->toEqual(100.00)
         ->and($product->fresh()->stock_quantity)->toBe(8);
 
-    actingAs($user);
-
-    Livewire::test(Index::class)
+    Livewire::actingAs($this->user)
+        ->test(Index::class)
         ->call('confirmCancelSale', $sale->id)
         ->call('cancelSale');
 
@@ -332,12 +356,10 @@ test('can cancel a paid sale, restore stock and decrement balance', function () 
 
 test('can dispatch invoice generation job', function () {
     Queue::fake();
-    $user = User::factory()->create();
     $sale = Sale::factory()->create();
 
-    actingAs($user);
-
-    Livewire::test(Index::class)
+    Livewire::actingAs($this->user)
+        ->test(Index::class)
         ->call('downloadInvoice', $sale->id);
 
     Queue::assertPushed(GenerateInvoiceJob::class, function ($job) use ($sale) {
@@ -348,19 +370,16 @@ test('can dispatch invoice generation job', function () {
 });
 
 test('can handle invoice generation failure', function () {
-    $user = User::factory()->create();
     $sale = Sale::factory()->create(['invoice_status' => 'failed']);
 
-    actingAs($user);
-
-    Livewire::test(Index::class)
+    Livewire::actingAs($this->user)
+        ->test(Index::class)
         ->call('showDetails', $sale->id)
         ->assertSee(__('sales.invoice_failed_retry'));
 });
 
 test('can download invoice when it is ready', function () {
     Storage::fake();
-    $user = User::factory()->create();
     $sale = Sale::factory()->create([
         'invoice_status' => 'ready',
         'invoice_path'   => 'invoices/ready.pdf',
@@ -368,9 +387,8 @@ test('can download invoice when it is ready', function () {
 
     Storage::put('invoices/ready.pdf', 'dummy content');
 
-    actingAs($user);
-
-    Livewire::test(Index::class)
+    Livewire::actingAs($this->user)
+        ->test(Index::class)
         ->call('downloadInvoice', $sale->id)
         ->assertFileDownloaded("{$sale->id}.pdf");
 });

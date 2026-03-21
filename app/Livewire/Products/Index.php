@@ -2,10 +2,12 @@
 
 namespace App\Livewire\Products;
 
+use App\Enums\Permission;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Pagination\Paginator;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
@@ -16,6 +18,7 @@ use WireUi\Traits\WireUiActions;
 
 class Index extends Component
 {
+    use AuthorizesRequests;
     use WireUiActions;
     use WithPagination;
 
@@ -23,6 +26,8 @@ class Index extends Component
 
     public function mount(): void
     {
+        $this->authorize(Permission::ViewProduct->value);
+
         $this->selectedCategoryId = 0;
     }
 
@@ -35,10 +40,13 @@ class Index extends Component
     #[Computed]
     public function stats(): array
     {
-        $products = Product::select('unit_cost', 'sale_price', 'stock_quantity')->get();
+        $stats = Product::query()
+            ->selectRaw('SUM(unit_cost * stock_quantity) as total_cost')
+            ->selectRaw('SUM(sale_price * stock_quantity) as total_sale')
+            ->first();
 
-        $totalCost = $products->sum(fn ($p) => $p->unit_cost * ($p->stock_quantity ?? 0));
-        $totalSale = $products->sum(fn ($p) => $p->sale_price * ($p->stock_quantity ?? 0));
+        $totalCost = ((float) $stats->total_cost) / 100;
+        $totalSale = ((float) $stats->total_sale) / 100;
         $totalProfit = $totalSale - $totalCost;
 
         return [

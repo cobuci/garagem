@@ -9,15 +9,13 @@ use App\Models\AccountBalance;
 use App\Models\FinancialTransaction;
 use App\Models\Product;
 use App\Models\Sale;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
-    $this->actingAs($this->user);
+    $this->actingAsAdmin();
 });
 
 it('can render dashboard index page', function () {

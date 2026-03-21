@@ -7,13 +7,20 @@ use App\Livewire\Reports\SalesByPeriod;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Carbon;
 use Livewire\Livewire;
 
 use function Pest\Laravel\actingAs;
+use function Pest\Laravel\seed;
 
-test('it can load sales data for the last 30 days', function () {
+beforeEach(function () {
+    seed(RolesAndPermissionsSeeder::class);
+});
+
+test('it can load sales data for the last 30 days for authorized user', function () {
     $user = User::factory()->create();
+    $user->assignRole('admin');
     actingAs($user);
 
     $product = Product::factory()->create();
@@ -41,8 +48,9 @@ test('it can load sales data for the last 30 days', function () {
         ->assertSee('40'); // Total Profit (100.00 - 60.00 = 40.00)
 });
 
-test('it can change the period and update data', function () {
+test('it can change the period and update data for authorized user', function () {
     $user = User::factory()->create();
+    $user->assignRole('admin');
     actingAs($user);
 
     $product = Product::factory()->create();
@@ -69,4 +77,12 @@ test('it can change the period and update data', function () {
         ->assertSet('chartData.sales', [])
         ->set('period', 'last_30_days')
         ->assertSet('chartData.sales', [50.0]);
+});
+
+test('it denies access to sales by period for unauthorized user', function () {
+    $user = User::factory()->create();
+    actingAs($user);
+
+    Livewire::test(SalesByPeriod::class)
+        ->assertForbidden();
 });

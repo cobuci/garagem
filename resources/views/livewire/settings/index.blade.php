@@ -27,7 +27,8 @@
             </div>
         </div>
 
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        @can(\App\Enums\Permission::EditSetting->value)
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
             <div class="p-6 border-b border-gray-100 dark:border-gray-700">
                 <h2 class="text-lg font-semibold text-gray-900 dark:text-white">{{ __('settings.sections.general.title') }}</h2>
                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('settings.sections.general.description') }}</p>
@@ -105,5 +106,6 @@
                 <span wire:loading>{{ __('settings.actions.saving') }}</span>
             </x-button>
         </div>
+        @endcan
     </form>
 </div>

@@ -1,18 +1,32 @@
+@use(App\Enums\Permission)
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <div>
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ __('customers.title') }}</h1>
             <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('customers.subtitle') }}</p>
         </div>
-        <x-button
-            primary
-            :label="__('customers.new_customer')"
-            x-on:click="$dispatch('open-drawer', { component: 'customers.create' })"
-            class="shadow-sm"
-        />
+        @can(Permission::CreateCustomer->value)
+            <x-button
+                primary
+                :label="__('customers.new_customer')"
+                x-on:click="$dispatch('open-drawer', { component: 'customers.create' })"
+                class="shadow-sm"
+            />
+        @endcan
     </div>
 
     <livewire:customers.create />
+
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="w-full sm:max-w-xs">
+            <x-input
+                wire:model.live.debounce.300ms="search"
+                icon="magnifying-glass"
+                :placeholder="__('customers.search_placeholder')"
+                class="bg-white dark:bg-gray-800"
+            />
+        </div>
+    </div>
 
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         <div class="overflow-x-auto">

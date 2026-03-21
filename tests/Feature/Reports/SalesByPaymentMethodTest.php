@@ -7,13 +7,20 @@ use App\Livewire\Reports\SalesByPaymentMethod;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Carbon;
 use Livewire\Livewire;
 
 use function Pest\Laravel\actingAs;
+use function Pest\Laravel\seed;
 
-test('it can load sales by payment method for the last 30 days', function () {
+beforeEach(function () {
+    seed(RolesAndPermissionsSeeder::class);
+});
+
+test('it can load sales by payment method for the last 30 days for authorized user', function () {
     $user = User::factory()->create();
+    $user->assignRole('admin');
     actingAs($user);
 
     Sale::query()->delete();
@@ -61,8 +68,9 @@ test('it can load sales by payment method for the last 30 days', function () {
         ]);
 });
 
-test('it filters by period for payment methods', function () {
+test('it filters by period for payment methods for authorized user', function () {
     $user = User::factory()->create();
+    $user->assignRole('admin');
     actingAs($user);
 
     Sale::query()->delete();
@@ -108,4 +116,12 @@ test('it filters by period for payment methods', function () {
         ->assertSet('chartData.series', [100.0])
         ->set('period', 'last_30_days')
         ->assertSet('chartData.series', [50.0, 100.0]);
+});
+
+test('it denies access to sales by payment method for unauthorized user', function () {
+    $user = User::factory()->create();
+    actingAs($user);
+
+    Livewire::test(SalesByPaymentMethod::class)
+        ->assertForbidden();
 });

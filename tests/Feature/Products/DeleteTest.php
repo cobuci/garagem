@@ -1,11 +1,11 @@
 <?php
 
-namespace Tests\Feature\Products;
-
+use App\Enums\Permission;
 use App\Livewire\Products\Delete;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -15,8 +15,25 @@ use function Pest\Laravel\assertSoftDeleted;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    $this->seed(RolesAndPermissionsSeeder::class);
     $this->user = User::factory()->create();
+    $this->user->givePermissionTo(Permission::DeleteProduct->value);
     config(['wireui.style.icon' => 'outline']);
+});
+
+test('it returns 403 when deleting a product without permission', function () {
+    $userWithoutPermission = User::factory()->create();
+    $product = Product::factory()->create(['category_id' => Category::factory()->create()->id]);
+
+    Livewire::actingAs($userWithoutPermission)
+        ->test(Delete::class)
+        ->dispatch('product:delete', product: $product->id)
+        ->assertForbidden();
+
+    Livewire::actingAs($userWithoutPermission)
+        ->test(Delete::class)
+        ->call('destroy')
+        ->assertForbidden();
 });
 
 test('it can delete a product with correct confirmation', function () {

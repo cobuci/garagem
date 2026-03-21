@@ -1,17 +1,37 @@
 <?php
 
+use App\Enums\Permission;
 use App\Livewire\Products\Edit;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    $this->seed(RolesAndPermissionsSeeder::class);
     $this->user = User::factory()->create();
+    $this->user->givePermissionTo(Permission::EditProduct->value);
     config(['wireui.style.icon' => 'outline']);
+});
+
+test('it returns 403 when editing a product without permission', function () {
+    $userWithoutPermission = User::factory()->create();
+    $product = Product::factory()->create(['category_id' => Category::factory()->create()->id]);
+
+    Livewire::actingAs($userWithoutPermission)
+        ->test(Edit::class, ['categories' => new Collection])
+        ->dispatch('product:edit', product: $product->id)
+        ->assertForbidden();
+
+    Livewire::actingAs($userWithoutPermission)
+        ->test(Edit::class, ['categories' => new Collection])
+        ->call('update')
+        ->assertForbidden();
 });
 
 test('it can edit a product with all fields including extra ones', function () {
@@ -32,7 +52,7 @@ test('it can edit a product with all fields including extra ones', function () {
     $expirationDate = now()->addYears(2)->format('Y-m-d');
 
     Livewire::actingAs($this->user)
-        ->test(Edit::class)
+        ->test(Edit::class, ['categories' => Category::all()])
         ->dispatch('product:edit', product: $product->id)
         ->assertSet('editDrawer', true)
         ->assertSet('form.name', 'Old Name')
@@ -70,7 +90,7 @@ test('it validates unique upc excluding current product', function () {
     $product = Product::factory()->create(['upc' => 'MY_UPC', 'category_id' => $category->id]);
 
     Livewire::actingAs($this->user)
-        ->test(Edit::class)
+        ->test(Edit::class, ['categories' => Category::all()])
         ->dispatch('product:edit', product: $product->id)
         ->set('form.upc', 'OTHER_UPC')
         ->call('update')
@@ -85,7 +105,7 @@ test('it validates extra fields numeric and positive', function () {
     $product = Product::factory()->create(['category_id' => $category->id]);
 
     Livewire::actingAs($this->user)
-        ->test(Edit::class)
+        ->test(Edit::class, ['categories' => Category::all()])
         ->dispatch('product:edit', product: $product->id)
         ->set('form.unitCost', 'not-numeric')
         ->set('form.salePrice', -10)
