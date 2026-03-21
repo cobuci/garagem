@@ -5,13 +5,16 @@ namespace Tests\Feature\Settings;
 use App\Livewire\Settings\Index;
 use App\Models\Setting;
 use App\Models\User;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
+    $this->seed(RolesAndPermissionsSeeder::class);
     $this->user = User::factory()->create();
+    $this->user->assignRole('admin');
     $this->actingAs($this->user);
 });
 
@@ -94,4 +97,31 @@ it('applies user locale from session or user model', function () {
         ->assertOk();
 
     expect(app()->getLocale())->toBe('pt_BR');
+});
+
+it('hides global settings from users without permission', function () {
+    $user = User::factory()->create();
+    $user->assignRole('user');
+    $this->actingAs($user);
+
+    $this->get(route('settings.index'))
+        ->assertOk()
+        ->assertDontSee(__('settings.sections.general.title'))
+        ->assertDontSee(__('settings.sections.fees.title'))
+        ->assertDontSee(__('settings.sections.address.title'))
+        ->assertSee(__('settings.sections.preferences.title'));
+});
+
+it('cannot save global settings without permission', function () {
+    $user = User::factory()->create();
+    $user->assignRole('user');
+    $this->actingAs($user);
+
+    Livewire::test(Index::class)
+        ->set('form.store_name', 'Nome Malicioso')
+        ->call('save')
+        ->assertForbidden();
+
+    $settings = Setting::singleton();
+    expect($settings->store_name)->not->toBe('Nome Malicioso');
 });

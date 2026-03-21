@@ -2,16 +2,19 @@
 
 namespace App\Livewire\Settings;
 
+use App\Enums\Permission;
 use App\Livewire\Forms\SettingsForm;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\View\View;
 use Livewire\Component;
 use WireUi\Traits\WireUiActions;
 
 class Index extends Component
 {
+    use AuthorizesRequests;
     use WireUiActions;
 
     public User $user;
@@ -35,6 +38,8 @@ class Index extends Component
 
     public function save(): void
     {
+        $this->authorize(Permission::EditSetting->value);
+
         $this->form->update($this->user);
 
         config(['app.name' => Setting::singleton()->store_name]);

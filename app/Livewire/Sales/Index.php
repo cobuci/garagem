@@ -152,7 +152,7 @@ class Index extends Component
         $sale = Sale::find($saleId);
 
         if (! $sale) {
-            return;
+            return null;
         }
 
         if ($sale->invoice_status === 'ready' && $sale->invoice_path && Storage::exists($sale->invoice_path)) {
@@ -161,6 +161,8 @@ class Index extends Component
 
         $sale->update(['invoice_status' => 'generating']);
         GenerateInvoiceJob::dispatch($sale);
+
+        return null;
     }
 
     public function render(): View
