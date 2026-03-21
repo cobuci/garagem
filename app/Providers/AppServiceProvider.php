@@ -19,8 +19,14 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         $this->configureAppName();
+        $this->configureMail();
 
         Model::unguard();
+    }
+
+    protected function configureMail(): void
+    {
+        config(['mail.markdown.theme' => 'garagem']);
     }
 
     protected function configureDefaults(): void
