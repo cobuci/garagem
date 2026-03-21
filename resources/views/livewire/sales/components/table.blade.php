@@ -37,7 +37,7 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                         {{ $sale->created_at->format('d/m/Y') }}
                     </td>
-                    <td class="px-6 py-4 text-right flex justify-end gap-2">
+                    <td class="px-6 py-4 text-right flex justify-end gap-2 text-nowrap">
                         @if($sale->status === \App\Enums\SaleStatus::Pending)
                             <x-button
                                 xs
