@@ -22,4 +22,8 @@ return [
         'this_month'    => 'This Month',
         'last_6_months' => 'Last 6 Months',
     ],
+    'top_products'       => 'Top Products',
+    'most_sold_products' => 'Most sold products in the selected period',
+    'quantity'           => 'Quantity',
+    'units'              => 'units',
 ];

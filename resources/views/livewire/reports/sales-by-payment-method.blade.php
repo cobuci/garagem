@@ -1,4 +1,4 @@
-<div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+<div wire:key="sales-by-payment-method" class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
             <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ __('reports.sales_by_payment_method') }}</h3>
