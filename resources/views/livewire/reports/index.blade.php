@@ -8,7 +8,8 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <livewire:reports.sales-by-period lazy />
+        <livewire:reports.sales-by-payment-method lazy />
     </div>
 </div>

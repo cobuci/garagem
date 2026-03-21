@@ -37,8 +37,49 @@
             labels: @js($this->chartData['labels']),
             sales: @js($this->chartData['sales']),
             profit: @js($this->chartData['profit']),
+            chart: null,
             init() {
-                let chart = new ApexCharts(this.$refs.chart, {
+                this.$nextTick(() => {
+                    this.initChart();
+                });
+
+                this.$watch('sales', (value) => {
+                    if (this.chart) {
+                        this.chart.updateSeries([
+                            { name: '{{ __('reports.sales') }}', data: value },
+                            { name: '{{ __('reports.profit') }}', data: this.profit }
+                        ]);
+                    }
+                });
+
+                this.$watch('profit', (value) => {
+                    if (this.chart) {
+                        this.chart.updateSeries([
+                            { name: '{{ __('reports.sales') }}', data: this.sales },
+                            { name: '{{ __('reports.profit') }}', data: value }
+                        ]);
+                    }
+                });
+
+                this.$watch('labels', (value) => {
+                    if (this.chart) {
+                        this.chart.updateOptions({
+                            xaxis: { categories: value }
+                        });
+                    }
+                });
+            },
+            initChart() {
+                if (!this.$refs.chart) {
+                    setTimeout(() => this.initChart(), 50);
+                    return;
+                }
+
+                if (this.chart) {
+                    this.chart.destroy();
+                }
+
+                this.chart = new ApexCharts(this.$refs.chart, {
                     chart: {
                         type: 'area',
                         height: 350,
@@ -86,7 +127,8 @@
                         labels: {
                             style: {
                                 colors: '#9ca3af',
-                                fontSize: '12px'
+                                fontSize: '11px',
+                                fontFamily: 'Inter, ui-sans-serif, system-ui'
                             }
                         }
                     },
@@ -94,33 +136,36 @@
                         labels: {
                             style: {
                                 colors: '#9ca3af',
-                                fontSize: '12px'
+                                fontSize: '11px',
+                                fontFamily: 'Inter, ui-sans-serif, system-ui'
                             },
                             formatter: function(val) {
                                 return 'R$ ' + val.toLocaleString('pt-BR');
                             }
                         }
                     },
+                    responsive: [
+                        {
+                            breakpoint: 640,
+                            options: {
+                                chart: {
+                                    height: 250
+                                },
+                                xaxis: {
+                                    labels: {
+                                        show: false
+                                    }
+                                }
+                            }
+                        }
+                    ],
                     tooltip: {
                         x: { show: true },
                         theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
                     },
                     legend: { show: false }
                 });
-                chart.render();
-
-                this.$watch('sales', (value) => {
-                    chart.updateSeries([
-                        { name: '{{ __('reports.sales') }}', data: value },
-                        { name: '{{ __('reports.profit') }}', data: this.profit }
-                    ]);
-                });
-
-                this.$watch('labels', (value) => {
-                    chart.updateOptions({
-                        xaxis: { categories: value }
-                    });
-                });
+                this.chart.render();
             }
         }"
         class="w-full"
