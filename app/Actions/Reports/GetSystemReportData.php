@@ -22,14 +22,14 @@ class GetSystemReportData
             ->get();
 
         $transactions = FinancialTransaction::query()
-            ->whereBetween('created_at', [$start, $end])
+            ->whereBetween('transaction_date', [$start, $end])
             ->get();
 
         return [
-            'totalRevenue'         => $sales->sum('total_amount'),
-            'totalDiscount'        => $sales->sum('discount_amount'),
-            'totalFees'            => $sales->sum('fee_amount'),
-            'netSales'             => $sales->sum('net_amount'),
+            'totalRevenue'         => $sales->sum(fn ($sale) => $sale->getRawOriginal('total_amount')),
+            'totalDiscount'        => $sales->sum(fn ($sale) => $sale->getRawOriginal('discount_amount')),
+            'totalFees'            => $sales->sum(fn ($sale) => $sale->getRawOriginal('fee_amount')),
+            'netSales'             => $sales->sum(fn ($sale) => $sale->getRawOriginal('net_amount')),
             'salesByPaymentMethod' => $this->getSalesByPaymentMethod($sales),
             'topProducts'          => $this->getTopProducts($start, $end),
             'inflow'               => $this->calculateInflow($transactions),
@@ -45,7 +45,7 @@ class GetSystemReportData
         return $sales->groupBy('payment_method')
             ->map(fn (Collection $group) => [
                 'count'  => $group->count(),
-                'amount' => $group->sum('total_amount'),
+                'amount' => $group->sum(fn ($sale) => $sale->getRawOriginal('total_amount')),
             ]);
     }
 
@@ -66,14 +66,14 @@ class GetSystemReportData
     protected function calculateInflow(Collection $transactions): int|float
     {
         return $transactions
-            ->filter(fn (FinancialTransaction $t) => $t->type !== TransactionType::Purchase && $t->amount > 0)
-            ->sum('amount');
+            ->filter(fn (FinancialTransaction $t) => $t->type !== TransactionType::Purchase && $t->getRawOriginal('amount') > 0)
+            ->sum(fn ($t) => $t->getRawOriginal('amount'));
     }
 
     protected function calculateOutflow(Collection $transactions): int|float
     {
         return $transactions
-            ->filter(fn (FinancialTransaction $t) => $t->type === TransactionType::Purchase || $t->amount < 0)
-            ->sum('amount');
+            ->filter(fn (FinancialTransaction $t) => $t->type === TransactionType::Purchase || $t->getRawOriginal('amount') < 0)
+            ->sum(fn ($t) => $t->getRawOriginal('amount'));
     }
 }
