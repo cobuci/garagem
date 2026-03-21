@@ -96,21 +96,25 @@
                             </td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
                                 <div class="flex justify-end gap-2">
-                                    <x-button
-                                        xs
-                                        outline
-                                        negative
-                                        label="{{ __('bills_payable.actions.cancel') }}"
-                                        wire:click="confirmCancellation({{ $bill->id }})"
-                                    />
-
-                                    @if (!$bill->is_paid)
+                                    @can(\App\Enums\Permission::DeleteProductPurchase->value)
                                         <x-button
                                             xs
-                                            primary
-                                            label="{{ __('bills_payable.actions.pay') }}"
-                                            wire:click="confirmPayment({{ $bill->id }})"
+                                            outline
+                                            negative
+                                            label="{{ __('bills_payable.actions.cancel') }}"
+                                            wire:click="confirmCancellation({{ $bill->id }})"
                                         />
+                                    @endcan
+
+                                    @if (!$bill->is_paid)
+                                        @can(\App\Enums\Permission::EditProductPurchase->value)
+                                            <x-button
+                                                xs
+                                                primary
+                                                label="{{ __('bills_payable.actions.pay') }}"
+                                                wire:click="confirmPayment({{ $bill->id }})"
+                                            />
+                                        @endcan
                                     @endif
                                 </div>
                             </td>
