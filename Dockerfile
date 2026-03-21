@@ -1,17 +1,3 @@
-FROM composer:2 AS vendor
-
-WORKDIR /app
-
-COPY composer.json composer.lock ./
-
-RUN composer install \
-    --no-dev \
-    --no-interaction \
-    --no-progress \
-    --prefer-dist \
-    --optimize-autoloader \
-    --ignore-platform-req=ext-pcntl
-
 FROM php:8.4-fpm
 
 RUN apt-get update && apt-get install -y \
@@ -19,12 +5,12 @@ RUN apt-get update && apt-get install -y \
     supervisor \
     git \
     unzip \
+    curl \
     libzip-dev \
     libicu-dev \
     libonig-dev \
     libpng-dev \
-    libxml2-dev \
-    curl
+    libxml2-dev
 
 RUN docker-php-ext-install \
     pdo_mysql \
@@ -33,10 +19,17 @@ RUN docker-php-ext-install \
     intl \
     opcache
 
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
 WORKDIR /var/www
 
-COPY --from=vendor /app/vendor /var/www/vendor
 COPY . .
+
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --prefer-dist \
+    --optimize-autoloader
 
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 775 storage bootstrap/cache
