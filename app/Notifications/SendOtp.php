@@ -27,8 +27,8 @@ class SendOtp extends OneTimePasswordNotification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject(__('login.otp_subject'))
-            ->line(__('login.otp_line1', ['otp' => $this->oneTimePassword->password]))
-            ->line(__('login.otp_line2'))
-            ->line(__('login.otp_line3'));
+            ->markdown('mail.otp', [
+                'otp' => $this->oneTimePassword->password,
+            ]);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Livewire\Forms;
 
 use App\Models\Setting;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Form;
 
 class SettingsForm extends Form
@@ -55,6 +56,8 @@ class SettingsForm extends Form
         $this->validate();
 
         Setting::singleton()->update($this->except(['locale']));
+
+        Cache::forget('store_name');
 
         $user->update(['locale' => $this->locale]);
     }

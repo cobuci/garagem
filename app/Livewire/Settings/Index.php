@@ -37,6 +37,8 @@ class Index extends Component
     {
         $this->form->update($this->user);
 
+        config(['app.name' => Setting::singleton()->store_name]);
+
         $this->notification()->success(
             title: __('settings.actions.success'),
         );

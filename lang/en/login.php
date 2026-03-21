@@ -19,8 +19,8 @@ return [
     'otp_sent_message'  => 'OTP sent to your email.',
     'invalid_otp'       => 'Invalid OTP.',
     'error'             => 'Error',
-    'otp_subject'       => 'Your One-Time Password',
-    'otp_line1'         => 'Your one-time password is: :otp',
-    'otp_line2'         => 'This password will expire in 10 minutes.',
+    'otp_subject'       => 'Your Access Code',
+    'otp_line1'         => 'Use the code below to access your account.',
+    'otp_line2'         => 'This code will expire in 10 minutes.',
     'otp_line3'         => 'If you did not request this, please ignore this email.',
 ];
