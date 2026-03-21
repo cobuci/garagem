@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
@@ -56,11 +57,14 @@ test('it can generate the report PDF', function () {
         'quantity'   => 1,
     ]);
 
+    Carbon::setTestNow($now = now());
     $job = new GenerateSystemReportJob($user, now()->subDay()->format('Y-m-d'), now()->addDay()->format('Y-m-d'));
     $job->handle(new GetSystemReportData);
 
     Mail::assertSent(SystemReportMail::class);
-    Storage::disk('public')->assertExists('reports/system_report_' . $user->id . '_' . now()->timestamp . '.pdf');
+    Storage::disk('public')->assertExists('reports/system_report_' . $user->id . '_' . $now->timestamp . '.pdf');
+
+    Carbon::setTestNow();
 });
 
 test('it validates the date range', function () {
