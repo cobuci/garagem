@@ -1,15 +1,15 @@
 <div x-data="{ open: false, userDropdown: false, desktopUserDropdown: false }" class="relative">
     <!-- Mobile Top Bar -->
-    <div class="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50">
+    <div class="lg:hidden fixed top-0 left-0 right-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 z-50">
         <div class="flex justify-between items-center p-4">
-            <button @click="open = !open" class="p-2 rounded-md text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <button @click="open = !open" class="p-2 rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 <x-icon name="bars-3" class="w-6 h-6" x-show="!open" x-cloak />
                 <x-icon name="x-mark" class="w-6 h-6" x-show="open" x-cloak />
             </button>
 
             <div class="relative">
                 <button @click="userDropdown = !userDropdown" class="flex items-center focus:outline-none">
-                    <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold border border-gray-300">
+                    <div class="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400 font-bold border border-gray-300 dark:border-gray-600">
                         {{ substr(auth()->user()->name ?? auth()->user()->email, 0, 1) }}
                     </div>
                 </button>
@@ -23,7 +23,7 @@
                      x-transition:leave-start="transform opacity-100 scale-100"
                      x-transition:leave-end="transform opacity-0 scale-95"
                      @click.away="userDropdown = false"
-                     class="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
+                     class="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
                     <div class="py-1">
                         <button @click="darkMode = !darkMode" class="w-full flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border-none bg-transparent cursor-pointer">
                             <x-icon x-show="!darkMode" name="moon" class="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" x-cloak />

@@ -3,8 +3,8 @@
     <div class="flex items-center justify-between">
         <div class="flex items-center space-x-4">
             <a href="{{ route('customers.index') }}" wire:navigate
-               class="p-2 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition shadow-sm">
-                <x-icon name="arrow-left" class="w-5 h-5 text-gray-600"/>
+               class="p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition shadow-sm">
+                <x-icon name="arrow-left" class="w-5 h-5 text-gray-600 dark:text-gray-400"/>
             </a>
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $customer->name }}</h1>
@@ -13,7 +13,7 @@
         </div>
         <div class="flex space-x-3">
             <button wire:click="$dispatch('edit:customer', { customer: {{ $customer->id }} }   )"
-                    class="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-50 transition shadow-sm">
+                    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition shadow-sm">
                 {{ __('customers.edit') }}
             </button>
         </div>
