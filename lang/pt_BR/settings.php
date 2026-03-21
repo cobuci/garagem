@@ -41,7 +41,7 @@ return [
         'success' => 'Configurações atualizadas!',
     ],
     'import_legacy_data'         => 'Importar Dados Legados',
-    'import_legacy_description'  => 'Faça upload de um arquivo SQL do sistema antigo para importar categorias e produtos.',
+    'import_legacy_description'  => 'Faça upload de um arquivo SQL do sistema antigo para importar categorias, produtos e clientes.',
     'sql_file'                   => 'Arquivo SQL',
     'sql_file_hint'              => 'Selecione o arquivo .sql exportado do banco de dados antigo.',
     'import_now'                 => 'Importar Agora',

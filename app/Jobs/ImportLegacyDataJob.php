@@ -2,7 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Enums\Gender;
 use App\Models\Category;
+use App\Models\Customer;
 use App\Models\Product;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -33,6 +35,7 @@ class ImportLegacyDataJob implements ShouldQueue
         DB::transaction(function () use ($sql) {
             $this->importCategories($sql);
             $this->importProducts($sql);
+            $this->importCustomers($sql);
         });
 
         Storage::delete($this->filePath);
@@ -56,8 +59,8 @@ class ImportLegacyDataJob implements ShouldQueue
             $id = (int) $data[0];
             $name = $data[1];
             $icon = isset($data[2]) ? $this->mapIcon($data[2]) : null;
-            $created_at = (isset($data[3]) && $data[3] !== '0000-00-00 00:00:00') ? Carbon::parse($data[3]) : now();
-            $updated_at = (isset($data[4]) && $data[4] !== '0000-00-00 00:00:00') ? Carbon::parse($data[4]) : now();
+            $createdAt = $this->parseDate($data[3]);
+            $updatedAt = $this->parseDate($data[4]);
 
             Category::updateOrCreate(
                 ['id' => $id],
@@ -65,11 +68,81 @@ class ImportLegacyDataJob implements ShouldQueue
                     'name'       => $name,
                     'icon'       => $icon,
                     'sort_order' => $index + 1,
-                    'created_at' => $created_at,
-                    'updated_at' => $updated_at,
+                    'created_at' => $createdAt,
+                    'updated_at' => $updatedAt,
                 ],
             );
         }
+    }
+
+    protected function importCustomers(string $sql): void
+    {
+        if (! preg_match('/INSERT INTO `customers` \(`id`, `name`, `email`, `phone`, `gender`, `zipcode`, `street`, `number`, `district`, `created_at`, `updated_at`\) VALUES\s*(.*?);/s', $sql, $matches)) {
+            return;
+        }
+
+        $rows = $this->splitSqlRows($matches[1]);
+
+        foreach ($rows as $row) {
+            $data = $this->parseSqlRow($row);
+
+            if (count($data) < 11) {
+                continue;
+            }
+
+            $id = (int) $data[0];
+            $name = $this->getUniqueCustomerName($data[1], $id);
+            $email = $this->cleanValue($data[2]);
+            $phone = $this->cleanValue($data[3]);
+            $genderRaw = strtoupper($data[4] ?? '');
+            $zipCode = $this->cleanValue($data[5]);
+            $street = $this->cleanValue($data[6]);
+            $address = $this->cleanValue($data[7]);
+            $neighborhood = $this->cleanValue($data[8]);
+            $createdAt = $this->parseDate($data[9]);
+            $updatedAt = $this->parseDate($data[10]);
+
+            $gender = match (true) {
+                str_starts_with($genderRaw, 'M') => Gender::Male,
+                str_starts_with($genderRaw, 'F') => Gender::Female,
+                default                          => null,
+            };
+
+            Customer::updateOrCreate(
+                ['id' => $id],
+                [
+                    'name'         => $name,
+                    'email'        => $email,
+                    'phone'        => $phone,
+                    'gender'       => $gender,
+                    'zip_code'     => $zipCode,
+                    'street'       => $street,
+                    'address'      => $address,
+                    'neighborhood' => $neighborhood,
+                    'created_at'   => $createdAt,
+                    'updated_at'   => $updatedAt,
+                ],
+            );
+        }
+    }
+
+    protected function getUniqueCustomerName(string $name, int $id): string
+    {
+        $existingCustomer = Customer::find($id);
+
+        if ($existingCustomer) {
+            return $existingCustomer->name;
+        }
+
+        $originalName = $name;
+        $counter = 1;
+
+        while (Customer::where('name', $name)->exists()) {
+            $name = "{$originalName} {$counter}";
+            $counter++;
+        }
+
+        return $name;
     }
 
     protected function importProducts(string $sql): void
@@ -104,15 +177,33 @@ class ImportLegacyDataJob implements ShouldQueue
                         'name'            => $data[1],
                         'brand'           => $data[2],
                         'weight'          => $data[3],
-                        'upc'             => (! isset($data[9]) || $data[9] === 'NULL' || empty($data[9])) ? null : $data[9],
+                        'upc'             => $this->cleanValue($data[9]),
                         'stock_quantity'  => (int) $data[6],
                         'unit_cost'       => (float) $data[4],
                         'sale_price'      => (float) $data[5],
-                        'expiration_date' => (! isset($data[7]) || $data[7] === 'NULL' || empty($data[7]) || str_starts_with($data[7], '0000-00-00') || str_starts_with($data[7], '-0001')) ? null : Carbon::parse($data[7]),
+                        'expiration_date' => $this->parseExpirationDate($data[7] ?? null),
                     ],
                 );
             }
         }
+    }
+
+    protected function parseExpirationDate(?string $value): ?Carbon
+    {
+        if ($value === 'NULL' || empty($value) || str_starts_with($value, '0000-00-00') || str_starts_with($value, '-0001')) {
+            return null;
+        }
+
+        return Carbon::parse($value);
+    }
+
+    protected function parseDate(?string $value): Carbon
+    {
+        if ($value === 'NULL' || $value === '0000-00-00 00:00:00' || empty($value)) {
+            return Carbon::now();
+        }
+
+        return Carbon::parse($value);
     }
 
     protected function mapIcon(string $legacyIcon): string
@@ -175,10 +266,14 @@ class ImportLegacyDataJob implements ShouldQueue
         return $columns;
     }
 
-    protected function cleanValue(string $value): ?string
+    protected function cleanValue(?string $value): ?string
     {
+        if ($value === null) {
+            return null;
+        }
+
         $value = trim($value);
-        if ($value === 'NULL' || $value === 'null') {
+        if ($value === 'NULL' || $value === 'null' || $value === "''" || $value === '""' || $value === '') {
             return null;
         }
 
