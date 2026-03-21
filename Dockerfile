@@ -27,4 +27,4 @@ RUN chmod -R 775 storage bootstrap/cache
 
 EXPOSE 8080
 
-CMD php -S 0.0.0.0:8080 -t public
+CMD php -S 0.0.0.0:${PORT:-8080} -t public
