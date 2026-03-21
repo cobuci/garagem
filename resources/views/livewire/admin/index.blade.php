@@ -18,12 +18,23 @@
                     <x-icon name="arrow-down-tray" class="inline-block w-5 h-5 mr-2" />
                     {{ __('admin.tabs.import') }}
                 </button>
+                <button
+                    wire:click="setActiveTab('roles')"
+                    class="w-1/2 py-4 px-1 text-center border-b-2 font-medium text-sm transition-colors duration-200 {{ $activeTab === 'roles' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' }}"
+                >
+                    <x-icon name="shield-check" class="inline-block w-5 h-5 mr-2" />
+                    {{ __('admin.tabs.roles') }}
+                </button>
             </nav>
         </div>
 
         <div class="p-6">
             @if($activeTab === 'import')
                 <livewire:settings.import />
+            @endif
+
+            @if($activeTab === 'roles')
+                <livewire:roles.index />
             @endif
         </div>
     </div>

@@ -1,4 +1,4 @@
-<div class="max-w-7xl mx-auto space-y-6">
+<div>
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div class="flex items-center space-x-3">
             <div class="p-2 bg-primary-100 dark:bg-primary-900/40 rounded-lg">
@@ -179,7 +179,7 @@
                         <x-icon name="user-group" class="w-10 h-10 text-gray-300 dark:text-gray-600" />
                     </div>
                     <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">{{ __('No Role Selected') }}</h3>
-                    <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">{{ __('Please select a role from the sidebar to manage its access levels and permissions.') }}</p>
+                    <p class="text-gray-500 dark:text-gray-400 max-w-sm mx-auto">{{ __('Please select a role from the list to manage its access levels and permissions.') }}</p>
                 </div>
             @endif
         </div>
