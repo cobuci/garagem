@@ -1,4 +1,4 @@
-FROM php:8.4-fpm
+FROM php:8.4-cli
 
 RUN apt-get update && apt-get install -y \
     git \
@@ -7,8 +7,9 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libpng-dev \
     libxml2-dev \
-    libcurl4-openssl-dev \
-    && docker-php-ext-install \
+    libcurl4-openssl-dev
+
+RUN docker-php-ext-install \
     pdo_mysql \
     bcmath \
     pcntl \
@@ -22,6 +23,8 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader
 
-RUN chown -R www-data:www-data /var/www
+RUN chmod -R 775 storage bootstrap/cache
 
-CMD php artisan serve --host=0.0.0.0 --port=8080
+EXPOSE 8080
+
+CMD php artisan serve --host=0.0.0.0 --port=$PORT
