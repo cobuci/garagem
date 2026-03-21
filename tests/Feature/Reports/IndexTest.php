@@ -3,6 +3,7 @@
 namespace Tests\Feature\Reports;
 
 use App\Livewire\Reports\Index;
+use App\Livewire\Reports\SalesByPeriod;
 use App\Models\User;
 use Livewire\Livewire;
 
@@ -24,5 +25,6 @@ test('it displays the report title and subtitle', function () {
 
     Livewire::test(Index::class)
         ->assertSee(__('reports.title'))
-        ->assertSee(__('reports.subtitle'));
+        ->assertSee(__('reports.subtitle'))
+        ->assertSeeLivewire(SalesByPeriod::class);
 });
