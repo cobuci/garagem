@@ -2,12 +2,14 @@
 
 namespace App\Livewire\RecentActivities;
 
+use App\Enums\Permission;
 use App\Enums\SaleStatus;
 use App\Enums\TransactionType;
 use App\Models\AccountBalance;
 use App\Models\FinancialTransaction;
 use App\Models\ProductPurchase;
 use App\Models\Sale;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -18,6 +20,7 @@ use WireUi\Traits\WireUiActions;
 
 class Index extends Component
 {
+    use AuthorizesRequests;
     use WireUiActions;
     use WithPagination;
 
@@ -34,6 +37,11 @@ class Index extends Component
     public bool $showConfirmCancelModal = false;
 
     public ?int $transactionToCancel = null;
+
+    public function mount(): void
+    {
+        $this->authorize(Permission::ViewFinancialTransaction->value);
+    }
 
     public function updatingType(): void
     {
@@ -87,6 +95,8 @@ class Index extends Component
 
     public function saveAdjustment(): void
     {
+        $this->authorize(Permission::CreateFinancialTransaction->value);
+
         $this->validate([
             'amount'      => 'required|numeric|min:0.01',
             'description' => 'required|string|max:255',
@@ -128,6 +138,8 @@ class Index extends Component
 
     public function cancelAdjustment(): void
     {
+        $this->authorize(Permission::DeleteFinancialTransaction->value);
+
         if (! $this->transactionToCancel) {
             return;
         }
