@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\ProductPurchase;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -23,12 +24,12 @@ test('it returns 403 when purchasing a product without permission', function () 
     $userWithoutPermission = User::factory()->create();
 
     Livewire::actingAs($userWithoutPermission)
-        ->test(Purchase::class)
+        ->test(Purchase::class, ['categories' => new Collection])
         ->call('openDrawer')
         ->assertForbidden();
 
     Livewire::actingAs($userWithoutPermission)
-        ->test(Purchase::class)
+        ->test(Purchase::class, ['categories' => new Collection])
         ->call('save')
         ->assertForbidden();
 });
@@ -46,7 +47,7 @@ test('it can record a product purchase and update stock', function () {
     $invoiceDate = now()->format('Y-m-d');
 
     Livewire::actingAs($this->user)
-        ->test(Purchase::class)
+        ->test(Purchase::class, ['categories' => Category::all()])
         ->set('form.categoryId', $category->id)
         ->set('form.productId', $product->id)
         ->assertSet('form.salePrice', 10.00)
@@ -86,7 +87,7 @@ test('it filters products by category', function () {
     $prod2 = Product::factory()->create(['category_id' => $cat2->id, 'name' => 'Prod 2']);
 
     Livewire::actingAs($this->user)
-        ->test(Purchase::class)
+        ->test(Purchase::class, ['categories' => Category::all()])
         ->set('form.categoryId', $cat1->id)
         ->assertCount('products', 1)
         ->assertSee('Prod 1')
@@ -106,7 +107,7 @@ test('it calculates profit correctly', function () {
     ]);
 
     Livewire::actingAs($this->user)
-        ->test(Purchase::class)
+        ->test(Purchase::class, ['categories' => Category::all()])
         ->set('form.categoryId', $category->id)
         ->set('form.productId', $product->id)
         ->set('form.unitCost', 7.00)
