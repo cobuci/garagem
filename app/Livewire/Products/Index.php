@@ -40,10 +40,13 @@ class Index extends Component
     #[Computed]
     public function stats(): array
     {
-        $products = Product::select('unit_cost', 'sale_price', 'stock_quantity')->get();
+        $stats = Product::query()
+            ->selectRaw('SUM(unit_cost * stock_quantity) as total_cost')
+            ->selectRaw('SUM(sale_price * stock_quantity) as total_sale')
+            ->first();
 
-        $totalCost = $products->sum(fn ($p) => $p->unit_cost * ($p->stock_quantity ?? 0));
-        $totalSale = $products->sum(fn ($p) => $p->sale_price * ($p->stock_quantity ?? 0));
+        $totalCost = ((float) $stats->total_cost) / 100;
+        $totalSale = ((float) $stats->total_sale) / 100;
         $totalProfit = $totalSale - $totalCost;
 
         return [

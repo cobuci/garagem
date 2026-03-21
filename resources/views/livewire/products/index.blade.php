@@ -8,21 +8,22 @@
             </div>
 
             <div class="flex items-center gap-2 sm:justify-end">
+                @php $categories = $this->categories; @endphp
                 @can(\App\Enums\Permission::CreateProductPurchase->value)
                     <div>
-                        <livewire:products.purchase/>
+                        <livewire:products.purchase :categories="$categories"/>
                     </div>
                 @endcan
 
                 @can(\App\Enums\Permission::CreateProduct->value)
                     <div>
-                        <livewire:products.create/>
+                        <livewire:products.create :categories="$categories"/>
                     </div>
                 @endcan
 
                 @can(\App\Enums\Permission::EditProduct->value)
                     <div>
-                        <livewire:products.edit/>
+                        <livewire:products.edit :categories="$categories"/>
                     </div>
                 @endcan
 
@@ -47,25 +48,26 @@
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            @php $stats = $this->stats; @endphp
             <div class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
                 <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">{{ __('products.total_cost_value') }}</p>
                 <p class="text-lg font-bold text-gray-900 dark:text-white"
                    :class="showPrices ? '' : 'blur-sm select-none'">
-                    {{ __('products.currency_symbol') }} {{ number_format($this->stats['total_cost'], 2, ',', '.') }}
+                    {{ __('products.currency_symbol') }} {{ number_format($stats['total_cost'], 2, ',', '.') }}
                 </p>
             </div>
             <div class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
                 <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">{{ __('products.total_sale_value') }}</p>
                 <p class="text-lg font-bold text-gray-900 dark:text-white"
                    :class="showPrices ? '' : 'blur-sm select-none'">
-                    {{ __('products.currency_symbol') }} {{ number_format($this->stats['total_sale'], 2, ',', '.') }}
+                    {{ __('products.currency_symbol') }} {{ number_format($stats['total_sale'], 2, ',', '.') }}
                 </p>
             </div>
             <div class="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
                 <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">{{ __('products.total_profit') }}</p>
                 <p class="text-lg font-bold text-primary-600 dark:text-primary-400"
                    :class="showPrices ? '' : 'blur-sm select-none'">
-                    {{ __('products.currency_symbol') }} {{ number_format($this->stats['total_profit'], 2, ',', '.') }}
+                    {{ __('products.currency_symbol') }} {{ number_format($stats['total_profit'], 2, ',', '.') }}
                 </p>
             </div>
         </div>
@@ -79,7 +81,7 @@
                     <x-icon name="clock" class="w-4 h-4"/>
                     {{ __('products.latest_products') }}
                 </button>
-                @foreach($this->categories as $category)
+                @foreach($categories as $category)
                     <button
                         wire:click="selectCategory({{ $category->id }})"
                         class="py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors duration-200 flex items-center gap-2 {{ $selectedCategoryId === $category->id ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300' }}"

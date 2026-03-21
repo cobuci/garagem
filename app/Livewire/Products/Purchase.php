@@ -4,7 +4,6 @@ namespace App\Livewire\Products;
 
 use App\Enums\Permission;
 use App\Livewire\Forms\Products\PurchaseForm;
-use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -46,11 +45,7 @@ class Purchase extends Component
         $this->form->invoiceDate = now()->format('Y-m-d');
     }
 
-    #[Computed]
-    public function categories(): Collection
-    {
-        return Category::orderBy('name')->get();
-    }
+    public Collection $categories;
 
     #[Computed]
     public function products(): Collection
