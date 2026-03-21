@@ -22,7 +22,17 @@ beforeEach(function () {
     $this->actingAs($this->user);
 });
 
-it('can render customers index page', function () {
+it('cannot render customers index page without permission', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->get(route('customers.index'))
+        ->assertForbidden();
+});
+
+it('can render customers index page with permission', function () {
+    $this->actingAs($this->user);
+
     get(route('customers.index'))
         ->assertOk()
         ->assertSeeLivewire(Index::class);
