@@ -17,12 +17,12 @@ beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);
 });
 
-test('it can access the roles management page', function () {
+test('it can access the admin page with roles tab', function () {
     $user = User::factory()->create();
     $user->assignRole('admin');
 
     $this->actingAs($user)
-        ->get(route('roles.index'))
+        ->get(route('admin.index', ['t' => 'roles']))
         ->assertStatus(200);
 });
 
@@ -30,13 +30,11 @@ test('it can see roles and permissions', function () {
     $user = User::factory()->create();
     $user->assignRole('admin');
 
-    Role::findOrCreate('manager');
-
     Livewire::actingAs($user)
         ->test(Index::class)
         ->assertSee('Admin')
         ->assertSee('Manager')
-        ->assertSee('customer');
+        ->assertSee('user');
 });
 
 test('it can toggle permissions for a role', function () {

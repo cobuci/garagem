@@ -49,8 +49,8 @@ it('does not show adjustment buttons without create permission', function () {
 
 it('shows adjustment buttons with create permission', function () {
     Livewire::test(Index::class)
-        ->assertSee('Adicionar Saldo')
-        ->assertSee('Remover Saldo');
+        ->assertSee(__('finance.actions.add_balance'))
+        ->assertSee(__('finance.actions.remove_balance'));
 });
 
 it('does not show delete adjustment button without delete permission', function () {
@@ -72,5 +72,5 @@ it('shows delete adjustment button with delete permission', function () {
     ]);
 
     Livewire::test(Index::class)
-        ->assertSeeHtml('wire:click="confirmCancelAdjustment(' . $transaction->id . ')');
+        ->assertSeeHtml('wire:click="confirmCancelAdjustment(' . $transaction->id . ')"');
 });

@@ -4,11 +4,14 @@ namespace App\Livewire\Settings;
 
 use App\Enums\Permission;
 use App\Livewire\Forms\SettingsForm;
+use App\Models\Category;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\View\View;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 use WireUi\Traits\WireUiActions;
 
@@ -20,6 +23,12 @@ class Index extends Component
     public User $user;
 
     public SettingsForm $form;
+
+    #[Computed]
+    public function categories(): Collection
+    {
+        return Category::orderBy('name')->get();
+    }
 
     public function mount(#[CurrentUser] User $user): void
     {
