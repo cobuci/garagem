@@ -12,10 +12,10 @@
                                 placeholder="{{ __('sales.search_placeholder') }}"
                                 shadowless
                                 x-on:keydown.window.prevent.slash="$el.focus()"
-                                class="!rounded-xl border-gray-200 focus:!ring-primary-500/20"
+                                class="!rounded-xl border-gray-200 dark:border-gray-700 focus:!ring-primary-500/20"
                             />
                             <div class="absolute right-3 top-2 hidden sm:flex items-center gap-1 pointer-events-none">
-                                <kbd class="px-1.5 py-0.5 text-[10px] font-sans font-semibold text-gray-400 bg-gray-50 border border-gray-200 rounded-md dark:bg-gray-800 dark:border-gray-700">/</kbd>
+                                <kbd class="px-1.5 py-0.5 text-[10px] font-sans font-semibold text-gray-400 bg-gray-50 border border-gray-200 dark:border-gray-700 rounded-md dark:bg-gray-800">/</kbd>
                             </div>
                         </div>
                         <div class="w-40 sm:w-48">
