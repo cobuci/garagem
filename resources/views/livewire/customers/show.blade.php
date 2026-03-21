@@ -1,3 +1,4 @@
+@use(App\Enums\Permission)
 @use(App\Enums\SaleStatus)
 <div class="space-y-6">
     <div class="flex items-center justify-between">
@@ -12,10 +13,24 @@
             </div>
         </div>
         <div class="flex space-x-3">
-            <button wire:click="$dispatch('edit:customer', { customer: {{ $customer->id }} }   )"
-                    class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition shadow-sm">
-                {{ __('customers.edit') }}
-            </button>
+            @can(Permission::EditCustomer->value)
+                <x-button
+                    white
+                    :label="__('customers.edit')"
+                    wire:click="$dispatch('edit:customer', { customer: {{ $customer->id }} })"
+                    shadow="sm"
+                />
+            @endcan
+
+            @can(Permission::DeleteCustomer->value)
+                <x-button
+                    negative
+                    outline
+                    :label="__('customers.delete')"
+                    @click="$wire.set('showDeleteModal', true)"
+                    shadow="sm"
+                />
+            @endcan
         </div>
     </div>
 
@@ -147,6 +162,25 @@
     @include('livewire.sales.components.details-modal', ['selectedSale' => $this->selectedSale])
     @include('livewire.sales.components.confirm-payment-modal', ['selectedSale' => $this->selectedSale])
     @include('livewire.sales.components.confirm-cancel-modal', ['selectedSale' => $this->selectedSale])
+
+    <x-modal-card wire:model="showDeleteModal" :title="__('customers.delete')">
+        <div class="space-y-4">
+            <div class="flex items-center space-x-3 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                <x-icon name="exclamation-triangle" class="w-6 h-6 text-red-600 dark:text-red-400"/>
+                <p class="text-sm text-red-700 dark:text-red-300 font-medium">
+                    {{ __('customers.delete_confirm') }}
+                </p>
+            </div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+                {{ __('customers.delete_subtitle') }}
+            </p>
+        </div>
+
+        <x-slot name="footer" class="flex justify-end gap-x-4">
+            <x-button flat :label="__('customers.cancel')" x-on:click="close"/>
+            <x-button negative :label="__('customers.delete')" wire:click="delete" spinner="delete"/>
+        </x-slot>
+    </x-modal-card>
 
     <div>
         <livewire:customers.edit/>

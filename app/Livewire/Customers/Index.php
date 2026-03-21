@@ -2,9 +2,11 @@
 
 namespace App\Livewire\Customers;
 
+use App\Enums\Permission;
 use App\Enums\SaleStatus;
 use App\Models\Customer;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
@@ -17,7 +19,13 @@ use Livewire\WithPagination;
  */
 class Index extends Component
 {
+    use AuthorizesRequests;
     use WithPagination;
+
+    public function mount(): void
+    {
+        $this->authorize(Permission::ViewCustomer->value);
+    }
 
     #[Computed, On(['customer:created', 'customer:updated', 'sale:created', 'sale:updated'])]
     public function customers(): LengthAwarePaginator
