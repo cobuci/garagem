@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Layout;
 
+use App\Enums\Permission as PermissionEnum;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -48,7 +49,7 @@ class Sidebar extends Component
                         'icon'       => 'list-bullet',
                         'route'      => 'recent-activities.index',
                         'active'     => request()->routeIs('recent-activities.*'),
-                        'permission' => 'view financial_transaction',
+                        'permission' => PermissionEnum::ViewFinancialTransaction->value,
                     ],
                 ],
             ],
@@ -60,7 +61,7 @@ class Sidebar extends Component
                         'icon'       => 'users',
                         'route'      => 'customers.index',
                         'active'     => request()->routeIs('customers.*'),
-                        'permission' => 'view customer',
+                        'permission' => PermissionEnum::ViewCustomer->value,
                     ],
                 ],
             ],
@@ -72,7 +73,7 @@ class Sidebar extends Component
                         'icon'       => 'tag',
                         'route'      => 'products.index',
                         'active'     => request()->routeIs('products.*'),
-                        'permission' => 'view product',
+                        'permission' => PermissionEnum::ViewProduct->value,
                     ],
                 ],
             ],
@@ -84,21 +85,21 @@ class Sidebar extends Component
                         'icon'       => 'shopping-bag',
                         'route'      => 'sales.create',
                         'active'     => request()->routeIs('sales.create'),
-                        'permission' => 'create sale',
+                        'permission' => PermissionEnum::CreateSale->value,
                     ],
                     [
                         'label'      => __('sidebar.orders'),
                         'icon'       => 'shopping-cart',
                         'route'      => 'sales.index',
                         'active'     => request()->routeIs('sales.index'),
-                        'permission' => 'view sale',
+                        'permission' => PermissionEnum::ViewSale->value,
                     ],
                     [
                         'label'      => __('sidebar.bills_payable'),
                         'icon'       => 'banknotes',
                         'route'      => 'bills-payable.index',
                         'active'     => request()->routeIs('bills-payable.*'),
-                        'permission' => 'view financial_transaction',
+                        'permission' => PermissionEnum::ViewFinancialTransaction->value,
                     ],
                 ],
             ],
@@ -110,7 +111,7 @@ class Sidebar extends Component
                         'icon'       => 'chart-bar',
                         'route'      => 'reports.index',
                         'active'     => request()->routeIs('reports.*'),
-                        'permission' => 'view financial_transaction',
+                        'permission' => PermissionEnum::ViewFinancialTransaction->value,
                     ],
                 ],
             ],

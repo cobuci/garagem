@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\Permission as PermissionEnum;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -13,24 +14,8 @@ class RolesAndPermissionsSeeder extends Seeder
     {
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $models = [
-            'user',
-            'customer',
-            'category',
-            'product',
-            'product_purchase',
-            'sale',
-            'financial_transaction',
-            'setting',
-            'account_balance',
-        ];
-
-        $actions = ['view', 'create', 'edit', 'delete'];
-
-        foreach ($models as $model) {
-            foreach ($actions as $action) {
-                Permission::findOrCreate("{$action} {$model}");
-            }
+        foreach (PermissionEnum::cases() as $permission) {
+            Permission::findOrCreate($permission->value);
         }
 
         $adminRole = Role::findOrCreate('admin');
@@ -41,9 +26,9 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $userRole = Role::findOrCreate('user');
         $userRole->givePermissionTo([
-            'view product',
-            'view customer',
-            'view category',
+            PermissionEnum::ViewProduct->value,
+            PermissionEnum::ViewCustomer->value,
+            PermissionEnum::ViewCategory->value,
         ]);
     }
 }

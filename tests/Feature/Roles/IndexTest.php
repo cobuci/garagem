@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Roles;
 
+use App\Enums\Permission as PermissionEnum;
 use App\Livewire\Roles\Index;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -30,13 +31,12 @@ test('it can see roles and permissions', function () {
     $user->assignRole('admin');
 
     Role::findOrCreate('manager');
-    Permission::findOrCreate('view test');
 
     Livewire::actingAs($user)
         ->test(Index::class)
         ->assertSee('Admin')
         ->assertSee('Manager')
-        ->assertSee('test');
+        ->assertSee('customer');
 });
 
 test('it can toggle permissions for a role', function () {
@@ -44,18 +44,18 @@ test('it can toggle permissions for a role', function () {
     $user->assignRole('admin');
 
     $manager = Role::findOrCreate('manager');
-    $permission = Permission::findOrCreate('edit test');
+    $permission = PermissionEnum::EditCustomer;
 
     $manager->syncPermissions([]);
 
     Livewire::actingAs($user)
         ->test(Index::class)
         ->call('selectRole', $manager->id)
-        ->set('rolePermissions', [$permission->name])
+        ->set('rolePermissions', [$permission->value])
         ->call('savePermissions')
         ->assertDispatched('wireui:notification');
 
-    expect($manager->fresh()->hasPermissionTo($permission))->toBeTrue();
+    expect($manager->fresh()->hasPermissionTo($permission->value))->toBeTrue();
 
     Livewire::actingAs($user)
         ->test(Index::class)
@@ -64,7 +64,7 @@ test('it can toggle permissions for a role', function () {
         ->call('savePermissions')
         ->assertDispatched('wireui:notification');
 
-    expect($manager->fresh()->hasPermissionTo($permission))->toBeFalse();
+    expect($manager->fresh()->hasPermissionTo($permission->value))->toBeFalse();
 });
 
 test('it cannot toggle permissions for admin role', function () {
@@ -107,14 +107,14 @@ test('it updates permission list when switching roles', function () {
     $roleA = Role::create(['name' => 'Role A']);
     $roleB = Role::create(['name' => 'Role B']);
 
-    $permission = Permission::findOrCreate('view test');
+    $permission = PermissionEnum::ViewCustomer;
 
-    $roleA->givePermissionTo($permission);
+    $roleA->givePermissionTo($permission->value);
 
     Livewire::actingAs($user)
         ->test(Index::class)
         ->call('selectRole', $roleA->id)
-        ->assertSet('rolePermissions', [$permission->name])
+        ->assertSet('rolePermissions', [$permission->value])
         ->call('selectRole', $roleB->id)
         ->assertSet('rolePermissions', []);
 });
