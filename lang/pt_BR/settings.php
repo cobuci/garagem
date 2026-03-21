@@ -22,10 +22,12 @@ return [
             'zip_code_placeholder' => '00000-000',
         ],
         'general' => [
-            'title'                  => 'Informações Gerais',
-            'description'            => 'Informações básicas sobre o seu negócio.',
-            'store_name'             => 'Nome da Loja',
-            'store_name_placeholder' => 'Ex: Garagem das Bebidas',
+            'title'                          => 'Informações Gerais',
+            'description'                    => 'Informações básicas sobre o seu negócio.',
+            'store_name'                     => 'Nome da Loja',
+            'store_name_placeholder'         => 'Ex: Garagem das Bebidas',
+            'skipped_categories'             => 'Categorias Ignoradas',
+            'skipped_categories_placeholder' => 'Selecione as categorias que não entrarão nos cálculos',
         ],
         'preferences' => [
             'title'       => 'Preferências',
