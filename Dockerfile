@@ -9,8 +9,8 @@ RUN composer install \
     --no-interaction \
     --no-progress \
     --prefer-dist \
-    --optimize-autoloader
-
+    --optimize-autoloader \
+    --ignore-platform-req=ext-pcntl
 
 FROM php:8.4-fpm-alpine
 
@@ -34,14 +34,12 @@ RUN docker-php-ext-install \
 WORKDIR /var/www
 
 COPY --from=vendor /app/vendor /var/www/vendor
-
 COPY . .
 
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 775 storage bootstrap/cache
 
 COPY docker/nginx.conf /etc/nginx/http.d/default.conf
-
 COPY docker/supervisord.conf /etc/supervisord.conf
 
 EXPOSE 8080
