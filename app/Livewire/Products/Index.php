@@ -5,6 +5,7 @@ namespace App\Livewire\Products;
 use App\Enums\Permission;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Setting;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -24,11 +25,14 @@ class Index extends Component
 
     public ?int $selectedCategoryId = null;
 
+    public array $skippedCategories = [];
+
     public function mount(): void
     {
         $this->authorize(Permission::ViewProduct->value);
 
         $this->selectedCategoryId = 0;
+        $this->skippedCategories = Setting::singleton()->skipped_categories ?? [];
     }
 
     #[Computed]
@@ -41,6 +45,8 @@ class Index extends Component
     public function stats(): array
     {
         $stats = Product::query()
+            ->when(! empty($this->skippedCategories), fn ($query) => $query->whereNotIn('category_id', $this->skippedCategories))
+            ->where('stock_quantity', '>', 0)
             ->selectRaw('SUM(unit_cost * stock_quantity) as total_cost')
             ->selectRaw('SUM(sale_price * stock_quantity) as total_sale')
             ->first();
@@ -60,7 +66,7 @@ class Index extends Component
     public function products(): LengthAwarePaginator|Paginator|\Illuminate\Support\Collection
     {
         if ($this->selectedCategoryId === 0) {
-            return Product::latest()
+            return Product::orderByDesc('id')
                 ->limit(10)
                 ->get();
         }

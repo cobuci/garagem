@@ -18,10 +18,12 @@ return [
     'bills_payable'      => 'Bills Payable',
     'recent_activities'  => 'Recent Activities',
     'settings'           => 'Settings',
+    'admin'              => 'Admin',
     'roles'              => 'Roles & Permissions',
     'logout'             => 'Logout',
     'user'               => 'User',
     'dark_mode'          => 'Dark Mode',
     'light_mode'         => 'Light Mode',
     'switch_user'        => 'Switch User',
+    'administration'     => 'Administration',
 ];

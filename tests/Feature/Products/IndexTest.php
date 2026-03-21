@@ -81,14 +81,20 @@ test('it defaults to latest products tab (ID 0) on mount', function () {
 
 test('it displays the latest 10 products on the default tab', function () {
     $category = Category::factory()->create(['icon' => 'tag']);
-    Product::factory(5)->create(['created_at' => now()->subDays(10), 'category_id' => $category->id]);
-    $latestProducts = Product::factory(10)->create(['created_at' => now(), 'category_id' => $category->id]);
-    Product::factory(5)->create(['created_at' => now()->subDays(20), 'category_id' => $category->id]);
+
+    Product::factory(5)->create(['category_id' => $category->id]);
+
+    $latestProducts = Product::factory(10)->create(['category_id' => $category->id]);
 
     Livewire::actingAs($this->user)
         ->test(Index::class)
         ->assertCount('products', 10)
-        ->tap(fn ($component) => expect($component->get('products')->pluck('id')->diff($latestProducts->pluck('id')))->toBeEmpty());
+        ->tap(function ($component) use ($latestProducts) {
+            $productIds = $component->get('products')->pluck('id')->sort()->values()->toArray();
+            $expectedIds = $latestProducts->pluck('id')->sort()->values()->toArray();
+
+            expect($productIds)->toBe($expectedIds);
+        });
 });
 
 test('it lists categories ordered by sort_order and name', function () {

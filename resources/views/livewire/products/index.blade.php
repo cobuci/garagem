@@ -90,6 +90,14 @@
                             <x-icon :name="$category->icon" class="w-4 h-4"/>
                         @endif
                         {{ $category->name }}
+
+                        @if(in_array($category->id, $this->skippedCategories))
+                            <x-icon
+                                name="eye-slash"
+                                class="w-3 h-3 text-gray-400"
+                                title="{{ __('products.skipped') }}"
+                            />
+                        @endif
                     </button>
                 @endforeach
             </div>
