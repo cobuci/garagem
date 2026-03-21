@@ -23,4 +23,5 @@ return [
     'user'               => 'User',
     'dark_mode'          => 'Dark Mode',
     'light_mode'         => 'Light Mode',
+    'switch_user'        => 'Switch User',
 ];

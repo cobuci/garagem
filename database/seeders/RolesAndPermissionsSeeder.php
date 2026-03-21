@@ -38,5 +38,12 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $managerRole = Role::findOrCreate('manager');
         $managerRole->givePermissionTo(Permission::all());
+
+        $userRole = Role::findOrCreate('user');
+        $userRole->givePermissionTo([
+            'view product',
+            'view customer',
+            'view category',
+        ]);
     }
 }

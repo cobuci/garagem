@@ -22,6 +22,11 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ])->assignRole('admin');
 
+        User::factory()->create([
+            'name'  => 'Common User',
+            'email' => 'user@example.com',
+        ])->assignRole('user');
+
         $this->call([
             CustomerSeeder::class,
             CategoryProductSeeder::class,
