@@ -31,6 +31,7 @@ test('sidebar displays correct menu items for admin', function () {
 });
 
 test('sidebar hides restricted menu items for common user', function () {
+    $this->seed(RolesAndPermissionsSeeder::class);
     $user = User::factory()->create();
     $user->assignRole('user');
 
@@ -39,11 +40,11 @@ test('sidebar hides restricted menu items for common user', function () {
         ->assertSee(__('sidebar.dashboard'))
         ->assertSee(__('sidebar.customers'))
         ->assertSee(__('sidebar.products'))
+        ->assertSee(__('sidebar.pos'))
+        ->assertSee(__('sidebar.orders'))
+        ->assertSee(__('sidebar.reports'))
         ->assertDontSee(__('sidebar.recent_activities'))
-        ->assertDontSee(__('sidebar.pos'))
-        ->assertDontSee(__('sidebar.orders'))
-        ->assertDontSee(__('sidebar.bills_payable'))
-        ->assertDontSee(__('sidebar.reports'));
+        ->assertDontSee(__('sidebar.bills_payable'));
 });
 
 test('user can switch accounts when not in production', function () {

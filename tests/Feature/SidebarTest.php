@@ -13,8 +13,7 @@ it('renders the sidebar component', function () {
     $settings = Setting::factory()->create(['store_name' => 'Custom Store']);
     config(['app.name' => 'Custom Store']);
 
-    $user = User::factory()->create();
-    $this->actingAs($user);
+    $this->actingAsAdmin();
 
     Livewire::test('layout.sidebar')
         ->assertSee('Custom Store')
