@@ -54,7 +54,7 @@
                 <p class="text-xs font-semibold text-gray-500 uppercase mb-2">{{ __('sales.summary') }}</p>
                 <div class="flex justify-between text-sm">
                     <span class="text-gray-500">{{ __('sales.subtotal') }}</span>
-                    <span class="text-gray-900 dark:text-white">R$ {{ number_format($selectedSale->items->sum('subtotal'), 2, ',', '.') }}</span>
+                    <span class="text-gray-900 dark:text-white font-medium">R$ {{ number_format($selectedSale->items->sum('subtotal'), 2, ',', '.') }}</span>
                 </div>
                 @if($selectedSale->discount_amount > 0)
                     <div class="flex justify-between text-sm">
@@ -87,6 +87,21 @@
             </div>
             <div class="flex gap-x-4">
                 <x-button flat label="{{ __('sales.close') }}" x-on:click="close" />
+                @if($selectedSale)
+                    @if($selectedSale->invoice_status === 'generating')
+                        <x-button secondary outline spinner="downloadInvoice" icon="arrow-path" label="{{ __('sales.generating_invoice') }}" />
+                    @elseif($selectedSale->invoice_status === 'failed')
+                        <x-button negative outline
+                                  icon="exclamation-triangle"
+                                  label="{{ __('sales.invoice_failed_retry') }}"
+                                  wire:click="downloadInvoice({{ $selectedSale->id }})" />
+                    @else
+                        <x-button secondary outline
+                                  icon="arrow-down-tray"
+                                  label="{{ $selectedSale->invoice_status === 'ready' ? __('sales.download_invoice_ready') : __('sales.download_invoice') }}"
+                                  wire:click="downloadInvoice({{ $selectedSale->id }})" />
+                    @endif
+                @endif
                 @if($selectedSale && $selectedSale->status === \App\Enums\SaleStatus::Pending)
                     <x-button primary label="{{ __('sales.mark_as_paid') }}" wire:click="confirmMarkAsPaid({{ $selectedSale->id }})" />
                 @endif
