@@ -14,6 +14,7 @@ use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use WireUi\Traits\WireUiActions;
 
 /**
@@ -146,7 +147,7 @@ class Index extends Component
         $this->notification()->success(__('sales.cancel_sale_success'));
     }
 
-    public function downloadInvoice(int $saleId)
+    public function downloadInvoice(int $saleId): ?StreamedResponse
     {
         $sale = Sale::find($saleId);
 

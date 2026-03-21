@@ -2,14 +2,17 @@
 
 namespace App\Livewire\Reports;
 
+use App\Enums\Permission;
 use App\Jobs\GenerateSystemReportJob;
 use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use WireUi\Traits\WireUiActions;
 
 class ExportReport extends Component
 {
+    use AuthorizesRequests;
     use WireUiActions;
 
     public bool $showModal = false;
@@ -20,12 +23,16 @@ class ExportReport extends Component
 
     public function mount(): void
     {
+        $this->authorize(Permission::ViewReport->value);
+
         $this->startDate = now()->startOfMonth()->format('Y-m-d');
         $this->endDate = now()->format('Y-m-d');
     }
 
     public function export(): void
     {
+        $this->authorize(Permission::ViewReport->value);
+
         $this->validate([
             'startDate' => ['required', 'date', 'before_or_equal:endDate'],
             'endDate'   => ['required', 'date', 'after_or_equal:startDate'],

@@ -33,6 +33,7 @@ class RolesAndPermissionsSeeder extends Seeder
             PermissionEnum::CreateSale->value,
             PermissionEnum::ViewProductPurchase->value,
             PermissionEnum::CreateProductPurchase->value,
+            PermissionEnum::ViewReport->value,
         ]);
     }
 }

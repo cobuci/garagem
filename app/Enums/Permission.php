@@ -52,4 +52,5 @@ enum Permission: string
     case CreateRole = 'create role';
     case EditRole = 'edit role';
     case DeleteRole = 'delete role';
+    case ViewReport = 'view report';
 }

@@ -9,7 +9,6 @@ use App\Models\ProductPurchase;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Livewire\Livewire;
-use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
     $this->seed(RolesAndPermissionsSeeder::class);

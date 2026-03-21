@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Reports;
 
+use App\Enums\Permission;
 use App\Enums\SaleStatus;
 use App\Models\Sale;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -12,7 +14,14 @@ use Livewire\Component;
 
 class SalesByPaymentMethod extends Component
 {
+    use AuthorizesRequests;
+
     public string $period = 'last_30_days';
+
+    public function mount(): void
+    {
+        $this->authorize(Permission::ViewReport->value);
+    }
 
     #[Computed]
     public function chartData(): array

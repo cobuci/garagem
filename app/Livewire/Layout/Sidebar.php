@@ -111,7 +111,7 @@ class Sidebar extends Component
                         'icon'       => 'chart-bar',
                         'route'      => 'reports.index',
                         'active'     => request()->routeIs('reports.*'),
-                        'permission' => PermissionEnum::ViewFinancialTransaction->value,
+                        'permission' => PermissionEnum::ViewReport->value,
                     ],
                 ],
             ],
