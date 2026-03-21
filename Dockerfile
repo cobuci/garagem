@@ -12,17 +12,19 @@ RUN composer install \
     --optimize-autoloader \
     --ignore-platform-req=ext-pcntl
 
-FROM php:8.4-fpm-alpine
+FROM php:8.4-fpm
 
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     nginx \
     supervisor \
-    bash \
     git \
-    curl \
+    unzip \
     libzip-dev \
-    oniguruma-dev \
-    icu-dev
+    libicu-dev \
+    libonig-dev \
+    libpng-dev \
+    libxml2-dev \
+    curl
 
 RUN docker-php-ext-install \
     pdo_mysql \
@@ -39,9 +41,9 @@ COPY . .
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 775 storage bootstrap/cache
 
-COPY docker/nginx.conf /etc/nginx/http.d/default.conf
-COPY docker/supervisord.conf /etc/supervisord.conf
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 EXPOSE 8080
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["/usr/bin/supervisord"]
