@@ -36,6 +36,12 @@
                                 {{ __('sidebar.settings') }}
                             </a>
                         @endcan
+                        @can(\App\Enums\Permission::ViewAdmin->value)
+                            <a href="{{ route('admin.index') }}" wire:navigate class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <x-icon name="shield-check" class="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
+                                {{ __('sidebar.admin') }}
+                            </a>
+                        @endcan
                         @can(\App\Enums\Permission::ViewUser->value)
                             <a href="{{ route('roles.index') }}" wire:navigate class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
                                 <x-icon name="shield-check" class="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
@@ -147,6 +153,12 @@
                             <a href="{{ route('settings.index') }}" wire:navigate class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <x-icon name="cog-6-tooth" class="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
                                 {{ __('sidebar.settings') }}
+                            </a>
+                        @endcan
+                        @can(\App\Enums\Permission::ViewAdmin->value)
+                            <a href="{{ route('admin.index') }}" wire:navigate class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <x-icon name="shield-check" class="mr-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
+                                {{ __('sidebar.admin') }}
                             </a>
                         @endcan
                         @can(\App\Enums\Permission::ViewUser->value)

@@ -18,10 +18,12 @@ return [
     'bills_payable'      => 'Contas a Pagar',
     'recent_activities'  => 'Atividades Recentes',
     'settings'           => 'Configurações',
+    'admin'              => 'Admin',
     'roles'              => 'Roles & Permissões',
     'logout'             => 'Sair',
     'user'               => 'Usuário',
     'dark_mode'          => 'Modo Escuro',
     'light_mode'         => 'Modo Claro',
     'switch_user'        => 'Trocar Usuário',
+    'administration'     => 'Administração',
 ];

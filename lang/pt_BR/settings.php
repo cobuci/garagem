@@ -40,4 +40,12 @@ return [
         'saving'  => 'Salvando...',
         'success' => 'Configurações atualizadas!',
     ],
+    'import_legacy_data'         => 'Importar Dados Legados',
+    'import_legacy_description'  => 'Faça upload de um arquivo SQL do sistema antigo para importar categorias e produtos.',
+    'sql_file'                   => 'Arquivo SQL',
+    'sql_file_hint'              => 'Selecione o arquivo .sql exportado do banco de dados antigo.',
+    'import_now'                 => 'Importar Agora',
+    'import_notice'              => 'A importação é processada em segundo plano. O tempo de conclusão depende do tamanho do arquivo.',
+    'import_started'             => 'Importação Iniciada',
+    'import_started_description' => 'O arquivo foi recebido e está sendo processado. Os dados aparecerão no sistema em breve.',
 ];

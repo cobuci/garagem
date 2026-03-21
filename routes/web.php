@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Admin\Index as AdminIndex;
 use App\Livewire\BillsPayable\Index as BillsPayableIndex;
 use App\Livewire\Customers\Index as CustomersIndex;
 use App\Livewire\Customers\Show as CustomersShow;
@@ -29,5 +30,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/recent-activities', RecentActivitiesIndex::class)->name('recent-activities.index');
     Route::get('/reports', ReportsIndex::class)->name('reports.index');
     Route::get('/settings', SettingsIndex::class)->name('settings.index');
+    Route::get('/admin', AdminIndex::class)->name('admin.index');
     Route::get('/roles', RolesIndex::class)->name('roles.index');
 });
