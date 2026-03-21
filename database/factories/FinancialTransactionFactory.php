@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Enums\TransactionType;
-use App\Models\FinancialTransaction;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class FinancialTransactionFactory extends Factory
