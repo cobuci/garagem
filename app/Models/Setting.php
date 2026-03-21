@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Database\Factories\SettingFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
@@ -19,6 +21,9 @@ use Illuminate\Support\Carbon;
  */
 class Setting extends Model
 {
+    /** @use HasFactory<SettingFactory> */
+    use HasFactory;
+
     protected $guarded = ['id'];
 
     public static function singleton(): self

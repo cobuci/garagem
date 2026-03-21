@@ -128,7 +128,7 @@
 <body>
     <div class="header">
         <div class="header-left">
-            <div class="store-name">{{ $settings->store_name ?? config('app.name') }}</div>
+            <div class="store-name">{{ config('app.name') }}</div>
             <div class="invoice-title">{{ __('sales.invoice') }} #{{ $sale->id }}</div>
         </div>
         <div class="header-right">
@@ -194,7 +194,7 @@
     </div>
 
     <div class="footer">
-        {{ $settings->store_name ?? config('app.name') }} - {{ date('Y') }}
+        {{ config('app.name') }} - {{ date('Y') }}
     </div>
 </body>
 </html>

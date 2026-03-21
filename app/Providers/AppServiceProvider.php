@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Setting;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
@@ -16,6 +18,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->configureAppName();
 
         Model::unguard();
     }
@@ -38,5 +41,19 @@ class AppServiceProvider extends ServiceProvider
                 ->uncompromised()
             : null,
         );
+    }
+
+    protected function configureAppName(): void
+    {
+        try {
+            $storeName = Cache::remember('store_name', 3600, function () {
+                return Setting::first()?->store_name;
+            });
+
+            if ($storeName) {
+                config(['app.name' => $storeName]);
+            }
+        } catch (\Throwable $e) {
+        }
     }
 }

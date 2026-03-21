@@ -29,6 +29,7 @@ it('can update general settings', function () {
 
     $settings = Setting::singleton();
     expect($settings->store_name)->toBe('Minha Loja');
+    expect(config('app.name'))->toBe('Minha Loja');
 });
 
 it('can update card fees', function () {

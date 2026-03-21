@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -9,11 +10,14 @@ use function Pest\Laravel\assertGuest;
 uses(RefreshDatabase::class);
 
 it('renders the sidebar component', function () {
+    $settings = Setting::factory()->create(['store_name' => 'Custom Store']);
+    config(['app.name' => 'Custom Store']);
+
     $user = User::factory()->create();
     $this->actingAs($user);
 
     Livewire::test('layout.sidebar')
-        ->assertSee(config('app.name'))
+        ->assertSee('Custom Store')
         ->assertSee(__('sidebar.dashboard'))
         ->assertSee(__('sidebar.sales'))
         ->assertSee(__('sidebar.settings'))
