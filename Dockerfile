@@ -1,30 +1,49 @@
-FROM php:8.4-cli
+FROM composer:2 AS vendor
 
-RUN apt-get update && apt-get install -y \
+WORKDIR /app
+
+COPY composer.json composer.lock ./
+
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --no-progress \
+    --prefer-dist \
+    --optimize-autoloader
+
+
+FROM php:8.4-fpm-alpine
+
+RUN apk add --no-cache \
+    nginx \
+    supervisor \
+    bash \
     git \
-    unzip \
+    curl \
     libzip-dev \
-    libonig-dev \
-    libpng-dev \
-    libxml2-dev \
-    libcurl4-openssl-dev
+    oniguruma-dev \
+    icu-dev
 
 RUN docker-php-ext-install \
     pdo_mysql \
     bcmath \
     pcntl \
+    intl \
     opcache
-
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
+COPY --from=vendor /app/vendor /var/www/vendor
+
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 775 storage bootstrap/cache
 
-RUN chmod -R 775 storage bootstrap/cache
+COPY docker/nginx.conf /etc/nginx/http.d/default.conf
+
+COPY docker/supervisord.conf /etc/supervisord.conf
 
 EXPOSE 8080
 
-CMD php -S 0.0.0.0:${PORT:-8080} -t public
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
