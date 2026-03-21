@@ -22,6 +22,10 @@ class Index extends Component
     use AuthorizesRequests;
     use WithPagination;
 
+    public string $search = '';
+
+    protected $queryString = ['search' => ['except' => '']];
+
     public function mount(): void
     {
         $this->authorize(Permission::ViewCustomer->value);
@@ -32,8 +36,14 @@ class Index extends Component
     {
         return Customer::query()
             ->withSum(['sales' => fn (Builder $query) => $query->where('status', SaleStatus::Pending)], 'total_amount')
-            ->latest()
+            ->filters(['search' => $this->search])
+            ->orderBy('name')
             ->paginate(10);
+    }
+
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
     }
 
     public function render(): View

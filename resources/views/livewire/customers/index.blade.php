@@ -17,6 +17,17 @@
 
     <livewire:customers.create />
 
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="w-full sm:max-w-xs">
+            <x-input
+                wire:model.live.debounce.300ms="search"
+                icon="magnifying-glass"
+                :placeholder="__('customers.search_placeholder')"
+                class="bg-white dark:bg-gray-800"
+            />
+        </div>
+    </div>
+
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-100 dark:divide-gray-700">
