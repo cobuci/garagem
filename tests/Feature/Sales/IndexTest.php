@@ -1,11 +1,14 @@
 <?php
 
 use App\Enums\SaleStatus;
+use App\Jobs\GenerateInvoiceJob;
 use App\Livewire\Sales\Index;
 use App\Models\AccountBalance;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\User;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
 use function Pest\Laravel\actingAs;
@@ -325,4 +328,49 @@ test('can cancel a paid sale, restore stock and decrement balance', function () 
     expect($sale->status)->toBe(SaleStatus::Cancelled)
         ->and($product->fresh()->stock_quantity)->toBe(10)
         ->and(AccountBalance::singleton()->current_balance)->toEqual(0.00);
+});
+
+test('can dispatch invoice generation job', function () {
+    Queue::fake();
+    $user = User::factory()->create();
+    $sale = Sale::factory()->create();
+
+    actingAs($user);
+
+    Livewire::test(Index::class)
+        ->call('downloadInvoice', $sale->id);
+
+    Queue::assertPushed(GenerateInvoiceJob::class, function ($job) use ($sale) {
+        return $job->sale->id === $sale->id;
+    });
+
+    expect($sale->fresh()->invoice_status)->toBe('generating');
+});
+
+test('can handle invoice generation failure', function () {
+    $user = User::factory()->create();
+    $sale = Sale::factory()->create(['invoice_status' => 'failed']);
+
+    actingAs($user);
+
+    Livewire::test(Index::class)
+        ->call('showDetails', $sale->id)
+        ->assertSee(__('sales.invoice_failed_retry'));
+});
+
+test('can download invoice when it is ready', function () {
+    Storage::fake();
+    $user = User::factory()->create();
+    $sale = Sale::factory()->create([
+        'invoice_status' => 'ready',
+        'invoice_path'   => 'invoices/ready.pdf',
+    ]);
+
+    Storage::put('invoices/ready.pdf', 'dummy content');
+
+    actingAs($user);
+
+    Livewire::test(Index::class)
+        ->call('downloadInvoice', $sale->id)
+        ->assertFileDownloaded("{$sale->id}.pdf");
 });
