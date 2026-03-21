@@ -2,11 +2,13 @@
 
 namespace App\Livewire\Sales;
 
+use App\Enums\Permission as PermissionEnum;
 use App\Enums\SaleStatus;
 use App\Jobs\GenerateInvoiceJob;
 use App\Models\Sale;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
@@ -21,6 +23,7 @@ use WireUi\Traits\WireUiActions;
  */
 class Index extends Component
 {
+    use AuthorizesRequests;
     use WireUiActions;
     use WithPagination;
 
@@ -33,6 +36,11 @@ class Index extends Component
     public bool $showConfirmPaymentModal = false;
 
     public bool $showConfirmCancelModal = false;
+
+    public function mount(): void
+    {
+        $this->authorize(PermissionEnum::ViewSale->value);
+    }
 
     public function filterByStatus(?string $status): void
     {
@@ -82,6 +90,8 @@ class Index extends Component
 
     public function markAsPaid(): void
     {
+        $this->authorize(PermissionEnum::EditSale->value);
+
         if (! $this->selectedSaleId) {
             return;
         }
@@ -112,6 +122,8 @@ class Index extends Component
 
     public function cancelSale(): void
     {
+        $this->authorize(PermissionEnum::EditSale->value);
+
         if (! $this->selectedSaleId) {
             return;
         }

@@ -82,7 +82,9 @@
         <div class="flex justify-between items-center w-full">
             <div>
                 @if($selectedSale && $selectedSale->status !== \App\Enums\SaleStatus::Cancelled)
-                    <x-button negative outline label="{{ __('sales.cancel_sale') }}" wire:click="confirmCancelSale({{ $selectedSale->id }})" />
+                    @can(\App\Enums\Permission::EditSale->value)
+                        <x-button negative outline label="{{ __('sales.cancel_sale') }}" wire:click="confirmCancelSale({{ $selectedSale->id }})" />
+                    @endcan
                 @endif
             </div>
             <div class="flex gap-x-4">
@@ -103,7 +105,9 @@
                     @endif
                 @endif
                 @if($selectedSale && $selectedSale->status === \App\Enums\SaleStatus::Pending)
-                    <x-button primary label="{{ __('sales.mark_as_paid') }}" wire:click="confirmMarkAsPaid({{ $selectedSale->id }})" />
+                    @can(\App\Enums\Permission::EditSale->value)
+                        <x-button primary label="{{ __('sales.mark_as_paid') }}" wire:click="confirmMarkAsPaid({{ $selectedSale->id }})" />
+                    @endcan
                 @endif
             </div>
         </div>
