@@ -37,7 +37,7 @@
                 <h2 class="text-4xl font-black text-slate-900 dark:text-white italic tracking-tighter">{{ config('app.name') }}</h2>
             </div>
 
-            <div class="space-y-2 text-center md:text-left">
+            <div class="space-y-2 text-center">
                 <h2 class="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight leading-tight">
                     {{ $step == 1 ? __('login.welcome_back') : __('login.verify_email') }}
                 </h2>
@@ -77,15 +77,78 @@
                     </form>
                 @else
                     <form wire:submit.prevent="verifyOtp" class="space-y-6">
-                        <x-input
-                            wire:model="otp"
-                            :label="__('login.otp_label')"
-                            :placeholder="__('login.otp_placeholder')"
-                            maxlength="6"
-                            class="text-center text-2xl tracking-[1em] font-mono dark:bg-slate-900/50 dark:border-slate-800 dark:text-slate-200 dark:placeholder-slate-500"
-                            required
-                            autofocus
-                        />
+                        <div x-data="{
+                            otp: @entangle('otp'),
+                            length: 6,
+                            handleInput(e, index) {
+                                let val = e.target.value;
+                                if (val.length > 1) {
+                                    val = val.substring(0, 1);
+                                    e.target.value = val;
+                                }
+
+                                this.updateOtp();
+
+                                if (val.length === 1 && index < this.length - 1) {
+                                    this.$refs['otp' + (index + 1)].focus();
+                                }
+                            },
+                            handleKeyDown(e, index) {
+                                if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+                                    this.$refs['otp' + (index - 1)].focus();
+                                }
+                            },
+                            handlePaste(e) {
+                                let paste = (e.clipboardData || window.clipboardData).getData('text');
+                                paste = paste.replace(/\D/g, '').substring(0, this.length);
+                                if (paste) {
+                                    for (let i = 0; i < paste.length; i++) {
+                                        if (this.$refs['otp' + i]) {
+                                            this.$refs['otp' + i].value = paste[i];
+                                        }
+                                    }
+                                    this.updateOtp();
+                                    let nextIndex = Math.min(paste.length, this.length - 1);
+                                    if (this.$refs['otp' + nextIndex]) {
+                                        this.$refs['otp' + nextIndex].focus();
+                                    }
+                                }
+                            },
+                            updateOtp() {
+                                let code = '';
+                                for (let i = 0; i < this.length; i++) {
+                                    if (this.$refs['otp' + i]) {
+                                        code += this.$refs['otp' + i].value;
+                                    }
+                                }
+                                this.otp = code;
+                            }
+                        }" class="flex flex-col items-center space-y-4">
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                                {{ __('login.otp_label') }}
+                            </label>
+
+                            <div class="flex gap-2 sm:gap-4" @paste="handlePaste">
+                                @for($i = 0; $i < 6; $i++)
+                                    <input
+                                        x-ref="otp{{ $i }}"
+                                        type="text"
+                                        inputmode="numeric"
+                                        maxlength="1"
+                                        class="w-12 h-14 sm:w-14 sm:h-16 text-center text-2xl font-bold border-2 rounded-xl focus:border-primary-500 focus:ring-primary-500 bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white transition-all duration-200 outline-none"
+                                        @input="handleInput($event, {{ $i }})"
+                                        @keydown="handleKeyDown($event, {{ $i }})"
+                                        {{ $i === 0 ? 'autofocus' : '' }}
+                                    />
+                                @endfor
+                            </div>
+
+                            @error('otp')
+                                <span class="text-sm text-negative-600 dark:text-negative-500 font-medium italic">
+                                    {{ $message }}
+                                </span>
+                            @enderror
+                        </div>
 
                         <div class="grid grid-cols-2 gap-4">
                             <x-button
