@@ -23,10 +23,12 @@
     </div>
 
     <div
+        wire:ignore
+        id="chart-top-products"
         x-data="{
-            labels: @js($this->chartData['labels']),
-            quantity: @js($this->chartData['quantity']),
-            revenue: @js($this->chartData['revenue']),
+            labels: @entangle('chartDataArray.labels'),
+            quantity: @entangle('chartDataArray.quantity'),
+            revenue: @entangle('chartDataArray.revenue'),
             chart: null,
             init() {
                 this.$nextTick(() => {

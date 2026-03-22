@@ -18,7 +18,7 @@ class GetSystemReportData
 
         $sales = Sale::query()
             ->whereBetween('created_at', [$start, $end])
-            ->where('status', 'paid')
+            ->where('status', '!=', 'cancelled')
             ->get();
 
         $transactions = FinancialTransaction::query()
@@ -55,7 +55,7 @@ class GetSystemReportData
             ->select('product_id')
             ->selectRaw('SUM(quantity) as total_quantity')
             ->selectRaw('SUM(subtotal) as total_revenue')
-            ->whereHas('sale', fn ($query) => $query->whereBetween('created_at', [$start, $end])->where('status', 'paid'))
+            ->whereHas('sale', fn ($query) => $query->whereBetween('created_at', [$start, $end])->where('status', '!=', 'cancelled'))
             ->groupBy('product_id')
             ->orderByDesc('total_quantity')
             ->with('product')

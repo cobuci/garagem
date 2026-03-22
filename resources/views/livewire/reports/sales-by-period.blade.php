@@ -33,10 +33,12 @@
     </div>
 
     <div
+        wire:ignore
+        id="chart-sales-by-period"
         x-data="{
-            labels: @js($this->chartData['labels']),
-            sales: @js($this->chartData['sales']),
-            profit: @js($this->chartData['profit']),
+            labels: @entangle('chartDataArray.labels'),
+            sales: @entangle('chartDataArray.sales'),
+            profit: @entangle('chartDataArray.profit'),
             chart: null,
             init() {
                 this.$nextTick(() => {

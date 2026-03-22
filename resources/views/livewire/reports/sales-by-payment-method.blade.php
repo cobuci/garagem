@@ -22,9 +22,11 @@
     </div>
 
     <div
+        wire:ignore
+        id="chart-sales-by-payment-method"
         x-data="{
-            labels: @js($this->chartData['labels']),
-            series: @js($this->chartData['series']),
+            labels: @entangle('chartDataArray.labels'),
+            series: @entangle('chartDataArray.series'),
             chart: null,
             init() {
                 this.$nextTick(() => {
