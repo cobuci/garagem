@@ -8,23 +8,13 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
         $this->call(RolesAndPermissionsSeeder::class);
 
-        // User::factory(10)->create();
-
         User::factory()->create([
-            'name'  => 'Test User',
-            'email' => 'test@example.com',
+            'name'  => 'Victor Cobuci',
+            'email' => 'cobuci80@gmail.com',
         ])->assignRole('admin');
-
-        User::factory()->create([
-            'name'  => 'Common User',
-            'email' => 'user@example.com',
-        ])->assignRole('user');
     }
 }

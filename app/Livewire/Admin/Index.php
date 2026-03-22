@@ -13,7 +13,7 @@ class Index extends Component
     use AuthorizesRequests;
 
     #[Url(as: 't')]
-    public string $activeTab = 'import';
+    public string $activeTab = 'users';
 
     public function mount(): void
     {

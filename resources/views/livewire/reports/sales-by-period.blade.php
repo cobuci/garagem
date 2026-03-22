@@ -33,41 +33,32 @@
     </div>
 
     <div
+        wire:ignore
+        id="chart-sales-by-period"
         x-data="{
-            labels: @js($this->chartData['labels']),
-            sales: @js($this->chartData['sales']),
-            profit: @js($this->chartData['profit']),
+            labels: @entangle('chartDataArray.labels'),
+            sales: @entangle('chartDataArray.sales'),
+            profit: @entangle('chartDataArray.profit'),
             chart: null,
             init() {
                 this.$nextTick(() => {
                     this.initChart();
                 });
 
-                this.$watch('sales', (value) => {
-                    if (this.chart) {
-                        this.chart.updateSeries([
-                            { name: '{{ __('reports.sales') }}', data: value },
-                            { name: '{{ __('reports.profit') }}', data: this.profit }
-                        ]);
-                    }
-                });
-
-                this.$watch('profit', (value) => {
-                    if (this.chart) {
-                        this.chart.updateSeries([
+                this.$watch('sales', () => this.updateChart());
+                this.$watch('profit', () => this.updateChart());
+                this.$watch('labels', () => this.updateChart());
+            },
+            updateChart() {
+                if (this.chart) {
+                    this.chart.updateOptions({
+                        xaxis: { categories: this.labels },
+                        series: [
                             { name: '{{ __('reports.sales') }}', data: this.sales },
-                            { name: '{{ __('reports.profit') }}', data: value }
-                        ]);
-                    }
-                });
-
-                this.$watch('labels', (value) => {
-                    if (this.chart) {
-                        this.chart.updateOptions({
-                            xaxis: { categories: value }
-                        });
-                    }
-                });
+                            { name: '{{ __('reports.profit') }}', data: this.profit }
+                        ]
+                    });
+                }
             },
             initChart() {
                 if (!this.$refs.chart) {

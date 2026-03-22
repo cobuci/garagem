@@ -66,17 +66,17 @@ test('it can change the period and update data for authorized user', function ()
 
     $sale->items()->create([
         'product_id' => $product->id,
-        'subtotal'   => 50,
-        'unit_cost'  => 30,
+        'subtotal'   => 50.0,
+        'unit_cost'  => 30.0,
         'quantity'   => 1,
-        'unit_price' => 50,
+        'unit_price' => 50.0,
     ]);
 
     Livewire::test(SalesByPeriod::class)
         ->set('period', 'today')
-        ->assertSet('chartData.sales', [])
+        ->assertSet('chartDataArray.sales', [])
         ->set('period', 'last_30_days')
-        ->assertSet('chartData.sales', [50.0]);
+        ->assertSet('chartDataArray.sales', [50.0]);
 });
 
 test('it denies access to sales by period for unauthorized user', function () {

@@ -175,3 +175,12 @@ it('only users with DeleteCustomer permission can delete a customer', function (
 
     expect(Customer::where('id', $customer->id)->exists())->toBeFalse();
 });
+
+it('can call downloadInvoice method', function () {
+    $customer = Customer::factory()->create();
+    $sale = Sale::factory()->create(['customer_id' => $customer->id]);
+
+    Livewire::test(Show::class, ['customer' => $customer])
+        ->call('downloadInvoice', $sale->id)
+        ->assertStatus(200);
+});

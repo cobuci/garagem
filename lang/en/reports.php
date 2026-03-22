@@ -52,7 +52,7 @@ return [
         'total_sales_gross'       => 'Total Sales (Gross)',
         'transactions'            => 'Transactions',
         'net_revenue'             => 'Net Revenue',
-        'after_discounts_fees'    => 'After discounts & fees',
+        'after_discounts_fees'    => 'After discounts, fees & cost',
         'net_balance'             => 'Net Balance',
         'period_cash_flow'        => 'Period Cash Flow',
         'discounts_applied'       => 'Discounts Applied',

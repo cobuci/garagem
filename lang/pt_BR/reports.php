@@ -52,7 +52,7 @@ return [
         'total_sales_gross'       => 'Vendas Totais (Bruto)',
         'transactions'            => 'Transações',
         'net_revenue'             => 'Receita Líquida',
-        'after_discounts_fees'    => 'Após descontos e taxas',
+        'after_discounts_fees'    => 'Após descontos, taxas e custo',
         'net_balance'             => 'Saldo Líquido',
         'period_cash_flow'        => 'Fluxo de Caixa do Período',
         'discounts_applied'       => 'Descontos Aplicados',

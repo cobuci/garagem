@@ -4,15 +4,18 @@ namespace App\Livewire\Customers;
 
 use App\Enums\Permission;
 use App\Enums\SaleStatus;
+use App\Jobs\GenerateInvoiceJob;
 use App\Models\Customer;
 use App\Models\Sale;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use WireUi\Traits\WireUiActions;
 
 /**
@@ -162,6 +165,24 @@ class Show extends Component
         $this->notification()->success(__('customers.delete_success'));
 
         $this->redirect(route('customers.index'), navigate: true);
+    }
+
+    public function downloadInvoice(int $saleId): ?StreamedResponse
+    {
+        $sale = Sale::find($saleId);
+
+        if (! $sale) {
+            return null;
+        }
+
+        if ($sale->invoice_status === 'ready' && $sale->invoice_path && Storage::exists($sale->invoice_path)) {
+            return Storage::download($sale->invoice_path, "{$sale->id}.pdf");
+        }
+
+        $sale->update(['invoice_status' => 'generating']);
+        GenerateInvoiceJob::dispatch($sale);
+
+        return null;
     }
 
     public function render(): View

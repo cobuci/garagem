@@ -22,28 +22,27 @@
     </div>
 
     <div
+        wire:ignore
+        id="chart-sales-by-payment-method"
         x-data="{
-            labels: @js($this->chartData['labels']),
-            series: @js($this->chartData['series']),
+            labels: @entangle('chartDataArray.labels'),
+            series: @entangle('chartDataArray.series'),
             chart: null,
             init() {
                 this.$nextTick(() => {
                     this.initChart();
                 });
 
-                this.$watch('series', (value) => {
-                    if (this.chart) {
-                        this.chart.updateSeries(value);
-                    }
-                });
-
-                this.$watch('labels', (value) => {
-                    if (this.chart) {
-                        this.chart.updateOptions({
-                            labels: value
-                        });
-                    }
-                });
+                this.$watch('series', () => this.updateChart());
+                this.$watch('labels', () => this.updateChart());
+            },
+            updateChart() {
+                if (this.chart) {
+                    this.chart.updateOptions({
+                        labels: this.labels,
+                        series: this.series
+                    });
+                }
             },
             initChart() {
                 if (!this.$refs.chart) {

@@ -3,7 +3,7 @@
 <x-modal-card wire:model="showDetailsModal" title="{{ __('sales.sale_details') }}" max-width="2xl">
     @if($selectedSale)
         <div class="space-y-6">
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <p class="text-xs font-semibold text-gray-500 uppercase">{{ __('sales.customer') }}</p>
                     <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $selectedSale->customer->name ?? __('sales.customer_placeholder') }}</p>
@@ -26,9 +26,9 @@
                 </div>
             </div>
 
-            <div class="border-t border-gray-100 dark:border-gray-700 pt-4">
+            <div class="border-t border-gray-100 dark:border-gray-700 pt-4 overflow-x-auto">
                 <p class="text-xs font-semibold text-gray-500 uppercase mb-2">{{ __('sales.items') }}</p>
-                <table class="w-full text-sm">
+                <table class="w-full text-sm min-w-[500px] sm:min-w-full">
                     <thead class="bg-gray-50 dark:bg-gray-900/50">
                         <tr>
                             <th class="px-2 py-1 text-left">{{ __('sales.product') }}</th>
@@ -79,34 +79,38 @@
     @endif
 
     <x-slot name="footer">
-        <div class="flex justify-between items-center w-full">
-            <div>
+        <div class="flex flex-col sm:flex-row justify-between items-center w-full gap-y-4">
+            <div class="w-full sm:w-auto flex justify-center sm:justify-start">
                 @if($selectedSale && $selectedSale->status !== \App\Enums\SaleStatus::Cancelled)
                     @can(\App\Enums\Permission::EditSale->value)
-                        <x-button negative outline label="{{ __('sales.cancel_sale') }}" wire:click="confirmCancelSale({{ $selectedSale->id }})" />
+                        <x-button negative outline label="{{ __('sales.cancel_sale') }}" wire:click="confirmCancelSale({{ $selectedSale->id }})" class="w-full sm:w-auto" />
                     @endcan
                 @endif
             </div>
-            <div class="flex gap-x-4">
-                <x-button flat label="{{ __('sales.close') }}" x-on:click="close" />
+            <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                <x-button flat label="{{ __('sales.close') }}" x-on:click="close" class="order-last sm:order-first" />
                 @if($selectedSale)
-                    @if($selectedSale->invoice_status === 'generating')
-                        <x-button secondary outline spinner="downloadInvoice" icon="arrow-path" label="{{ __('sales.generating_invoice') }}" />
-                    @elseif($selectedSale->invoice_status === 'failed')
-                        <x-button negative outline
-                                  icon="exclamation-triangle"
-                                  label="{{ __('sales.invoice_failed_retry') }}"
-                                  wire:click="downloadInvoice({{ $selectedSale->id }})" />
-                    @else
-                        <x-button secondary outline
-                                  icon="arrow-down-tray"
-                                  label="{{ $selectedSale->invoice_status === 'ready' ? __('sales.download_invoice_ready') : __('sales.download_invoice') }}"
-                                  wire:click="downloadInvoice({{ $selectedSale->id }})" />
-                    @endif
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        @if($selectedSale->invoice_status === 'generating')
+                            <x-button secondary outline spinner="downloadInvoice" icon="arrow-path" label="{{ __('sales.generating_invoice') }}" class="w-full sm:w-auto" />
+                        @elseif($selectedSale->invoice_status === 'failed')
+                            <x-button negative outline
+                                      icon="exclamation-triangle"
+                                      label="{{ __('sales.invoice_failed_retry') }}"
+                                      wire:click="downloadInvoice({{ $selectedSale->id }})"
+                                      class="w-full sm:w-auto" />
+                        @else
+                            <x-button secondary outline
+                                      icon="arrow-down-tray"
+                                      label="{{ $selectedSale->invoice_status === 'ready' ? __('sales.download_invoice_ready') : __('sales.download_invoice') }}"
+                                      wire:click="downloadInvoice({{ $selectedSale->id }})"
+                                      class="w-full sm:w-auto" />
+                        @endif
+                    </div>
                 @endif
                 @if($selectedSale && $selectedSale->status === \App\Enums\SaleStatus::Pending)
                     @can(\App\Enums\Permission::EditSale->value)
-                        <x-button primary label="{{ __('sales.mark_as_paid') }}" wire:click="confirmMarkAsPaid({{ $selectedSale->id }})" />
+                        <x-button primary label="{{ __('sales.mark_as_paid') }}" wire:click="confirmMarkAsPaid({{ $selectedSale->id }})" class="w-full sm:w-auto" />
                     @endcan
                 @endif
             </div>

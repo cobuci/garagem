@@ -12,7 +12,12 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('settings.sections.preferences.description') }}</p>
             </div>
             <div class="p-6">
-                <div class="max-w-xs">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <x-input
+                        wire:model="form.name"
+                        label="{{ __('settings.sections.preferences.name') }}"
+                    />
+
                     <x-select
                         label="{{ __('settings.sections.preferences.language') }}"
                         wire:model.live="form.locale"

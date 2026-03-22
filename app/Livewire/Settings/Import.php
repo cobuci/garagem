@@ -3,6 +3,7 @@
 namespace App\Livewire\Settings;
 
 use App\Jobs\ImportLegacyDataJob;
+use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use WireUi\Traits\WireUiActions;
@@ -17,7 +18,7 @@ class Import extends Component
     public function save(): void
     {
         $this->validate([
-            'file' => 'required|file|max:10240', // 10MB max
+            'file' => ['required', 'file', 'max:20480'],
         ]);
 
         $path = $this->file->store('temp-imports');
@@ -32,7 +33,7 @@ class Import extends Component
         $this->reset('file');
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.settings.import');
     }

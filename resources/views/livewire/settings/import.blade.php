@@ -10,13 +10,31 @@
 
     <x-card>
         <form wire:submit="save" class="space-y-4">
-            <x-input
-                wire:model="file"
-                type="file"
-                label="{{ __('settings.sql_file') }}"
-                hint="{{ __('settings.sql_file_hint') }}"
-                accept=".sql"
-            />
+            <div
+                x-data="{ uploading: false, progress: 0 }"
+                x-on:livewire-upload-start="uploading = true"
+                x-on:livewire-upload-finish="uploading = false"
+                x-on:livewire-upload-error="uploading = false; $wire.notification().error('{{ __('settings.upload_error_title') }}', '{{ __('settings.upload_error_description') }}')"
+                x-on:livewire-upload-progress="progress = $event.detail.progress"
+            >
+                <x-input
+                    wire:model="file"
+                    type="file"
+                    label="{{ __('settings.sql_file') }}"
+                    hint="{{ __('settings.sql_file_hint') }}"
+                    accept=".sql"
+                />
+
+                <div x-show="uploading" class="mt-2">
+                    <progress max="100" x-bind:value="progress" class="w-full h-2 rounded-full overflow-hidden bg-gray-200 [&::-webkit-progress-bar]:bg-gray-200 [&::-webkit-progress-value]:bg-primary-600 [&::-moz-progress-bar]:bg-primary-600"></progress>
+                </div>
+            </div>
+
+            @error('file')
+                <span class="text-sm text-negative-600 dark:text-negative-500 font-medium italic">
+                    {{ $message }}
+                </span>
+            @enderror
 
             <div class="flex justify-end">
                 <x-button
