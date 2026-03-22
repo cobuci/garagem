@@ -1,8 +1,67 @@
 @import 'tailwindcss';
 
+@import '../../vendor/wireui/wireui/ts/global.css';
+@source '../../vendor/wireui/wireui';
+
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-primary-50: var(--color-sky-50);
+    --color-primary-100: var(--color-sky-100);
+    --color-primary-200: var(--color-sky-200);
+    --color-primary-300: var(--color-sky-300);
+    --color-primary-400: var(--color-sky-400);
+    --color-primary-500: var(--color-sky-500);
+    --color-primary-600: var(--color-sky-600);
+    --color-primary-700: var(--color-sky-700);
+    --color-primary-800: var(--color-sky-800);
+    --color-primary-900: var(--color-sky-900);
+    --color-primary-950: var(--color-sky-950);
+}
+
+[x-cloak] {
+    display: none !important;
+}
+
+@layer base {
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-gray-300) transparent;
+    }
+
+    .dark * {
+        scrollbar-color: var(--color-gray-700) transparent;
+    }
+
+    /* Webkit (Chrome, Safari, Edge) */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--color-gray-300);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--color-gray-400);
+    }
+
+    .dark ::-webkit-scrollbar-thumb {
+        background: var(--color-gray-700);
+    }
+
+    .dark ::-webkit-scrollbar-thumb:hover {
+        background: var(--color-gray-600);
+    }
 }

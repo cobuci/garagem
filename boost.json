@@ -9,7 +9,9 @@
     "nightwatch_mcp": false,
     "sail": false,
     "skills": [
+        "configuring-horizon",
         "livewire-development",
-        "pest-testing"
+        "pest-testing",
+        "tailwindcss-development"
     ]
 }

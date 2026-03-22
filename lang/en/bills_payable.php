@@ -1,0 +1,51 @@
+<?php
+
+return [
+    'title'       => 'Bills Payable',
+    'description' => 'Management of supplier and product payments',
+    'summary'     => [
+        'total_due'  => 'Total Due',
+        'overdue'    => 'Total Overdue',
+        'next_month' => 'Next Month',
+    ],
+    'filters' => [
+        'search_placeholder' => 'Search product...',
+        'pending'            => 'Pending',
+        'paid'               => 'Paid',
+        'all'                => 'All',
+    ],
+    'table' => [
+        'due_date'    => 'Due Date',
+        'product'     => 'Product',
+        'quantity'    => 'Qty',
+        'total_value' => 'Total Value',
+        'status'      => 'Status',
+        'paid_at'     => 'Paid on :date',
+        'overdue'     => 'Overdue',
+        'pending'     => 'Pending',
+        'no_records'  => 'No bills found.',
+    ],
+    'actions' => [
+        'pay'                         => 'Pay',
+        'confirm_payment'             => 'Confirm payment for this bill?',
+        'payment_success_title'       => 'Bills Payable',
+        'payment_success_description' => 'Payment recorded successfully!',
+        'confirm_modal'               => [
+            'title'       => 'Confirm Payment',
+            'description' => 'You are about to record the payment for:',
+            'product'     => 'Product',
+            'value'       => 'Value',
+            'due_date'    => 'Due Date',
+            'confirm'     => 'Confirm Payment',
+        ],
+        'cancel'                     => 'Cancel',
+        'confirm_cancellation'       => 'Confirm cancellation of this bill?',
+        'cancel_success_title'       => 'Bill Cancelled',
+        'cancel_success_description' => 'The bill has been cancelled and stock adjusted.',
+        'cancel_modal'               => [
+            'title'       => 'Cancel Bill',
+            'description' => 'Are you sure you want to cancel this bill? Stock will be reduced and, if the bill is already paid, the balance will be reversed.',
+            'confirm'     => 'Confirm Cancellation',
+        ],
+    ],
+];

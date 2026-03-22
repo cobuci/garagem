@@ -1,0 +1,48 @@
+<?php
+
+namespace App\Models;
+
+use App\Enums\Gender;
+use App\Traits\HasSearch;
+use Database\Factories\CustomerFactory;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
+
+/**
+ * @property int     $id
+ * @property string  $name
+ * @property ?Gender $gender
+ * @property ?string $phone
+ * @property ?string $email
+ * @property ?string $zip_code
+ * @property ?string $street
+ * @property ?string $neighborhood
+ * @property ?Carbon $created_at
+ * @property ?Carbon $updated_at
+ * @property ?Carbon $deleted_at
+ * @property-read Collection<int, Sale> $sales
+ */
+class Customer extends Model
+{
+    /* @use HasFactory<CustomerFactory> */
+    use HasFactory;
+    use HasSearch;
+    use SoftDeletes;
+
+    protected $guarded = ['id'];
+
+    protected array $searchable = ['name', 'email', 'phone'];
+
+    protected $casts = [
+        'gender' => Gender::class,
+    ];
+
+    public function sales(): HasMany
+    {
+        return $this->hasMany(Sale::class);
+    }
+}

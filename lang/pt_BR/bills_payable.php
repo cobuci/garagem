@@ -1,0 +1,56 @@
+<?php
+
+return [
+    'title'       => 'Contas a Pagar',
+    'description' => 'Gerenciamento de pagamentos de fornecedores e produtos',
+    'summary'     => [
+        'total_due'  => 'Total Devido',
+        'overdue'    => 'Total Vencido',
+        'next_month' => 'Próximo Mês',
+    ],
+    'filters' => [
+        'search_placeholder' => 'Buscar produto...',
+        'pending'            => 'Pendentes',
+        'paid'               => 'Pagos',
+        'all'                => 'Todos',
+    ],
+    'table' => [
+        'due_date'      => 'Vencimento',
+        'product'       => 'Produto',
+        'quantity'      => 'Qtd',
+        'total_value'   => 'Valor Total',
+        'status'        => 'Status',
+        'paid_at'       => 'Pago em :date',
+        'overdue'       => 'Vencido',
+        'pending'       => 'Pendente',
+        'no_records'    => 'Nenhuma conta encontrada.',
+        'units'         => 'unidades',
+        'paid'          => 'Pago',
+        'paid_at_short' => 'Pago em :date',
+        'recent_bills'  => 'Contas Recentes',
+        'title_list'    => 'Listagem de Contas',
+    ],
+    'actions' => [
+        'pay'                         => 'Pagar',
+        'confirm_payment'             => 'Confirmar pagamento desta conta?',
+        'payment_success_title'       => 'Contas a Pagar',
+        'payment_success_description' => 'Pagamento registrado com sucesso!',
+        'confirm_modal'               => [
+            'title'       => 'Confirmar Pagamento',
+            'description' => 'Você está prestes a registrar o pagamento para:',
+            'product'     => 'Produto',
+            'value'       => 'Valor',
+            'due_date'    => 'Vencimento',
+            'confirm'     => 'Confirmar Pagamento',
+        ],
+        'cancel'                     => 'Cancelar',
+        'confirm_cancellation'       => 'Confirmar cancelamento desta conta?',
+        'cancel_success_title'       => 'Conta Cancelada',
+        'cancel_success_description' => 'A conta foi cancelada e o estoque ajustado.',
+        'cancel_modal'               => [
+            'title'       => 'Cancelar Conta',
+            'description' => 'Tem certeza que deseja cancelar esta conta? O estoque será reduzido e, se a conta já estiver paga, o saldo será estornado.',
+            'confirm'     => 'Confirmar Cancelamento',
+        ],
+    ],
+];
