@@ -33,6 +33,7 @@ return [
             'title'       => 'Preferences',
             'description' => 'Personalize your system experience.',
             'language'    => 'Language',
+            'name'        => 'Your Name',
         ],
     ],
     'actions' => [

@@ -99,6 +99,23 @@ it('applies user locale from session or user model', function () {
     expect(app()->getLocale())->toBe('pt_BR');
 });
 
+it('can update user name', function () {
+    Livewire::test(Index::class)
+        ->set('form.name', 'John Doe Updated')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $this->user->refresh();
+    expect($this->user->name)->toBe('John Doe Updated');
+});
+
+it('validates user name is required', function () {
+    Livewire::test(Index::class)
+        ->set('form.name', '')
+        ->call('save')
+        ->assertHasErrors(['form.name' => 'required']);
+});
+
 it('hides global settings from users without permission', function () {
     $user = User::factory()->create();
     $user->assignRole('user');
