@@ -118,6 +118,24 @@ test('it filters by period for payment methods for authorized user', function ()
         ->assertSet('chartData.series', [50.0, 100.0]);
 });
 
+test('it supports uppercase PIX payment method', function () {
+    $user = User::factory()->create();
+    $user->assignRole('admin');
+    actingAs($user);
+
+    Sale::query()->delete();
+
+    Sale::factory()->create([
+        'status'          => SaleStatus::Paid,
+        'payment_method'  => 'PIX',
+        'total_amount'    => 10000,
+        'net_amount'      => 10000,
+    ]);
+
+    Livewire::test(SalesByPaymentMethod::class)
+        ->assertSee(__('reports.payment_methods.pix'));
+});
+
 test('it denies access to sales by payment method for unauthorized user', function () {
     $user = User::factory()->create();
     actingAs($user);

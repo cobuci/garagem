@@ -38,7 +38,7 @@ class SalesByPaymentMethod extends Component
             ->get();
 
         $labels = $metrics->pluck('payment_method')->map(function ($method) {
-            return match ($method) {
+            return match (strtolower($method)) {
                 'credit_card' => __('reports.payment_methods.credit_card'),
                 'debit_card'  => __('reports.payment_methods.debit_card'),
                 'cash'        => __('reports.payment_methods.cash'),
