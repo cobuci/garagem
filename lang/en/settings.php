@@ -48,4 +48,6 @@ return [
     'import_notice'              => 'The import is processed in the background. Completion time depends on the file size.',
     'import_started'             => 'Import Started',
     'import_started_description' => 'The file was received and is being processed. Data will appear in the system soon.',
+    'upload_error_title'         => 'Upload Error',
+    'upload_error_description'   => 'Could not upload the file. Please check the file size and try again.',
 ];
