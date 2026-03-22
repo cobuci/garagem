@@ -77,7 +77,6 @@ test('it filters by period for payment methods for authorized user', function ()
 
     $product = Product::factory()->create();
 
-    // Sale today
     $sale1 = Sale::factory()->create([
         'status'          => SaleStatus::Paid,
         'payment_method'  => 'pix',
@@ -127,7 +126,6 @@ test('it includes pending sales in report but not cancelled', function () {
 
     Sale::query()->delete();
 
-    // Paid sale
     Sale::factory()->create([
         'status'          => SaleStatus::Paid,
         'payment_method'  => 'pix',
@@ -135,7 +133,6 @@ test('it includes pending sales in report but not cancelled', function () {
         'created_at'      => now(),
     ]);
 
-    // Pending sale
     Sale::factory()->create([
         'status'          => SaleStatus::Pending,
         'payment_method'  => 'cash',
@@ -143,7 +140,6 @@ test('it includes pending sales in report but not cancelled', function () {
         'created_at'      => now(),
     ]);
 
-    // Cancelled sale (should be ignored)
     Sale::factory()->create([
         'status'          => SaleStatus::Cancelled,
         'payment_method'  => 'credit_card',
@@ -151,7 +147,6 @@ test('it includes pending sales in report but not cancelled', function () {
         'created_at'      => now(),
     ]);
 
-    // Force values after factory finishes (just in case)
     Sale::where('payment_method', 'pix')->update(['total_amount' => 10000]);
     Sale::where('payment_method', 'cash')->update(['total_amount' => 5000]);
 
