@@ -27,6 +27,11 @@ class UserForm extends Form
         $this->password = '';
     }
 
+    public function generatePassword(): void
+    {
+        $this->password = str()->password(16);
+    }
+
     public function rules(): array
     {
         return [

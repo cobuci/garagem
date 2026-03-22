@@ -64,7 +64,23 @@
                 <div class="space-y-4">
                     <x-input wire:model="form.name" label="{{ __('admin.users.fields.name') }}" placeholder="{{ __('admin.users.fields.name_placeholder') }}" />
                     <x-input wire:model="form.email" label="{{ __('admin.users.fields.email') }}" placeholder="{{ __('admin.users.fields.email_placeholder') }}" />
-                    <x-password wire:model="form.password" label="{{ __('admin.users.fields.password') }}" placeholder="{{ $form->user ? __('admin.users.fields.password_placeholder_edit') : __('admin.users.fields.password_placeholder') }}" />
+                    <div class="flex items-end gap-2">
+                        <div class="flex-1">
+                            <x-password wire:model="form.password"
+                                label="{{ __('admin.users.fields.password') }}"
+                                placeholder="{{ $form->user ? __('admin.users.fields.password_placeholder_edit') : __('admin.users.fields.password_placeholder') }}"
+                            />
+                        </div>
+                        <x-button
+                            icon="key"
+                            primary
+                            flat
+                            squared
+                            class="h-10"
+                            wire:click="generatePassword"
+                            x-tooltip="'{{ __('admin.users.actions.generate_password') }}'"
+                        />
+                    </div>
 
                     <x-select
                         label="{{ __('admin.users.fields.roles') }}"

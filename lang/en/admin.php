@@ -23,12 +23,12 @@ return [
             'roles_placeholder'         => 'Select roles',
         ],
         'actions' => [
-            'label'           => 'Actions',
-            'create'          => 'New User',
-            'edit'            => 'Edit User',
-            'save'            => 'Save',
-            'save_and_create' => 'Save & Create',
-            'cancel'          => 'Cancel',
+            'label'             => 'Actions',
+            'create'            => 'New User',
+            'edit'              => 'Edit User',
+            'save'              => 'Save',
+            'cancel'            => 'Cancel',
+            'generate_password' => 'Generate Strong Password',
         ],
         'messages' => [
             'success'            => 'Success',

@@ -102,3 +102,19 @@ it('denies access to unauthorized user', function () {
     Livewire::test(Index::class)
         ->assertForbidden();
 });
+
+it('can generate a strong password', function () {
+    Livewire::test(Index::class)
+        ->call('create')
+        ->assertSet('form.password', '')
+        ->call('generatePassword')
+        ->assertNotSet('form.password', '')
+        ->assertNotSet('form.password', null);
+
+    $password = Livewire::test(Index::class)
+        ->call('create')
+        ->call('generatePassword')
+        ->get('form.password');
+
+    expect(strlen($password))->toBe(16);
+});

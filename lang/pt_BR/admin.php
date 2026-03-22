@@ -23,12 +23,12 @@ return [
             'roles_placeholder'         => 'Selecione os cargos',
         ],
         'actions' => [
-            'label'           => 'Ações',
-            'create'          => 'Novo Usuário',
-            'edit'            => 'Editar Usuário',
-            'save'            => 'Salvar',
-            'save_and_create' => 'Salvar e Criar',
-            'cancel'          => 'Cancelar',
+            'label'             => 'Ações',
+            'create'            => 'Novo Usuário',
+            'edit'              => 'Editar Usuário',
+            'save'              => 'Salvar',
+            'cancel'            => 'Cancelar',
+            'generate_password' => 'Gerar Senha Forte',
         ],
         'messages' => [
             'success'            => 'Sucesso',

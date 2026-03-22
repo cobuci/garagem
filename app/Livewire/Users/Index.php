@@ -76,6 +76,11 @@ class Index extends Component
         $this->showDrawer = false;
     }
 
+    public function generatePassword(): void
+    {
+        $this->form->generatePassword();
+    }
+
     public function delete(User $user): void
     {
         $this->authorize(Permission::DeleteUser->value);
