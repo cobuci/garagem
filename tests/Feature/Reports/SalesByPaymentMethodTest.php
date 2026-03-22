@@ -126,10 +126,10 @@ test('it supports uppercase PIX payment method', function () {
     Sale::query()->delete();
 
     Sale::factory()->create([
-        'status'          => SaleStatus::Paid,
-        'payment_method'  => 'PIX',
-        'total_amount'    => 10000,
-        'net_amount'      => 10000,
+        'status'         => SaleStatus::Paid,
+        'payment_method' => 'PIX',
+        'total_amount'   => 10000,
+        'net_amount'     => 10000,
     ]);
 
     Livewire::test(SalesByPaymentMethod::class)
