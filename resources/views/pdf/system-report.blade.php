@@ -88,22 +88,15 @@
     <div class="container">
         <!-- Key Metrics -->
         <div class="grid">
-            <div class="col-3 card">
+            <div class="col-2 card">
                 <h4>{{ __('reports.pdf.total_sales_gross') }}</h4>
                 <div class="value">R$ {{ number_format($totalRevenue / 100, 2, ',', '.') }}</div>
                 <div class="sub-value">{{ $salesByPaymentMethod->sum('count') }} {{ __('reports.pdf.transactions') }}</div>
             </div>
-            <div class="col-3 card">
+            <div class="col-2 card" style="margin-right: 0;">
                 <h4>{{ __('reports.pdf.net_revenue') }}</h4>
                 <div class="value text-blue">R$ {{ number_format($netSales / 100, 2, ',', '.') }}</div>
                 <div class="sub-value">{{ __('reports.pdf.after_discounts_fees') }}</div>
-            </div>
-            <div class="col-3 card" style="margin-right: 0;">
-                <h4>{{ __('reports.pdf.net_balance') }}</h4>
-                <div class="value {{ ($inflow + $outflow) >= 0 ? 'text-green' : 'text-red' }}">
-                    R$ {{ number_format(($inflow + $outflow) / 100, 2, ',', '.') }}
-                </div>
-                <div class="sub-value">{{ __('reports.pdf.period_cash_flow') }}</div>
             </div>
             <div class="clearfix"></div>
         </div>
@@ -166,40 +159,6 @@
             </tbody>
         </table>
 
-        <!-- Financial Summary -->
-        <div class="section-title">{{ __('reports.pdf.cash_flow_summary') }}</div>
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 50%;">{{ __('reports.pdf.description') }}</th>
-                    <th class="text-right" style="width: 25%;">{{ __('reports.pdf.inflow') }}</th>
-                    <th class="text-right" style="width: 25%;">{{ __('reports.pdf.outflow') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ __('reports.pdf.sales_revenue') }}</td>
-                    <td class="text-right text-green">+ R$ {{ number_format($totalRevenue / 100, 2, ',', '.') }}</td>
-                    <td class="text-right">-</td>
-                </tr>
-                <tr>
-                    <td>{{ __('reports.pdf.other_inflows') }}</td>
-                    <td class="text-right text-green">+ R$ {{ number_format(max(0, ($inflow - $totalRevenue)) / 100, 2, ',', '.') }}</td>
-                    <td class="text-right">-</td>
-                </tr>
-                <tr>
-                    <td>{{ __('reports.pdf.purchases_expenses') }}</td>
-                    <td class="text-right">-</td>
-                    <td class="text-right text-red">- R$ {{ number_format(abs($outflow) / 100, 2, ',', '.') }}</td>
-                </tr>
-                <tr style="background: #f8fafc; font-weight: bold;">
-                    <td style="border-top: 2px solid #e2e8f0;">{{ __('reports.pdf.final_period_balance') }}</td>
-                    <td colspan="2" class="text-right {{ ($inflow + $outflow) >= 0 ? 'text-green' : 'text-red' }}" style="border-top: 2px solid #e2e8f0; font-size: 14px;">
-                        R$ {{ number_format(($inflow + $outflow) / 100, 2, ',', '.') }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
     </div>
 
     <div class="footer">

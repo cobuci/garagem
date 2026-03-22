@@ -51,11 +51,11 @@ class SalesByPaymentMethod extends Component
                 'pix'         => __('reports.payment_methods.pix'),
                 default       => $method,
             };
-        })->toArray();
+        })->all();
 
         $series = $metrics->pluck('total_sum')->map(function ($val) {
             return round((float) $val / 100, 2);
-        })->toArray();
+        })->all();
 
         $this->chartDataArray = [
             'labels' => $labels,
