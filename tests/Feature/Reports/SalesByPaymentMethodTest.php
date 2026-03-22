@@ -61,8 +61,8 @@ test('it can load sales by payment method for the last 30 days for authorized us
 
     Livewire::test(SalesByPaymentMethod::class)
         ->assertSet('period', 'last_30_days')
-        ->assertSet('chartData.series', [200.0, 150.0])
-        ->assertSet('chartData.labels', [
+        ->assertSet('chartDataArray.series', [20000.0, 15000.0])
+        ->assertSet('chartDataArray.labels', [
             __('reports.payment_methods.credit_card'),
             __('reports.payment_methods.pix'),
         ]);
@@ -113,9 +113,54 @@ test('it filters by period for payment methods for authorized user', function ()
 
     Livewire::test(SalesByPaymentMethod::class)
         ->set('period', 'today')
-        ->assertSet('chartData.series', [100.0])
+        ->assertSet('chartDataArray.series', [10000.0])
         ->set('period', 'last_30_days')
-        ->assertSet('chartData.series', [50.0, 100.0]);
+        ->assertSet('chartDataArray.series', [5000.0, 10000.0]);
+});
+
+test('it includes pending sales in report but not cancelled', function () {
+    $user = User::factory()->create();
+    $user->assignRole('admin');
+    actingAs($user);
+
+    Product::factory()->create(['sale_price' => 10000]); // Ensure a product exists for the factory
+
+    Sale::query()->delete();
+
+    // Paid sale
+    Sale::factory()->create([
+        'status'          => SaleStatus::Paid,
+        'payment_method'  => 'pix',
+        'discount_amount' => 0,
+        'created_at'      => now(),
+    ]);
+
+    // Pending sale
+    Sale::factory()->create([
+        'status'          => SaleStatus::Pending,
+        'payment_method'  => 'cash',
+        'discount_amount' => 0,
+        'created_at'      => now(),
+    ]);
+
+    // Cancelled sale (should be ignored)
+    Sale::factory()->create([
+        'status'          => SaleStatus::Cancelled,
+        'payment_method'  => 'credit_card',
+        'discount_amount' => 0,
+        'created_at'      => now(),
+    ]);
+
+    // Force values after factory finishes (just in case)
+    Sale::where('payment_method', 'pix')->update(['total_amount' => 10000]);
+    Sale::where('payment_method', 'cash')->update(['total_amount' => 5000]);
+
+    Livewire::test(SalesByPaymentMethod::class)
+        ->assertSet('chartDataArray.series', [50.0, 100.0])
+        ->assertSet('chartDataArray.labels', [
+            __('reports.payment_methods.cash'),
+            __('reports.payment_methods.pix'),
+        ]);
 });
 
 test('it supports uppercase PIX payment method', function () {
@@ -133,7 +178,9 @@ test('it supports uppercase PIX payment method', function () {
     ]);
 
     Livewire::test(SalesByPaymentMethod::class)
-        ->assertSee(__('reports.payment_methods.pix'));
+        ->assertSet('chartDataArray.labels', [
+            __('reports.payment_methods.pix'),
+        ]);
 });
 
 test('it denies access to sales by payment method for unauthorized user', function () {
