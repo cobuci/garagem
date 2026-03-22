@@ -8,7 +8,6 @@ use App\Models\SaleItem;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
-use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class SalesByPeriod extends Component
@@ -17,13 +16,20 @@ class SalesByPeriod extends Component
 
     public string $period = 'last_30_days';
 
+    public array $chartDataArray = [];
+
     public function mount(): void
     {
         $this->authorize(Permission::ViewReport->value);
+        $this->updateChartData();
     }
 
-    #[Computed]
-    public function chartData(): array
+    public function updatedPeriod(): void
+    {
+        $this->updateChartData();
+    }
+
+    public function updateChartData(): void
     {
         [$startDate, $endDate, $groupBy] = $this->getPeriodConfig();
 
@@ -32,12 +38,12 @@ class SalesByPeriod extends Component
             ->selectRaw($this->getSelectRaw($groupBy))
             ->where('sales.created_at', '>=', $startDate)
             ->where('sales.created_at', '<=', $endDate)
-            ->where('sales.status', SaleStatus::Paid)
+            ->where('sales.status', '!=', SaleStatus::Cancelled)
             ->groupBy('period_label', 'sort_key')
             ->orderBy('sort_key')
             ->get();
 
-        return [
+        $this->chartDataArray = [
             'labels' => $metrics->pluck('period_label')->toArray(),
             'sales'  => $metrics->pluck('total_sales')->map(fn ($val) => round($val / 100, 2))->toArray(),
             'profit' => $metrics->pluck('total_profit')->map(fn ($val) => round($val / 100, 2))->toArray(),
@@ -58,7 +64,7 @@ class SalesByPeriod extends Component
     {
         return match ($this->period) {
             'today' => [
-                Carbon::today(),
+                Carbon::today()->startOfDay(),
                 Carbon::today()->endOfDay(),
                 'hour',
             ],
@@ -73,13 +79,13 @@ class SalesByPeriod extends Component
                 'day',
             ],
             'this_month' => [
-                Carbon::now()->startOfMonth(),
-                Carbon::now()->endOfMonth(),
+                Carbon::now()->startOfMonth()->startOfDay(),
+                Carbon::now()->endOfMonth()->endOfDay(),
                 'day',
             ],
             'last_6_months' => [
-                Carbon::now()->subMonths(5)->startOfMonth(),
-                Carbon::now()->endOfMonth(),
+                Carbon::now()->subMonths(5)->startOfMonth()->startOfDay(),
+                Carbon::now()->endOfMonth()->endOfDay(),
                 'month',
             ],
             default => [

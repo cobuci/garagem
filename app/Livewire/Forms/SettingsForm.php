@@ -27,6 +27,8 @@ class SettingsForm extends Form
 
     public string $locale = 'pt_BR';
 
+    public string $name = '';
+
     public function rules(): array
     {
         return [
@@ -39,6 +41,7 @@ class SettingsForm extends Form
             'zip_code'           => ['nullable', 'string', 'max:20'],
             'skipped_categories' => ['nullable', 'array'],
             'locale'             => ['required', 'string'],
+            'name'               => ['required', 'string', 'max:255'],
         ];
     }
 
@@ -53,16 +56,20 @@ class SettingsForm extends Form
         $this->zip_code = $settings->zip_code ?? '';
         $this->skipped_categories = $settings->skipped_categories ?? [];
         $this->locale = $user->locale ?? 'pt_BR';
+        $this->name = $user->name ?? '';
     }
 
     public function update(User $user): void
     {
         $this->validate();
 
-        Setting::singleton()->update($this->except(['locale']));
+        Setting::singleton()->update($this->except(['locale', 'name']));
 
         Cache::forget('store_name');
 
-        $user->update(['locale' => $this->locale]);
+        $user->update([
+            'locale' => $this->locale,
+            'name'   => $this->name,
+        ]);
     }
 }

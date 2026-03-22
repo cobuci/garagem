@@ -88,6 +88,7 @@ return [
         'credit_card' => 'Credit Card',
         'debit_card'  => 'Debit Card',
         'pix'         => 'Pix',
+        'PIX'         => 'PIX',
         'others'      => 'Others',
     ],
 ];

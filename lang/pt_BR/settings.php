@@ -33,6 +33,7 @@ return [
             'title'       => 'Preferências',
             'description' => 'Personalize sua experiência no sistema.',
             'language'    => 'Idioma',
+            'name'        => 'Seu Nome',
         ],
     ],
     'actions' => [
@@ -48,4 +49,6 @@ return [
     'import_notice'              => 'A importação é processada em segundo plano. O tempo de conclusão depende do tamanho do arquivo.',
     'import_started'             => 'Importação Iniciada',
     'import_started_description' => 'O arquivo foi recebido e está sendo processado. Os dados aparecerão no sistema em breve.',
+    'upload_error_title'         => 'Erro no Upload',
+    'upload_error_description'   => 'Não foi possível enviar o arquivo. Verifique o tamanho e tente novamente.',
 ];
