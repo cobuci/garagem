@@ -33,19 +33,16 @@
                     this.initChart();
                 });
 
-                this.$watch('series', (value) => {
-                    if (this.chart) {
-                        this.chart.updateSeries(value);
-                    }
-                });
-
-                this.$watch('labels', (value) => {
-                    if (this.chart) {
-                        this.chart.updateOptions({
-                            labels: value
-                        });
-                    }
-                });
+                this.$watch('series', () => this.updateChart());
+                this.$watch('labels', () => this.updateChart());
+            },
+            updateChart() {
+                if (this.chart) {
+                    this.chart.updateOptions({
+                        labels: this.labels,
+                        series: this.series
+                    });
+                }
             },
             initChart() {
                 if (!this.$refs.chart) {

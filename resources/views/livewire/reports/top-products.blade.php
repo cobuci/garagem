@@ -35,22 +35,28 @@
                     this.initChart();
                 });
 
-                this.$watch('quantity', (value) => {
-                    if (this.chart) {
-                        this.chart.updateSeries([{
+                this.$watch('quantity', () => this.updateChart());
+                this.$watch('revenue', () => this.updateChart());
+                this.$watch('labels', () => this.updateChart());
+            },
+            updateChart() {
+                if (this.chart) {
+                    this.chart.updateOptions({
+                        xaxis: { categories: this.labels },
+                        series: [{
                             name: '{{ __('reports.quantity') }}',
-                            data: value
-                        }]);
-                    }
-                });
-
-                this.$watch('labels', (value) => {
-                    if (this.chart) {
-                        this.chart.updateOptions({
-                            xaxis: { categories: value }
-                        });
-                    }
-                });
+                            data: this.quantity
+                        }],
+                        tooltip: {
+                            y: {
+                                formatter: (val, { seriesIndex, dataPointIndex, w }) => {
+                                    let rev = this.revenue[dataPointIndex] || 0;
+                                    return val + ' {{ __('reports.units') }} (R$ ' + rev.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ')';
+                                }
+                            }
+                        }
+                    });
+                }
             },
             initChart() {
                 if (!this.$refs.chart) {
