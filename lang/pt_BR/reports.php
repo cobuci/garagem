@@ -51,6 +51,14 @@ return [
         'success_description' => 'O relatório está sendo gerado e será enviado para o seu e-mail em breve.',
     ],
 
+    'email' => [
+        'subject'  => 'Seu Relatório do Sistema Está Pronto',
+        'greeting' => 'Olá, :name!',
+        'intro'    => 'Seu relatório do sistema para o período de :start a :end foi gerado com sucesso.',
+        'body'     => 'Você encontrará o relatório detalhado em PDF em anexo neste e-mail.',
+        'support'  => 'Se tiver alguma dúvida, entre em contato com o suporte.',
+    ],
+
     'pdf' => [
         'executive_summary'       => 'Resumo Executivo',
         'reporting_period'        => 'Período do Relatório',

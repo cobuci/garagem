@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -16,11 +17,12 @@ use Spatie\Permission\Traits\HasRoles;
  * @property int     $id
  * @property string  $name
  * @property string  $email
+ * @property string  $locale
  * @property string  $password
  * @property ?Carbon $email_verified_at
  * @property ?string $remember_token
  */
-class User extends Authenticatable
+class User extends Authenticatable implements HasLocalePreference
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory;
@@ -41,6 +43,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password'          => 'hashed',
         ];
+    }
+
+    public function preferredLocale(): string
+    {
+        return $this->locale;
     }
 
     public function initials(): string

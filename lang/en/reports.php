@@ -51,6 +51,14 @@ return [
         'success_description' => 'The report is being generated and will be sent to your email shortly.',
     ],
 
+    'email' => [
+        'subject'  => 'Your System Report is Ready',
+        'greeting' => 'Hello, :name!',
+        'intro'    => 'Your system report for the period from :start to :end has been generated successfully.',
+        'body'     => 'You can find the detailed report attached to this email in PDF format.',
+        'support'  => 'If you have any questions, please contact support.',
+    ],
+
     'pdf' => [
         'executive_summary'       => 'Executive Summary',
         'reporting_period'        => 'Reporting Period',
