@@ -21,6 +21,10 @@ trait HasSearch
 
     protected function getSearchable(): array
     {
-        return property_exists($this, 'searchable') ? $this->searchable : [];
+        if (isset($this->searchable)) {
+            return $this->searchable;
+        }
+
+        return [];
     }
 }

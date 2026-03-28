@@ -26,8 +26,8 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
  */
 class SaleItem extends Model implements AuditableContract
 {
-    /** @use HasFactory<SaleItemFactory> */
     use Auditable;
+    /** @use HasFactory<SaleItemFactory> */
     use HasFactory;
 
     protected $guarded = ['id'];

@@ -13,7 +13,9 @@ return [
         'credit_card' => 'Credit Card',
         'debit_card'  => 'Debit Card',
         'cash'        => 'Cash',
+        'money'       => 'Cash',
         'pix'         => 'PIX',
+        'others'      => 'Others',
     ],
     'periods' => [
         'today'         => 'Today',
