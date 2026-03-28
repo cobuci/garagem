@@ -1,12 +1,12 @@
 <x-mail::message>
-# Hello, {{ $userName }}!
+# {{ __('reports.email.greeting', ['name' => $userName]) }}
 
-Your system report for the period from **{{ $startDate }}** to **{{ $endDate }}** has been generated successfully.
+{{ __('reports.email.intro', ['start' => $startDate, 'end' => $endDate]) }}
 
-You can find the detailed report attached to this email in PDF format.
+{{ __('reports.email.body') }}
 
-If you have any questions, please contact support.
+{{ __('reports.email.support') }}
 
-Thanks,<br>
+{{ __('Regards') }},<br>
 {{ config('app.name') }}
 </x-mail::message>

@@ -37,6 +37,8 @@ class SaleForm extends Form
             $this->items[$productId] = [
                 'id'         => $product->id,
                 'name'       => $product->name,
+                'brand'      => $product->brand,
+                'weight'     => $product->weight,
                 'unit_price' => $product->getRawOriginal('sale_price'),
                 'unit_cost'  => $product->getRawOriginal('unit_cost'),
                 'quantity'   => 1,
@@ -163,6 +165,6 @@ class SaleForm extends Form
             }
         });
 
-        $this->reset(['items', 'customerId', 'discountAmount', 'isGift', 'passFeeToCustomer']);
+        $this->reset(['items', 'customerId', 'discountAmount', 'isGift', 'passFeeToCustomer', 'paymentMethod', 'status']);
     }
 }

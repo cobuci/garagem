@@ -16,6 +16,8 @@ class Login extends Component
 
     public string $otp = '';
 
+    public bool $rememberMe = false;
+
     public int $step = 1;
 
     protected $rules = [
@@ -46,7 +48,7 @@ class Login extends Component
         $user = User::where('email', $this->email)->first();
 
         if ($user->consumeOneTimePassword($this->otp)->isOk()) {
-            Auth::login($user);
+            Auth::login($user, $this->rememberMe);
 
             $this->redirect(route('dashboard'));
 

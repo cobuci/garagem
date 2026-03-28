@@ -64,7 +64,7 @@
                 </div>
             </div>
             <h3 class="text-gray-500 dark:text-gray-400 text-sm font-medium">{{ __('customers.total_orders') }}</h3>
-            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $this->orders->count() }}</p>
+            <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $this->orders->total() }}</p>
         </div>
     </div>
 

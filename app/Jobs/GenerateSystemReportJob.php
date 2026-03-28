@@ -9,6 +9,7 @@ use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
@@ -26,6 +27,8 @@ class GenerateSystemReportJob implements ShouldQueue
 
     public function handle(GetSystemReportData $reportDataAction): void
     {
+        App::setLocale($this->user->locale);
+
         $data = $reportDataAction->execute($this->startDate, $this->endDate);
 
         $pdf = Pdf::loadView('pdf.system-report', [
@@ -38,11 +41,14 @@ class GenerateSystemReportJob implements ShouldQueue
 
         Storage::disk('public')->put($fileName, $pdf->output());
 
-        Mail::to($this->user->email)->send(new SystemReportMail(
-            $this->user->name,
-            $this->startDate,
-            $this->endDate,
-            $pdfPath,
-        ));
+        Mail::to($this->user->email)
+            ->send(
+                (new SystemReportMail(
+                    $this->user->name,
+                    $this->startDate,
+                    $this->endDate,
+                    $pdfPath,
+                ))->locale($this->user->locale),
+            );
     }
 }

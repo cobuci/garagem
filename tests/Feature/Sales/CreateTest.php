@@ -242,3 +242,35 @@ test('can create a sale with debit card and verify fees', function () {
         'net_amount'     => 9750,
     ]);
 });
+
+test('form resets paymentMethod and status to defaults after saving', function () {
+    $product = Product::factory()->create(['sale_price' => 10.00]);
+
+    Livewire::actingAs($this->user)
+        ->test(Create::class)
+        ->call('addItem', $product->id)
+        ->set('form.paymentMethod', 'credit_card')
+        ->set('form.status', 'paid')
+        ->call('save')
+        ->assertSet('form.paymentMethod', 'money')
+        ->assertSet('form.status', 'pending');
+});
+
+test('cannot add a product that does not exist to the cart', function () {
+    Livewire::actingAs($this->user)
+        ->test(Create::class)
+        ->call('addItem', 99999)
+        ->assertSet('form.items', []);
+});
+
+test('products list is empty when no search or category is selected', function () {
+    Product::factory()->create(['name' => 'Some Product']);
+
+    Livewire::actingAs($this->user)
+        ->test(Create::class)
+        ->assertSet('search', '')
+        ->assertSet('selectedCategoryId', null)
+        ->assertSet('products', function ($products) {
+            return $products->isEmpty();
+        });
+});

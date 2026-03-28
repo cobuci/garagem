@@ -60,6 +60,12 @@
                             required
                         />
 
+                        <x-checkbox
+                            wire:model="rememberMe"
+                            :label="__('login.remember_me')"
+                            class="text-slate-600 dark:text-slate-400"
+                        />
+
                         <x-button
                             type="submit"
                             primary
@@ -68,11 +74,9 @@
                             wire:loading.attr="disabled"
                             wire:target="sendOtp"
                         >
+                            <x-icon wire:loading wire:target="sendOtp" name="arrow-path" class="w-5 h-5 animate-spin" />
+                            <span wire:loading wire:target="sendOtp">{{ __('login.sending') }}</span>
                             <span wire:loading.remove wire:target="sendOtp">{{ __('login.send_code') }}</span>
-                            <span wire:loading wire:target="sendOtp" class="flex items-center gap-2">
-                                 <x-icon name="arrow-path" class="w-5 h-5 animate-spin" />
-                                 {{ __('login.sending') }}
-                            </span>
                         </x-button>
                     </form>
                 @else
@@ -168,11 +172,9 @@
                                 wire:loading.attr="disabled"
                                 wire:target="verifyOtp"
                             >
+                                <x-icon wire:loading wire:target="verifyOtp" name="arrow-path" class="w-5 h-5 animate-spin" />
+                                <span wire:loading wire:target="verifyOtp">{{ __('login.validating') }}</span>
                                 <span wire:loading.remove wire:target="verifyOtp">{{ __('login.verify') }}</span>
-                                <span wire:loading wire:target="verifyOtp" class="flex items-center gap-2">
-                                    <x-icon name="arrow-path" class="w-5 h-5 animate-spin" />
-                                    {{ __('login.validating') }}
-                                </span>
                             </x-button>
                         </div>
                     </form>

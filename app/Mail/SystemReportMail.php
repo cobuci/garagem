@@ -24,7 +24,7 @@ class SystemReportMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your System Report is Ready',
+            subject: __('reports.email.subject'),
         );
     }
 

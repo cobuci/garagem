@@ -160,7 +160,7 @@
                         <x-icon name="shopping-cart" class="w-6 h-6 text-gray-400" />
                         @if(count($form->items) > 0)
                             <span class="absolute -top-2 -right-2 bg-primary-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full ring-2 ring-white dark:ring-gray-900 animate-bounce">
-                                {{ count($form->items) }}
+                                {{ collect($form->items)->sum('quantity') }}
                             </span>
                         @endif
                     </div>
@@ -184,6 +184,19 @@
                                     <x-icon name="x-mark" class="w-4 h-4" />
                                 </button>
                             </div>
+                            @if(!empty($item['brand']) || !empty($item['weight']))
+                                <div class="flex flex-wrap gap-x-2 gap-y-0.5 mb-1.5 text-[10px] text-gray-400 dark:text-gray-500 font-medium">
+                                    @if(!empty($item['brand']))
+                                        <span>{{ $item['brand'] }}</span>
+                                    @endif
+                                    @if(!empty($item['brand']) && !empty($item['weight']))
+                                        <span class="text-gray-300 dark:text-gray-600">·</span>
+                                    @endif
+                                    @if(!empty($item['weight']))
+                                        <span>{{ $item['weight'] }}</span>
+                                    @endif
+                                </div>
+                            @endif
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5 border border-gray-200 dark:border-gray-700">
                                     <button
@@ -349,7 +362,7 @@
             <x-icon name="shopping-cart" class="w-6 h-6" />
             @if(count($form->items) > 0)
                 <span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full ring-2 ring-white">
-                    {{ count($form->items) }}
+                    {{ collect($form->items)->sum('quantity') }}
                 </span>
             @endif
         </div>
