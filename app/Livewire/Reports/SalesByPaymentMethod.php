@@ -80,17 +80,37 @@ class SalesByPaymentMethod extends Component
                 Carbon::today()->startOfDay(),
                 Carbon::today()->endOfDay(),
             ],
+            'yesterday' => [
+                Carbon::yesterday()->startOfDay(),
+                Carbon::yesterday()->endOfDay(),
+            ],
             'last_7_days' => [
                 Carbon::now()->subDays(6)->startOfDay(),
                 Carbon::now()->endOfDay(),
+            ],
+            'last_week' => [
+                Carbon::now()->subWeek()->startOfWeek()->startOfDay(),
+                Carbon::now()->subWeek()->endOfWeek()->endOfDay(),
             ],
             'this_month' => [
                 Carbon::now()->startOfMonth()->startOfDay(),
                 Carbon::now()->endOfMonth()->endOfDay(),
             ],
+            'last_month' => [
+                Carbon::now()->subMonth()->startOfMonth()->startOfDay(),
+                Carbon::now()->subMonth()->endOfMonth()->endOfDay(),
+            ],
             'last_6_months' => [
                 Carbon::now()->subMonths(5)->startOfMonth()->startOfDay(),
                 Carbon::now()->endOfMonth()->endOfDay(),
+            ],
+            'this_year' => [
+                Carbon::now()->startOfYear()->startOfDay(),
+                Carbon::now()->endOfYear()->endOfDay(),
+            ],
+            'last_year' => [
+                Carbon::now()->subYear()->startOfYear()->startOfDay(),
+                Carbon::now()->subYear()->endOfYear()->endOfDay(),
             ],
             default => [
                 Carbon::now()->subDays(29)->startOfDay(),

@@ -68,9 +68,19 @@ class SalesByPeriod extends Component
                 Carbon::today()->endOfDay(),
                 'hour',
             ],
+            'yesterday' => [
+                Carbon::yesterday()->startOfDay(),
+                Carbon::yesterday()->endOfDay(),
+                'hour',
+            ],
             'last_7_days' => [
                 Carbon::now()->subDays(6)->startOfDay(),
                 Carbon::now()->endOfDay(),
+                'day',
+            ],
+            'last_week' => [
+                Carbon::now()->subWeek()->startOfWeek()->startOfDay(),
+                Carbon::now()->subWeek()->endOfWeek()->endOfDay(),
                 'day',
             ],
             'last_30_days' => [
@@ -83,9 +93,24 @@ class SalesByPeriod extends Component
                 Carbon::now()->endOfMonth()->endOfDay(),
                 'day',
             ],
+            'last_month' => [
+                Carbon::now()->subMonth()->startOfMonth()->startOfDay(),
+                Carbon::now()->subMonth()->endOfMonth()->endOfDay(),
+                'day',
+            ],
             'last_6_months' => [
                 Carbon::now()->subMonths(5)->startOfMonth()->startOfDay(),
                 Carbon::now()->endOfMonth()->endOfDay(),
+                'month',
+            ],
+            'this_year' => [
+                Carbon::now()->startOfYear()->startOfDay(),
+                Carbon::now()->endOfYear()->endOfDay(),
+                'month',
+            ],
+            'last_year' => [
+                Carbon::now()->subYear()->startOfYear()->startOfDay(),
+                Carbon::now()->subYear()->endOfYear()->endOfDay(),
                 'month',
             ],
             default => [

@@ -10,10 +10,15 @@
                 noscroll
                 :options="[
                     ['name' => __('reports.periods.today'), 'id' => 'today'],
+                    ['name' => __('reports.periods.yesterday'), 'id' => 'yesterday'],
                     ['name' => __('reports.periods.last_7_days'), 'id' => 'last_7_days'],
+                    ['name' => __('reports.periods.last_week'), 'id' => 'last_week'],
                     ['name' => __('reports.periods.last_30_days'), 'id' => 'last_30_days'],
                     ['name' => __('reports.periods.this_month'), 'id' => 'this_month'],
+                    ['name' => __('reports.periods.last_month'), 'id' => 'last_month'],
                     ['name' => __('reports.periods.last_6_months'), 'id' => 'last_6_months'],
+                    ['name' => __('reports.periods.this_year'), 'id' => 'this_year'],
+                    ['name' => __('reports.periods.last_year'), 'id' => 'last_year'],
                 ]"
                 option-label="name"
                 option-value="id"
