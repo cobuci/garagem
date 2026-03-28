@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Casts\MoneyCast;
+use App\Casts\PaymentMethodCast;
+use App\Enums\PaymentMethod;
 use App\Enums\SaleStatus;
 use App\Enums\TransactionType;
 use Database\Factories\SaleFactory;
@@ -17,28 +19,29 @@ use OwenIt\Auditing\Auditable;
 use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 /**
- * @property int        $id
- * @property ?int       $customer_id
- * @property string     $payment_method
- * @property float      $total_amount
- * @property float      $discount_amount
- * @property float      $fee_amount
- * @property float      $fee_percentage
- * @property bool       $pass_fee_to_customer
- * @property float      $net_amount
- * @property bool       $is_gift
- * @property SaleStatus $status
- * @property string     $invoice_status
- * @property ?string    $invoice_path
- * @property ?Carbon    $created_at
- * @property ?Carbon    $updated_at
+ * @property int           $id
+ * @property ?int          $customer_id
+ * @property PaymentMethod $payment_method
+ * @property float         $total_amount
+ * @property float         $discount_amount
+ * @property float         $fee_amount
+ * @property float         $fee_percentage
+ * @property bool          $pass_fee_to_customer
+ * @property float         $net_amount
+ * @property bool          $is_gift
+ * @property SaleStatus    $status
+ * @property string        $invoice_status
+ * @property ?string       $invoice_path
+ * @property ?string       $invoice_png_path
+ * @property ?Carbon       $created_at
+ * @property ?Carbon       $updated_at
  * @property-read ?Customer $customer
  * @property-read Collection<int, SaleItem> $items
  */
 class Sale extends Model implements AuditableContract
 {
-    /** @use HasFactory<SaleFactory> */
     use Auditable;
+    /** @use HasFactory<SaleFactory> */
     use HasFactory;
 
     protected $guarded = ['id'];
@@ -46,6 +49,7 @@ class Sale extends Model implements AuditableContract
     /** @var list<string> */
     protected array $auditExclude = [
         'invoice_path',
+        'invoice_png_path',
         'invoice_status',
     ];
 
@@ -60,6 +64,7 @@ class Sale extends Model implements AuditableContract
             'net_amount'           => MoneyCast::class,
             'is_gift'              => 'boolean',
             'status'               => SaleStatus::class,
+            'payment_method'       => PaymentMethodCast::class,
         ];
     }
 
