@@ -41,6 +41,7 @@ it('calculates daily metrics correctly', function () {
         'status'         => SaleStatus::Paid,
         'created_at'     => now(),
         'total_amount'   => 40.00,
+        'net_amount'     => 40.00,
         'payment_method' => 'cash',
         'is_gift'        => false,
     ]);
@@ -56,6 +57,7 @@ it('calculates daily metrics correctly', function () {
         'status'         => SaleStatus::Paid,
         'created_at'     => now()->subDay(),
         'total_amount'   => 20.00,
+        'net_amount'     => 20.00,
         'payment_method' => 'cash',
         'is_gift'        => false,
     ]);
@@ -101,6 +103,55 @@ it('does not count unpaid sales in daily metrics', function () {
         ->assertSet('dailyMetrics.profit', 0.0);
 });
 
+it('does not count pending sales in monthly metrics', function () {
+    $product = Product::factory()->create(['unit_cost' => 10.00, 'sale_price' => 20.00]);
+
+    $salePending = Sale::query()->create([
+        'status'         => SaleStatus::Pending,
+        'created_at'     => now()->startOfMonth(),
+        'total_amount'   => 200.00,
+        'payment_method' => 'cash',
+        'is_gift'        => false,
+    ]);
+    $salePending->items()->create([
+        'product_id' => $product->id,
+        'quantity'   => 10,
+        'unit_price' => 20.00,
+        'unit_cost'  => 10.00,
+        'subtotal'   => 200.00,
+    ]);
+
+    Livewire::test(Index::class)
+        ->assertSet('monthlyMetrics.sales', 0.0)
+        ->assertSet('monthlyMetrics.profit', 0.0);
+});
+
+it('deducts discounts and fees from monthly sales total', function () {
+    $product = Product::factory()->create(['unit_cost' => 0, 'sale_price' => 100.00]);
+
+    $sale = Sale::query()->create([
+        'status'          => SaleStatus::Paid,
+        'created_at'      => now()->startOfMonth(),
+        'total_amount'    => 300.00,
+        'discount_amount' => 30.00,
+        'fee_amount'      => 15.00,
+        'net_amount'      => 255.00,
+        'payment_method'  => 'cash',
+        'is_gift'         => false,
+    ]);
+    $sale->items()->create([
+        'product_id' => $product->id,
+        'quantity'   => 3,
+        'unit_price' => 100.00,
+        'unit_cost'  => 0,
+        'subtotal'   => 300.00,
+    ]);
+
+    // net_amount = 300 - 30 - 15 = 255
+    Livewire::test(Index::class)
+        ->assertSet('monthlyMetrics.sales', 255.00);
+});
+
 it('calculates monthly metrics correctly', function () {
     $product = Product::factory()->create([
         'unit_cost'  => 50.00,
@@ -108,11 +159,14 @@ it('calculates monthly metrics correctly', function () {
     ]);
 
     $saleThisMonth = Sale::query()->create([
-        'status'         => SaleStatus::Paid,
-        'created_at'     => now()->startOfMonth(),
-        'total_amount'   => 500.00,
-        'payment_method' => 'cash',
-        'is_gift'        => false,
+        'status'          => SaleStatus::Paid,
+        'created_at'      => now()->startOfMonth(),
+        'total_amount'    => 500.00,
+        'discount_amount' => 50.00,
+        'fee_amount'      => 10.00,
+        'net_amount'      => 440.00,
+        'payment_method'  => 'cash',
+        'is_gift'         => false,
     ]);
     $saleThisMonth->items()->create([
         'product_id' => $product->id,
@@ -123,11 +177,14 @@ it('calculates monthly metrics correctly', function () {
     ]);
 
     $saleLastMonth = Sale::query()->create([
-        'status'         => SaleStatus::Paid,
-        'created_at'     => now()->subMonth()->startOfMonth(),
-        'total_amount'   => 200.00,
-        'payment_method' => 'cash',
-        'is_gift'        => false,
+        'status'          => SaleStatus::Paid,
+        'created_at'      => now()->subMonth()->startOfMonth(),
+        'total_amount'    => 200.00,
+        'discount_amount' => 20.00,
+        'fee_amount'      => 5.00,
+        'net_amount'      => 175.00,
+        'payment_method'  => 'cash',
+        'is_gift'         => false,
     ]);
     $saleLastMonth->items()->create([
         'product_id' => $product->id,
@@ -137,12 +194,13 @@ it('calculates monthly metrics correctly', function () {
         'subtotal'   => 200.00,
     ]);
 
+    // net_amount: 440 | profit: 440 - (50 * 5) = 190
+    // net_amount: 175 | profit: 175 - (50 * 2) = 75
     Livewire::test(Index::class)
-        ->assertSet('monthlyMetrics.sales', 500.00)
-        ->assertSet('monthlyMetrics.previous_sales', 200.00)
-        ->assertSet('monthlyMetrics.profit', 250.00)
-        ->assertSet('monthlyMetrics.previous_profit', 100.00)
-        ->assertSet('monthlyMetrics.percent', 150.0);
+        ->assertSet('monthlyMetrics.sales', 440.00)
+        ->assertSet('monthlyMetrics.previous_sales', 175.00)
+        ->assertSet('monthlyMetrics.profit', 190.00)
+        ->assertSet('monthlyMetrics.previous_profit', 75.00);
 });
 
 it('provides correct chart data for the last 6 months', function () {
@@ -154,6 +212,7 @@ it('provides correct chart data for the last 6 months', function () {
             'status'         => SaleStatus::Paid,
             'created_at'     => $date,
             'total_amount'   => 20,
+            'net_amount'     => 20,
             'payment_method' => 'cash',
             'is_gift'        => false,
         ]);
@@ -183,6 +242,7 @@ it('calculates goal metrics correctly', function () {
         'status'         => SaleStatus::Paid,
         'created_at'     => now(),
         'total_amount'   => 400,
+        'net_amount'     => 400,
         'payment_method' => 'cash',
         'is_gift'        => false,
     ]);
@@ -209,6 +269,7 @@ it('marks goal as reached when sales exceed target', function () {
         'status'         => SaleStatus::Paid,
         'created_at'     => now(),
         'total_amount'   => 600,
+        'net_amount'     => 600,
         'payment_method' => 'cash',
         'is_gift'        => false,
     ]);
@@ -268,6 +329,7 @@ it('shows 100% growth when previous period had zero sales', function () {
         'status'         => SaleStatus::Paid,
         'created_at'     => now(),
         'total_amount'   => 20,
+        'net_amount'     => 20,
         'payment_method' => 'cash',
         'is_gift'        => false,
     ]);

@@ -95,3 +95,124 @@ test('it validates the date range', function () {
         ->call('export')
         ->assertHasErrors(['endDate']);
 });
+
+test('GetSystemReportData excludes pending sales from total revenue', function () {
+    $product = Product::factory()->create(['unit_cost' => 50.00, 'sale_price' => 100.00]);
+
+    $paidSale = Sale::query()->create([
+        'status'          => SaleStatus::Paid,
+        'total_amount'    => 100.00,
+        'discount_amount' => 0,
+        'fee_amount'      => 0,
+        'payment_method'  => 'cash',
+        'created_at'      => now(),
+        'is_gift'         => false,
+    ]);
+    $paidSale->items()->create([
+        'product_id' => $product->id,
+        'subtotal'   => 100.00,
+        'unit_cost'  => 50.00,
+        'quantity'   => 1,
+        'unit_price' => 100.00,
+    ]);
+
+    $pendingSale = Sale::query()->create([
+        'status'          => SaleStatus::Pending,
+        'total_amount'    => 50.00,
+        'discount_amount' => 0,
+        'fee_amount'      => 0,
+        'payment_method'  => 'cash',
+        'created_at'      => now(),
+        'is_gift'         => false,
+    ]);
+    $pendingSale->items()->create([
+        'product_id' => $product->id,
+        'subtotal'   => 50.00,
+        'unit_cost'  => 25.00,
+        'quantity'   => 1,
+        'unit_price' => 50.00,
+    ]);
+
+    $data = (new GetSystemReportData)->execute(
+        now()->startOfDay()->format('Y-m-d'),
+        now()->endOfDay()->format('Y-m-d'),
+    );
+
+    expect($data['totalRevenue'])->toBe(10000)
+        ->and($data['netSales'])->toBe(5000);
+});
+
+test('GetSystemReportData excludes cancelled sales from total revenue', function () {
+    $product = Product::factory()->create(['unit_cost' => 50.00, 'sale_price' => 100.00]);
+
+    $paidSale = Sale::query()->create([
+        'status'          => SaleStatus::Paid,
+        'total_amount'    => 80.00,
+        'discount_amount' => 0,
+        'fee_amount'      => 0,
+        'payment_method'  => 'cash',
+        'created_at'      => now(),
+        'is_gift'         => false,
+    ]);
+    $paidSale->items()->create([
+        'product_id' => $product->id,
+        'subtotal'   => 80.00,
+        'unit_cost'  => 40.00,
+        'quantity'   => 1,
+        'unit_price' => 80.00,
+    ]);
+
+    $cancelledSale = Sale::query()->create([
+        'status'          => SaleStatus::Cancelled,
+        'total_amount'    => 30.00,
+        'discount_amount' => 0,
+        'fee_amount'      => 0,
+        'payment_method'  => 'cash',
+        'created_at'      => now(),
+        'is_gift'         => false,
+    ]);
+    $cancelledSale->items()->create([
+        'product_id' => $product->id,
+        'subtotal'   => 30.00,
+        'unit_cost'  => 10.00,
+        'quantity'   => 1,
+        'unit_price' => 30.00,
+    ]);
+
+    $data = (new GetSystemReportData)->execute(
+        now()->startOfDay()->format('Y-m-d'),
+        now()->endOfDay()->format('Y-m-d'),
+    );
+
+    expect($data['totalRevenue'])->toBe(8000);
+});
+
+test('GetSystemReportData deducts discounts and fees from net sales', function () {
+    $product = Product::factory()->create(['unit_cost' => 50.00, 'sale_price' => 100.00]);
+
+    $sale = Sale::query()->create([
+        'status'          => SaleStatus::Paid,
+        'total_amount'    => 100.00,
+        'discount_amount' => 5.00,
+        'fee_amount'      => 2.00,
+        'payment_method'  => 'pix',
+        'created_at'      => now(),
+        'is_gift'         => false,
+    ]);
+    $sale->items()->create([
+        'product_id' => $product->id,
+        'subtotal'   => 100.00,
+        'unit_cost'  => 40.00,
+        'quantity'   => 1,
+        'unit_price' => 100.00,
+    ]);
+
+    $data = (new GetSystemReportData)->execute(
+        now()->startOfDay()->format('Y-m-d'),
+        now()->endOfDay()->format('Y-m-d'),
+    );
+
+    expect($data['totalDiscount'])->toBe(500)
+        ->and($data['totalFees'])->toBe(200)
+        ->and($data['netSales'])->toBe(5300);
+});
