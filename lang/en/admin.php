@@ -7,6 +7,7 @@ return [
         'users'  => 'Users',
         'import' => 'Import Legacy',
         'roles'  => 'Roles & Permissions',
+        'audits' => 'Audit Log',
     ],
     'users' => [
         'title'    => 'User Management',
