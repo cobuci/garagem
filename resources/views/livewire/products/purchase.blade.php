@@ -24,7 +24,7 @@
                         placeholder="{{ __('products.select_product') }}"
                         wire:model.live="form.productId"
                         :options="$this->products"
-                        option-label="name"
+                        option-label="label"
                         option-value="id"
                         :disabled="!$this->form->categoryId"
                     />

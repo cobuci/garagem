@@ -54,7 +54,15 @@ class Purchase extends Component
             return new Collection;
         }
 
-        return Product::where('category_id', $this->form->categoryId)->orderBy('name')->get();
+        return Product::where('category_id', $this->form->categoryId)
+            ->orderBy('name')
+            ->get()
+            ->map(function (Product $product): Product {
+                $suffix = collect([$product->brand, $product->weight])->filter()->implode(' · ');
+                $product->label = $suffix ? "{$product->name} — {$suffix}" : $product->name;
+
+                return $product;
+            });
     }
 
     public function updatedFormCategoryId(): void
