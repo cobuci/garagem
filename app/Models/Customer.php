@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 /**
  * @property int     $id
@@ -26,9 +28,10 @@ use Illuminate\Support\Carbon;
  * @property ?Carbon $deleted_at
  * @property-read Collection<int, Sale> $sales
  */
-class Customer extends Model
+class Customer extends Model implements AuditableContract
 {
     /* @use HasFactory<CustomerFactory> */
+    use Auditable;
     use HasFactory;
     use HasSearch;
     use SoftDeletes;

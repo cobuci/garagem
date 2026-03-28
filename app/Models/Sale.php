@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 /**
  * @property int        $id
@@ -33,12 +35,19 @@ use Illuminate\Support\Facades\DB;
  * @property-read ?Customer $customer
  * @property-read Collection<int, SaleItem> $items
  */
-class Sale extends Model
+class Sale extends Model implements AuditableContract
 {
     /** @use HasFactory<SaleFactory> */
+    use Auditable;
     use HasFactory;
 
     protected $guarded = ['id'];
+
+    /** @var list<string> */
+    protected array $auditExclude = [
+        'invoice_path',
+        'invoice_status',
+    ];
 
     protected function casts(): array
     {

@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 /**
  * @property int       $id
@@ -19,9 +21,10 @@ use Illuminate\Support\Carbon;
  * @property ?Carbon   $deleted_at
  * @property Product[] $products
  */
-class Category extends Model
+class Category extends Model implements AuditableContract
 {
     /** @use HasFactory<CategoryFactory> */
+    use Auditable;
     use HasFactory;
     use SoftDeletes;
 
