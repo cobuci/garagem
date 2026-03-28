@@ -58,4 +58,5 @@ return [
         'no_location'     => 'Location not defined',
     ],
     'add_sale' => 'New Sale',
+    'not_paid' => 'Not paid',
 ];

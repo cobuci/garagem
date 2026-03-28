@@ -77,7 +77,7 @@ it('calculates daily metrics correctly', function () {
         ->assertSet('dailyMetrics.percent', 100.0);
 });
 
-it('does not count unpaid sales in daily metrics', function () {
+it('separates unpaid sales from paid sales in daily metrics', function () {
     $product = Product::factory()->create([
         'unit_cost'  => 10.00,
         'sale_price' => 20.00,
@@ -87,6 +87,7 @@ it('does not count unpaid sales in daily metrics', function () {
         'status'         => SaleStatus::Pending,
         'created_at'     => now(),
         'total_amount'   => 40.00,
+        'net_amount'     => 40.00,
         'payment_method' => 'cash',
         'is_gift'        => false,
     ]);
@@ -100,16 +101,18 @@ it('does not count unpaid sales in daily metrics', function () {
 
     Livewire::test(Index::class)
         ->assertSet('dailyMetrics.sales', 0.0)
-        ->assertSet('dailyMetrics.profit', 0.0);
+        ->assertSet('dailyMetrics.profit', 0.0)
+        ->assertSet('dailyMetrics.pending_sales', 40.0);
 });
 
-it('does not count pending sales in monthly metrics', function () {
+it('separates pending sales from paid sales in monthly metrics', function () {
     $product = Product::factory()->create(['unit_cost' => 10.00, 'sale_price' => 20.00]);
 
     $salePending = Sale::query()->create([
         'status'         => SaleStatus::Pending,
         'created_at'     => now()->startOfMonth(),
         'total_amount'   => 200.00,
+        'net_amount'     => 200.00,
         'payment_method' => 'cash',
         'is_gift'        => false,
     ]);
@@ -123,7 +126,8 @@ it('does not count pending sales in monthly metrics', function () {
 
     Livewire::test(Index::class)
         ->assertSet('monthlyMetrics.sales', 0.0)
-        ->assertSet('monthlyMetrics.profit', 0.0);
+        ->assertSet('monthlyMetrics.profit', 0.0)
+        ->assertSet('monthlyMetrics.pending_sales', 200.0);
 });
 
 it('deducts discounts and fees from monthly sales total', function () {
@@ -231,7 +235,9 @@ it('provides correct chart data for the last 6 months', function () {
     expect($chartData['labels'])->toHaveCount(6)
         ->and($chartData['sales'])->toHaveCount(6)
         ->and($chartData['profit'])->toHaveCount(6)
-        ->and($chartData['sales'][5])->toEqual(20.0);
+        ->and($chartData['pending'])->toHaveCount(6)
+        ->and($chartData['sales'][5])->toEqual(20.0)
+        ->and($chartData['pending'][5])->toEqual(0.0);
 });
 
 it('calculates goal metrics correctly', function () {
@@ -342,5 +348,64 @@ it('shows 100% growth when previous period had zero sales', function () {
     ]);
 
     Livewire::test(Index::class)
+        ->assertSet('dailyMetrics.percent', 100.0);
+});
+
+it('includes pending sales in percent calculation for daily and monthly metrics', function () {
+    $product = Product::factory()->create(['unit_cost' => 10, 'sale_price' => 20]);
+
+    // Today: 20 paid + 20 pending = 40 total
+    $salePaid = Sale::query()->create([
+        'status'         => SaleStatus::Paid,
+        'created_at'     => now(),
+        'total_amount'   => 20,
+        'net_amount'     => 20,
+        'payment_method' => 'cash',
+        'is_gift'        => false,
+    ]);
+    $salePaid->items()->create([
+        'product_id' => $product->id,
+        'quantity'   => 1,
+        'unit_price' => 20,
+        'unit_cost'  => 10,
+        'subtotal'   => 20,
+    ]);
+
+    $salePending = Sale::query()->create([
+        'status'         => SaleStatus::Pending,
+        'created_at'     => now(),
+        'total_amount'   => 20,
+        'net_amount'     => 20,
+        'payment_method' => 'cash',
+        'is_gift'        => false,
+    ]);
+    $salePending->items()->create([
+        'product_id' => $product->id,
+        'quantity'   => 1,
+        'unit_price' => 20,
+        'unit_cost'  => 10,
+        'subtotal'   => 20,
+    ]);
+
+    // Yesterday: 20 paid — percent = (40 - 20) / 20 * 100 = 100%
+    $saleYesterday = Sale::query()->create([
+        'status'         => SaleStatus::Paid,
+        'created_at'     => now()->subDay(),
+        'total_amount'   => 20,
+        'net_amount'     => 20,
+        'payment_method' => 'cash',
+        'is_gift'        => false,
+    ]);
+    $saleYesterday->items()->create([
+        'product_id' => $product->id,
+        'quantity'   => 1,
+        'unit_price' => 20,
+        'unit_cost'  => 10,
+        'subtotal'   => 20,
+    ]);
+
+    Livewire::test(Index::class)
+        ->assertSet('dailyMetrics.sales', 20.0)
+        ->assertSet('dailyMetrics.pending_sales', 20.0)
         ->assertSet('dailyMetrics.percent', 100.0);
 });

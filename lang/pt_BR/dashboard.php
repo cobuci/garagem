@@ -58,4 +58,5 @@ return [
         'no_location'     => 'Localização não definida',
     ],
     'add_sale' => 'Nova Venda',
+    'not_paid' => 'Não pago',
 ];

@@ -6,6 +6,7 @@
     'trend' => null,
     'profit' => null,
     'previousProfit' => null,
+    'pendingSales' => null,
 ])
 
 @php
@@ -58,8 +59,14 @@
         </div>
 
         <h3 class="text-gray-500 dark:text-gray-400 text-sm font-semibold uppercase tracking-wider">{{ $title }}</h3>
-        <div class="mt-2 flex items-baseline">
+        <div class="mt-2">
             <p class="text-2xl font-bold text-gray-900 dark:text-white leading-none">R$ {{ number_format($value, 2, ',', '.') }}</p>
+            @if($pendingSales !== null && $pendingSales > 0)
+                <div class="mt-1.5 inline-flex items-center gap-1 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-md px-2 py-0.5">
+                    <x-icon name="clock" class="w-3 h-3 shrink-0" />
+                    <span class="text-xs font-bold whitespace-nowrap">+ R$ {{ number_format($pendingSales, 2, ',', '.') }} {{ __('dashboard.not_paid') }}</span>
+                </div>
+            @endif
         </div>
 
         @if($profit !== null)

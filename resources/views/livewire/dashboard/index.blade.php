@@ -17,6 +17,7 @@
                 :trend="$this->dailyMetrics['percent']"
                 :profit="$this->dailyMetrics['profit']"
                 :previous-profit="$this->dailyMetrics['previous_profit']"
+                :pending-sales="$this->dailyMetrics['pending_sales']"
                 icon="shopping-cart"
                 color="emerald"
             />
@@ -27,6 +28,7 @@
                 :trend="$this->monthlyMetrics['percent']"
                 :profit="$this->monthlyMetrics['profit']"
                 :previous-profit="$this->monthlyMetrics['previous_profit']"
+                :pending-sales="$this->monthlyMetrics['pending_sales']"
                 icon="calendar-days"
                 color="purple"
             />

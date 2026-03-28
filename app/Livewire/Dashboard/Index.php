@@ -66,11 +66,13 @@ class Index extends Component
     {
         if (! $this->user->can(Permission::ViewFinancialTransaction->value)) {
             return [
-                'sales'           => 0,
-                'previous_sales'  => 0,
-                'percent'         => 0,
-                'profit'          => 0,
-                'previous_profit' => 0,
+                'sales'                  => 0,
+                'previous_sales'         => 0,
+                'percent'                => 0,
+                'profit'                 => 0,
+                'previous_profit'        => 0,
+                'pending_sales'          => 0,
+                'previous_pending_sales' => 0,
             ];
         }
 
@@ -82,6 +84,13 @@ class Index extends Component
             ->selectRaw('SUM(CASE WHEN DATE(created_at) = ? THEN net_amount ELSE 0 END) as yesterday_sales', [$yesterday->toDateString()])
             ->whereIn(DB::raw('DATE(created_at)'), [$today->toDateString(), $yesterday->toDateString()])
             ->where('status', SaleStatus::Paid)
+            ->first();
+
+        $pendingMetrics = Sale::query()
+            ->selectRaw('SUM(CASE WHEN DATE(created_at) = ? THEN net_amount ELSE 0 END) as today_pending', [$today->toDateString()])
+            ->selectRaw('SUM(CASE WHEN DATE(created_at) = ? THEN net_amount ELSE 0 END) as yesterday_pending', [$yesterday->toDateString()])
+            ->whereIn(DB::raw('DATE(created_at)'), [$today->toDateString(), $yesterday->toDateString()])
+            ->where('status', SaleStatus::Pending)
             ->first();
 
         $itemCosts = SaleItem::query()
@@ -98,15 +107,19 @@ class Index extends Component
 
         $salesToday = $salesMetrics->today_sales ?? 0;
         $salesYesterday = $salesMetrics->yesterday_sales ?? 0;
+        $pendingToday = $pendingMetrics->today_pending ?? 0;
+        $pendingYesterday = $pendingMetrics->yesterday_pending ?? 0;
         $profitToday = $profitMetrics->today_profit ?? 0;
         $profitYesterday = $profitMetrics->yesterday_profit ?? 0;
 
         return [
-            'sales'           => $salesToday / 100,
-            'previous_sales'  => $salesYesterday / 100,
-            'percent'         => $this->calculatePercentage((float) $salesToday, (float) $salesYesterday),
-            'profit'          => $profitToday / 100,
-            'previous_profit' => $profitYesterday / 100,
+            'sales'                  => $salesToday / 100,
+            'previous_sales'         => $salesYesterday / 100,
+            'percent'                => $this->calculatePercentage((float) ($salesToday + $pendingToday), (float) ($salesYesterday + $pendingYesterday)),
+            'profit'                 => $profitToday / 100,
+            'previous_profit'        => $profitYesterday / 100,
+            'pending_sales'          => $pendingToday / 100,
+            'previous_pending_sales' => $pendingYesterday / 100,
         ];
     }
 
@@ -115,11 +128,13 @@ class Index extends Component
     {
         if (! $this->user->can(Permission::ViewFinancialTransaction->value)) {
             return [
-                'sales'           => 0,
-                'previous_sales'  => 0,
-                'percent'         => 0,
-                'profit'          => 0,
-                'previous_profit' => 0,
+                'sales'                  => 0,
+                'previous_sales'         => 0,
+                'percent'                => 0,
+                'profit'                 => 0,
+                'previous_profit'        => 0,
+                'pending_sales'          => 0,
+                'previous_pending_sales' => 0,
             ];
         }
 
@@ -130,6 +145,16 @@ class Index extends Component
             ->selectRaw('SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? THEN net_amount ELSE 0 END) as current_sales', [$currentMonth->month, $currentMonth->year])
             ->selectRaw('SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? THEN net_amount ELSE 0 END) as previous_sales', [$previousMonth->month, $previousMonth->year])
             ->where('status', SaleStatus::Paid)
+            ->where(function (Builder $q) use ($currentMonth, $previousMonth) {
+                $q->where(fn (Builder $sq) => $sq->whereMonth('created_at', $currentMonth->month)->whereYear('created_at', $currentMonth->year))
+                    ->orWhere(fn (Builder $sq) => $sq->whereMonth('created_at', $previousMonth->month)->whereYear('created_at', $previousMonth->year));
+            })
+            ->first();
+
+        $pendingMetrics = Sale::query()
+            ->selectRaw('SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? THEN net_amount ELSE 0 END) as current_pending', [$currentMonth->month, $currentMonth->year])
+            ->selectRaw('SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? THEN net_amount ELSE 0 END) as previous_pending', [$previousMonth->month, $previousMonth->year])
+            ->where('status', SaleStatus::Pending)
             ->where(function (Builder $q) use ($currentMonth, $previousMonth) {
                 $q->where(fn (Builder $sq) => $sq->whereMonth('created_at', $currentMonth->month)->whereYear('created_at', $currentMonth->year))
                     ->orWhere(fn (Builder $sq) => $sq->whereMonth('created_at', $previousMonth->month)->whereYear('created_at', $previousMonth->year));
@@ -153,15 +178,19 @@ class Index extends Component
 
         $salesMonth = $salesMetrics->current_sales ?? 0;
         $salesLastMonth = $salesMetrics->previous_sales ?? 0;
+        $pendingMonth = $pendingMetrics->current_pending ?? 0;
+        $pendingLastMonth = $pendingMetrics->previous_pending ?? 0;
         $profitMonth = $profitMetrics->current_profit ?? 0;
         $profitLastMonth = $profitMetrics->previous_profit ?? 0;
 
         return [
-            'sales'           => $salesMonth / 100,
-            'previous_sales'  => $salesLastMonth / 100,
-            'percent'         => $this->calculatePercentage((float) $salesMonth, (float) $salesLastMonth),
-            'profit'          => $profitMonth / 100,
-            'previous_profit' => $profitLastMonth / 100,
+            'sales'                  => $salesMonth / 100,
+            'previous_sales'         => $salesLastMonth / 100,
+            'percent'                => $this->calculatePercentage((float) ($salesMonth + $pendingMonth), (float) ($salesLastMonth + $pendingLastMonth)),
+            'profit'                 => $profitMonth / 100,
+            'previous_profit'        => $profitLastMonth / 100,
+            'pending_sales'          => $pendingMonth / 100,
+            'previous_pending_sales' => $pendingLastMonth / 100,
         ];
     }
 
@@ -170,9 +199,10 @@ class Index extends Component
     {
         if (! $this->user->can(Permission::ViewFinancialTransaction->value)) {
             return [
-                'labels' => [],
-                'sales'  => [],
-                'profit' => [],
+                'labels'  => [],
+                'sales'   => [],
+                'profit'  => [],
+                'pending' => [],
             ];
         }
 
@@ -182,6 +212,14 @@ class Index extends Component
             ->selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, SUM(net_amount) as total_sales')
             ->where('created_at', '>=', $startDate)
             ->where('status', SaleStatus::Paid)
+            ->groupBy('year', 'month')
+            ->get()
+            ->keyBy(fn ($item) => "{$item->getAttribute('year')}-{$item->getAttribute('month')}");
+
+        $pendingByMonth = Sale::query()
+            ->selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, SUM(net_amount) as total_pending')
+            ->where('created_at', '>=', $startDate)
+            ->where('status', SaleStatus::Pending)
             ->groupBy('year', 'month')
             ->get()
             ->keyBy(fn ($item) => "{$item->getAttribute('year')}-{$item->getAttribute('month')}");
@@ -202,6 +240,7 @@ class Index extends Component
         $labels = [];
         $salesData = [];
         $profitData = [];
+        $pendingData = [];
 
         for ($i = 5; $i >= 0; $i--) {
             $date = Carbon::now()->subMonths($i);
@@ -210,12 +249,14 @@ class Index extends Component
             $labels[] = $date->translatedFormat('M');
             $salesData[] = round(($salesByMonth->get($key)->total_sales ?? 0) / 100, 2);
             $profitData[] = round(($profitByMonth->get($key)->total_profit ?? 0) / 100, 2);
+            $pendingData[] = round(($pendingByMonth->get($key)->total_pending ?? 0) / 100, 2);
         }
 
         return [
-            'labels' => $labels,
-            'sales'  => $salesData,
-            'profit' => $profitData,
+            'labels'  => $labels,
+            'sales'   => $salesData,
+            'profit'  => $profitData,
+            'pending' => $pendingData,
         ];
     }
 
