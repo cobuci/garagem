@@ -230,3 +230,93 @@ it('can cancel a paid bill, decrement stock and restore balance', function () {
     $this->balance->refresh();
     expect($this->balance->getRawOriginal('current_balance'))->toBe(150000); // 1000.00 + 500.00
 });
+
+it('cannot mark an already paid bill as paid again', function () {
+    $this->actingAs($this->user);
+    $product = Product::factory()->create();
+    $purchase = ProductPurchase::create([
+        'product_id'   => $product->id,
+        'quantity'     => 1,
+        'unit_cost'    => 100.00,
+        'total_cost'   => 100.00,
+        'payment_date' => now()->toDateString(),
+        'due_date'     => now()->toDateString(),
+        'is_paid'      => true,
+    ]);
+
+    $balanceBefore = $this->balance->getRawOriginal('current_balance');
+
+    Livewire::test(Index::class)
+        ->call('confirmPayment', $purchase->id)
+        ->call('markAsPaid')
+        ->assertHasNoErrors();
+
+    // selectedBill guard: if already paid, nothing happens
+    $this->balance->refresh();
+    expect($this->balance->getRawOriginal('current_balance'))->toBe($balanceBefore);
+});
+
+it('can filter bills by status all, paid and pending', function () {
+    $this->actingAs($this->user);
+    $product = Product::factory()->create();
+
+    ProductPurchase::create([
+        'product_id' => $product->id,
+        'quantity'   => 1,
+        'unit_cost'  => 50.00,
+        'total_cost' => 50.00,
+        'due_date'   => now()->addDays(5)->toDateString(),
+        'is_paid'    => false,
+    ]);
+
+    ProductPurchase::create([
+        'product_id'   => $product->id,
+        'quantity'     => 1,
+        'unit_cost'    => 80.00,
+        'total_cost'   => 80.00,
+        'payment_date' => now()->toDateString(),
+        'due_date'     => now()->toDateString(),
+        'is_paid'      => true,
+    ]);
+
+    Livewire::test(Index::class)
+        ->assertSet('status', 'pending')
+        ->assertSet('bills', fn ($bills) => $bills->count() === 1 && $bills->first()->is_paid === false)
+        ->set('status', 'paid')
+        ->assertSet('bills', fn ($bills) => $bills->count() === 1 && $bills->first()->is_paid === true)
+        ->set('status', 'all')
+        ->assertSet('bills', fn ($bills) => $bills->count() === 2);
+});
+
+it('can search bills by product name', function () {
+    $this->actingAs($this->user);
+    $productA = Product::factory()->create(['name' => 'Alpha Product']);
+    $productB = Product::factory()->create(['name' => 'Beta Product']);
+
+    ProductPurchase::create([
+        'product_id' => $productA->id,
+        'quantity'   => 1,
+        'unit_cost'  => 10.00,
+        'total_cost' => 10.00,
+        'due_date'   => now()->addDays(5)->toDateString(),
+        'is_paid'    => false,
+    ]);
+
+    ProductPurchase::create([
+        'product_id' => $productB->id,
+        'quantity'   => 1,
+        'unit_cost'  => 20.00,
+        'total_cost' => 20.00,
+        'due_date'   => now()->addDays(10)->toDateString(),
+        'is_paid'    => false,
+    ]);
+
+    Livewire::test(Index::class)
+        ->set('status', 'all')
+        ->set('search', 'Alpha')
+        ->assertSet('bills', fn ($bills) => $bills->count() === 1 && $bills->first()->product->name === 'Alpha Product')
+        ->set('search', 'Beta')
+        ->assertSet('bills', fn ($bills) => $bills->count() === 1 && $bills->first()->product->name === 'Beta Product')
+        ->set('search', 'Nonexistent')
+        ->assertSet('bills', fn ($bills) => $bills->isEmpty());
+});

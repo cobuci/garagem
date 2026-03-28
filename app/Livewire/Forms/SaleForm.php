@@ -165,6 +165,6 @@ class SaleForm extends Form
             }
         });
 
-        $this->reset(['items', 'customerId', 'discountAmount', 'isGift', 'passFeeToCustomer']);
+        $this->reset(['items', 'customerId', 'discountAmount', 'isGift', 'passFeeToCustomer', 'paymentMethod', 'status']);
     }
 }

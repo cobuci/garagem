@@ -104,6 +104,8 @@ class Show extends Component
 
     public function markAsPaid(): void
     {
+        $this->authorize(Permission::EditSale->value);
+
         if (! $this->selectedSaleId) {
             return;
         }
@@ -134,6 +136,8 @@ class Show extends Component
 
     public function cancelSale(): void
     {
+        $this->authorize(Permission::EditSale->value);
+
         if (! $this->selectedSaleId) {
             return;
         }

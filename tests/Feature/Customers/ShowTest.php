@@ -184,3 +184,73 @@ it('can call downloadInvoice method', function () {
         ->call('downloadInvoice', $sale->id)
         ->assertStatus(200);
 });
+
+it('cannot mark a sale as paid without EditSale permission', function () {
+    $userWithoutPermission = User::factory()->create();
+    $userWithoutPermission->assignRole('user');
+
+    $customer = Customer::factory()->create();
+    $sale = Sale::factory()->create([
+        'customer_id' => $customer->id,
+        'status'      => SaleStatus::Pending,
+    ]);
+
+    Livewire::actingAs($userWithoutPermission)
+        ->test(Show::class, ['customer' => $customer])
+        ->call('confirmMarkAsPaid', $sale->id)
+        ->call('markAsPaid')
+        ->assertForbidden();
+
+    expect($sale->fresh()->status)->toBe(SaleStatus::Pending);
+});
+
+it('cannot cancel a sale without EditSale permission', function () {
+    $userWithoutPermission = User::factory()->create();
+    $userWithoutPermission->assignRole('user');
+
+    $customer = Customer::factory()->create();
+    $sale = Sale::factory()->create([
+        'customer_id' => $customer->id,
+        'status'      => SaleStatus::Pending,
+    ]);
+
+    Livewire::actingAs($userWithoutPermission)
+        ->test(Show::class, ['customer' => $customer])
+        ->call('confirmCancelSale', $sale->id)
+        ->call('cancelSale')
+        ->assertForbidden();
+
+    expect($sale->fresh()->status)->toBe(SaleStatus::Pending);
+});
+
+it('cannot mark an already paid sale as paid from customer page', function () {
+    $customer = Customer::factory()->create();
+    $sale = Sale::factory()->create([
+        'customer_id' => $customer->id,
+        'status'      => SaleStatus::Paid,
+    ]);
+
+    Livewire::actingAs($this->user)
+        ->test(Show::class, ['customer' => $customer])
+        ->call('confirmMarkAsPaid', $sale->id)
+        ->call('markAsPaid')
+        ->assertHasNoErrors();
+
+    expect($sale->fresh()->status)->toBe(SaleStatus::Paid);
+});
+
+it('cannot cancel an already cancelled sale from customer page', function () {
+    $customer = Customer::factory()->create();
+    $sale = Sale::factory()->create([
+        'customer_id' => $customer->id,
+        'status'      => SaleStatus::Cancelled,
+    ]);
+
+    Livewire::actingAs($this->user)
+        ->test(Show::class, ['customer' => $customer])
+        ->call('confirmCancelSale', $sale->id)
+        ->call('cancelSale')
+        ->assertHasNoErrors();
+
+    expect($sale->fresh()->status)->toBe(SaleStatus::Cancelled);
+});
