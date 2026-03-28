@@ -23,4 +23,5 @@ return [
     'otp_line1'         => 'Use o código abaixo para acessar sua conta.',
     'otp_line2'         => 'Este código expira em 10 minutos.',
     'otp_line3'         => 'Se você não solicitou este código, por favor ignore este e-mail.',
+    'remember_me'       => 'Manter conectado',
 ];
