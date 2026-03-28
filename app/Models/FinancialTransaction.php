@@ -23,8 +23,8 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
  */
 class FinancialTransaction extends Model implements AuditableContract
 {
-    /** @use HasFactory<FinancialTransactionFactory> */
     use Auditable;
+    /** @use HasFactory<FinancialTransactionFactory> */
     use HasFactory;
 
     protected $guarded = ['id'];

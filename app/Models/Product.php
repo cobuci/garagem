@@ -27,12 +27,13 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
  * @property ?Carbon    $created_at
  * @property ?Carbon    $updated_at
  * @property ?Carbon    $deleted_at
+ * @property ?string    $label
  * @property Category   $category
  */
 class Product extends Model implements AuditableContract
 {
-    /** @use HasFactory<ProductFactory> */
     use Auditable;
+    /** @use HasFactory<ProductFactory> */
     use HasFactory;
     use SoftDeletes;
 

@@ -258,7 +258,7 @@ class Index extends Component
     #[Computed]
     public function goalMetrics(): array
     {
-        $monthlyMetrics = $this->monthlyMetrics;
+        $monthlyMetrics = $this->monthlyMetrics();
         $monthlySales = $monthlyMetrics['sales'];
         $pendingSales = $monthlyMetrics['pending_sales'];
         $target = $this->targetBalance;

@@ -20,6 +20,7 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
  * @property ?Carbon $payment_date
  * @property ?Carbon $due_date
  * @property bool    $is_paid
+ * @property-read Product $product
  */
 class ProductPurchase extends Model implements AuditableContract
 {
