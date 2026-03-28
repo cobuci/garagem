@@ -392,3 +392,34 @@ test('can download invoice when it is ready', function () {
         ->call('downloadInvoice', $sale->id)
         ->assertFileDownloaded("{$sale->id}.pdf");
 });
+
+test('can download invoice png when it is ready', function () {
+    Storage::fake();
+    $sale = Sale::factory()->create([
+        'invoice_status'   => 'ready',
+        'invoice_path'     => 'invoices/ready.pdf',
+        'invoice_png_path' => 'invoices/ready.png',
+    ]);
+
+    Storage::put('invoices/ready.png', 'dummy png content');
+
+    Livewire::actingAs($this->user)
+        ->test(Index::class)
+        ->call('downloadInvoicePng', $sale->id)
+        ->assertFileDownloaded("{$sale->id}.png");
+});
+
+test('dispatches invoice job when png requested but invoice not yet generated', function () {
+    Queue::fake();
+    $sale = Sale::factory()->create();
+
+    Livewire::actingAs($this->user)
+        ->test(Index::class)
+        ->call('downloadInvoicePng', $sale->id);
+
+    Queue::assertPushed(GenerateInvoiceJob::class, function ($job) use ($sale) {
+        return $job->sale->id === $sale->id;
+    });
+
+    expect($sale->fresh()->invoice_status)->toBe('generating');
+});
