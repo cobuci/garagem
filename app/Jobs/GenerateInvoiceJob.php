@@ -45,6 +45,11 @@ class GenerateInvoiceJob implements ShouldQueue
             ->setNodeBinary(config('services.browsershot.node_binary'))
             ->setNpmBinary(config('services.browsershot.npm_binary'))
             ->setNodeModulePath(base_path('node_modules'))
+            ->addChromiumArguments([
+                '--disable-gpu',
+                '--disable-dev-shm-usage',
+                '--headless=new',
+            ])
             ->windowSize(900, 1200)
             ->setScreenshotType('png');
 
