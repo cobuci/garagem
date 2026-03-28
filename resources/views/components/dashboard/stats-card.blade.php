@@ -7,6 +7,7 @@
     'profit' => null,
     'previousProfit' => null,
     'pendingSales' => null,
+    'pendingProfit' => null,
 ])
 
 @php
@@ -70,19 +71,27 @@
         </div>
 
         @if($profit !== null)
-            <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
-                <div class="flex flex-col">
-                    <span class="text-gray-400 text-[10px] uppercase font-bold">{{ __('dashboard.profit') }}</span>
-                    <span @class([
-                        'font-bold',
-                        'text-emerald-600 dark:text-emerald-400' => $color === 'emerald',
-                        'text-purple-600 dark:text-purple-400' => $color === 'purple',
-                    ])>R$ {{ number_format($profit, 2, ',', '.') }}</span>
+            <div class="mt-3 space-y-1.5 text-sm">
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="flex flex-col">
+                        <span class="text-gray-400 text-[10px] uppercase font-bold">{{ __('dashboard.profit') }}</span>
+                        <span @class([
+                            'font-bold',
+                            'text-emerald-600 dark:text-emerald-400' => $color === 'emerald',
+                            'text-purple-600 dark:text-purple-400' => $color === 'purple',
+                        ])>R$ {{ number_format($profit, 2, ',', '.') }}</span>
+                    </div>
+                    <div class="flex flex-col border-l border-gray-100 dark:border-gray-700 pl-2">
+                        <span class="text-gray-400 text-[10px] uppercase font-bold">{{ __('dashboard.previous_profit') }}</span>
+                        <span class="font-bold text-gray-500">R$ {{ number_format($previousProfit, 2, ',', '.') }}</span>
+                    </div>
                 </div>
-                <div class="flex flex-col border-l border-gray-100 dark:border-gray-700 pl-2">
-                    <span class="text-gray-400 text-[10px] uppercase font-bold">{{ __('dashboard.previous_profit') }}</span>
-                    <span class="font-bold text-gray-500">R$ {{ number_format($previousProfit, 2, ',', '.') }}</span>
-                </div>
+                @if($pendingProfit !== null && $pendingProfit > 0)
+                    <div class="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 text-[10px] font-bold">
+                        <x-icon name="clock" class="w-3 h-3 shrink-0" />
+                        +R$ {{ number_format($pendingProfit, 2, ',', '.') }}
+                    </div>
+                @endif
             </div>
         @endif
     </div>

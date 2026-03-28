@@ -73,6 +73,7 @@ class Index extends Component
                 'previous_profit'        => 0,
                 'pending_sales'          => 0,
                 'previous_pending_sales' => 0,
+                'pending_profit'         => 0,
             ];
         }
 
@@ -105,12 +106,20 @@ class Index extends Component
             ->where('sales.status', SaleStatus::Paid)
             ->first();
 
+        $pendingProfitMetrics = Sale::query()
+            ->joinSub($itemCosts, 'item_costs', 'sales.id', '=', 'item_costs.sale_id')
+            ->selectRaw('SUM(CASE WHEN DATE(sales.created_at) = ? THEN sales.net_amount - item_costs.total_cost ELSE 0 END) as today_pending_profit', [$today->toDateString()])
+            ->whereIn(DB::raw('DATE(sales.created_at)'), [$today->toDateString()])
+            ->where('sales.status', SaleStatus::Pending)
+            ->first();
+
         $salesToday = $salesMetrics->today_sales ?? 0;
         $salesYesterday = $salesMetrics->yesterday_sales ?? 0;
         $pendingToday = $pendingMetrics->today_pending ?? 0;
         $pendingYesterday = $pendingMetrics->yesterday_pending ?? 0;
         $profitToday = $profitMetrics->today_profit ?? 0;
         $profitYesterday = $profitMetrics->yesterday_profit ?? 0;
+        $pendingProfitToday = $pendingProfitMetrics->today_pending_profit ?? 0;
 
         return [
             'sales'                  => $salesToday / 100,
@@ -120,6 +129,7 @@ class Index extends Component
             'previous_profit'        => $profitYesterday / 100,
             'pending_sales'          => $pendingToday / 100,
             'previous_pending_sales' => $pendingYesterday / 100,
+            'pending_profit'         => $pendingProfitToday / 100,
         ];
     }
 
@@ -135,6 +145,7 @@ class Index extends Component
                 'previous_profit'        => 0,
                 'pending_sales'          => 0,
                 'previous_pending_sales' => 0,
+                'pending_profit'         => 0,
             ];
         }
 
@@ -176,12 +187,21 @@ class Index extends Component
             })
             ->first();
 
+        $pendingProfitMetrics = Sale::query()
+            ->joinSub($itemCosts, 'item_costs', 'sales.id', '=', 'item_costs.sale_id')
+            ->selectRaw('SUM(CASE WHEN MONTH(sales.created_at) = ? AND YEAR(sales.created_at) = ? THEN sales.net_amount - item_costs.total_cost ELSE 0 END) as current_pending_profit', [$currentMonth->month, $currentMonth->year])
+            ->where('sales.status', SaleStatus::Pending)
+            ->whereMonth('sales.created_at', $currentMonth->month)
+            ->whereYear('sales.created_at', $currentMonth->year)
+            ->first();
+
         $salesMonth = $salesMetrics->current_sales ?? 0;
         $salesLastMonth = $salesMetrics->previous_sales ?? 0;
         $pendingMonth = $pendingMetrics->current_pending ?? 0;
         $pendingLastMonth = $pendingMetrics->previous_pending ?? 0;
         $profitMonth = $profitMetrics->current_profit ?? 0;
         $profitLastMonth = $profitMetrics->previous_profit ?? 0;
+        $pendingProfitMonth = $pendingProfitMetrics->current_pending_profit ?? 0;
 
         return [
             'sales'                  => $salesMonth / 100,
@@ -191,6 +211,7 @@ class Index extends Component
             'previous_profit'        => $profitLastMonth / 100,
             'pending_sales'          => $pendingMonth / 100,
             'previous_pending_sales' => $pendingLastMonth / 100,
+            'pending_profit'         => $pendingProfitMonth / 100,
         ];
     }
 

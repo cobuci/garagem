@@ -102,7 +102,8 @@ it('separates unpaid sales from paid sales in daily metrics', function () {
     Livewire::test(Index::class)
         ->assertSet('dailyMetrics.sales', 0.0)
         ->assertSet('dailyMetrics.profit', 0.0)
-        ->assertSet('dailyMetrics.pending_sales', 40.0);
+        ->assertSet('dailyMetrics.pending_sales', 40.0)
+        ->assertSet('dailyMetrics.pending_profit', 20.0);
 });
 
 it('separates pending sales from paid sales in monthly metrics', function () {
@@ -127,7 +128,8 @@ it('separates pending sales from paid sales in monthly metrics', function () {
     Livewire::test(Index::class)
         ->assertSet('monthlyMetrics.sales', 0.0)
         ->assertSet('monthlyMetrics.profit', 0.0)
-        ->assertSet('monthlyMetrics.pending_sales', 200.0);
+        ->assertSet('monthlyMetrics.pending_sales', 200.0)
+        ->assertSet('monthlyMetrics.pending_profit', 100.0);
 });
 
 it('deducts discounts and fees from monthly sales total', function () {
