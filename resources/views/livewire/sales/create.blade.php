@@ -184,6 +184,19 @@
                                     <x-icon name="x-mark" class="w-4 h-4" />
                                 </button>
                             </div>
+                            @if(!empty($item['brand']) || !empty($item['weight']))
+                                <div class="flex flex-wrap gap-x-2 gap-y-0.5 mb-1.5 text-[10px] text-gray-400 dark:text-gray-500 font-medium">
+                                    @if(!empty($item['brand']))
+                                        <span>{{ $item['brand'] }}</span>
+                                    @endif
+                                    @if(!empty($item['brand']) && !empty($item['weight']))
+                                        <span class="text-gray-300 dark:text-gray-600">·</span>
+                                    @endif
+                                    @if(!empty($item['weight']))
+                                        <span>{{ $item['weight'] }}</span>
+                                    @endif
+                                </div>
+                            @endif
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-0.5 border border-gray-200 dark:border-gray-700">
                                     <button
