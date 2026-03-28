@@ -265,16 +265,20 @@ class Index extends Component
     {
         $monthlyMetrics = $this->monthlyMetrics();
         $monthlySales = $monthlyMetrics['sales'];
+        $pendingSales = $monthlyMetrics['pending_sales'];
         $target = $this->targetBalance;
 
         $percent = $target > 0 ? min(100, ($monthlySales / $target) * 100) : 0;
+        $pendingPercent = $target > 0 ? min(100, (($monthlySales + $pendingSales) / $target) * 100) : 0;
         $remaining = max(0, $target - $monthlySales);
 
         return [
-            'target'    => $target,
-            'percent'   => $percent,
-            'remaining' => $remaining,
-            'reached'   => $monthlySales >= $target && $target > 0,
+            'target'          => $target,
+            'percent'         => $percent,
+            'pending_percent' => $pendingPercent,
+            'pending_sales'   => $pendingSales,
+            'remaining'       => $remaining,
+            'reached'         => $monthlySales >= $target && $target > 0,
         ];
     }
 

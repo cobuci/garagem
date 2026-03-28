@@ -32,14 +32,21 @@
                 >
             </div>
 
-        <div class="mt-3">
-                <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-3 mb-2 p-0.5 shadow-inner">
+            <div class="mt-3">
+                <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-3 mb-2 p-0.5 shadow-inner relative overflow-hidden">
+                    @if($goalMetrics['pending_sales'] > 0)
+                        <div
+                            class="absolute inset-y-0.5 left-0.5 rounded-full transition-all duration-1000 ease-out"
+                            style="width: calc({{ min($goalMetrics['pending_percent'], 100) }}% - 4px); background: repeating-linear-gradient(90deg, #818cf8 0px, #818cf8 6px, transparent 6px, transparent 10px);"
+                        ></div>
+                    @endif
                     <div
-                        class="bg-gradient-to-r from-amber-400 to-amber-600 h-2 rounded-full transition-all duration-1000 ease-out shadow-sm"
-                        style="width: {{ $goalMetrics['percent'] }}%"
+                        class="absolute inset-y-0.5 left-0.5 bg-gradient-to-r from-amber-400 to-amber-600 rounded-full transition-all duration-1000 ease-out shadow-sm"
+                        style="width: calc({{ min($goalMetrics['percent'], 100) }}% - 4px)"
                     ></div>
                 </div>
-                <div class="flex items-center justify-between">
+
+                <div class="flex items-center justify-between gap-2">
                     <p class="text-[10px] font-bold uppercase tracking-tight {{ $goalMetrics['reached'] ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400' }}">
                         @if($goalMetrics['reached'])
                             <span class="flex items-center gap-1">
@@ -50,11 +57,19 @@
                             {{ __('dashboard.remaining_to_goal', ['amount' => 'R$ ' . number_format($goalMetrics['remaining'], 2, ',', '.')]) }}
                         @endif
                     </p>
-                    @if(!$goalMetrics['reached'])
-                        <p class="text-[10px] font-bold text-gray-400 uppercase">
-                            {{ number_format($goalMetrics['percent'], 0) }}%
-                        </p>
-                    @endif
+                    <div class="flex items-center gap-3 shrink-0">
+                        @if($goalMetrics['pending_sales'] > 0)
+                            <span class="flex items-center gap-1 text-[10px] font-bold text-indigo-400 dark:text-indigo-400 uppercase">
+                                <x-icon name="clock" class="w-3 h-3" />
+                                + R$ {{ number_format($goalMetrics['pending_sales'], 2, ',', '.') }}
+                            </span>
+                        @endif
+                        @if(!$goalMetrics['reached'])
+                            <p class="text-[10px] font-bold text-gray-400 uppercase">
+                                {{ number_format($goalMetrics['percent'], 0) }}%
+                            </p>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
