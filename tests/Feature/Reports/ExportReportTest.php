@@ -286,12 +286,12 @@ test('GetSystemReportData groups sales by payment method with correct count and 
 
     $byMethod = $data['salesByPaymentMethod'];
 
-    expect($byMethod->has('pix'))->toBeTrue()
-        ->and($byMethod['pix']['paid_count'])->toBe(2)
-        ->and($byMethod['pix']['paid_amount'])->toBe(20000)
-        ->and($byMethod->has('cash'))->toBeTrue()
-        ->and($byMethod['cash']['paid_count'])->toBe(1)
-        ->and($byMethod['cash']['paid_amount'])->toBe(10000);
+    expect($byMethod->has(__('sales.payments.pix')))->toBeTrue()
+        ->and($byMethod[__('sales.payments.pix')]['paid_count'])->toBe(2)
+        ->and($byMethod[__('sales.payments.pix')]['paid_amount'])->toBe(20000)
+        ->and($byMethod->has(__('sales.payments.money')))->toBeTrue()
+        ->and($byMethod[__('sales.payments.money')]['paid_count'])->toBe(1)
+        ->and($byMethod[__('sales.payments.money')]['paid_amount'])->toBe(10000);
 });
 
 test('GetSystemReportData top products are ordered by total quantity descending', function () {

@@ -44,8 +44,8 @@ class SalesByPaymentMethod extends Component
             ->orderBy('payment_method')
             ->get();
 
-        $labels = $metrics->pluck('payment_method')->map(function ($method) {
-            return PaymentMethod::fromRaw((string) $method)->label();
+        $labels = $metrics->pluck('payment_method')->map(function (PaymentMethod $method) {
+            return __('reports.payment_methods.' . $method->value);
         })->all();
 
         $series = $metrics->pluck('total_sum')->map(function ($val) {
