@@ -287,11 +287,11 @@ test('GetSystemReportData groups sales by payment method with correct count and 
     $byMethod = $data['salesByPaymentMethod'];
 
     expect($byMethod->has('pix'))->toBeTrue()
-        ->and($byMethod['pix']['count'])->toBe(2)
-        ->and($byMethod['pix']['amount'])->toBe(20000)
+        ->and($byMethod['pix']['paid_count'])->toBe(2)
+        ->and($byMethod['pix']['paid_amount'])->toBe(20000)
         ->and($byMethod->has('cash'))->toBeTrue()
-        ->and($byMethod['cash']['count'])->toBe(1)
-        ->and($byMethod['cash']['amount'])->toBe(10000);
+        ->and($byMethod['cash']['paid_count'])->toBe(1)
+        ->and($byMethod['cash']['paid_amount'])->toBe(10000);
 });
 
 test('GetSystemReportData top products are ordered by total quantity descending', function () {
@@ -319,7 +319,7 @@ test('GetSystemReportData top products are ordered by total quantity descending'
         ->and($data['topProducts']->last()->product_id)->toBe($productA->id);
 });
 
-test('GetSystemReportData top products are limited to 10 results', function () {
+test('GetSystemReportData top products are limited to 15 results', function () {
     $sale = Sale::query()->create([
         'status'          => SaleStatus::Paid,
         'total_amount'    => 0,
@@ -330,7 +330,7 @@ test('GetSystemReportData top products are limited to 10 results', function () {
         'created_at'      => now(),
     ]);
 
-    Product::factory()->count(15)->create(['sale_price' => 10.00, 'unit_cost' => 5.00])->each(function ($product) use ($sale) {
+    Product::factory()->count(20)->create(['sale_price' => 10.00, 'unit_cost' => 5.00])->each(function ($product) use ($sale) {
         $sale->items()->create([
             'product_id' => $product->id,
             'quantity'   => 1,
@@ -345,7 +345,7 @@ test('GetSystemReportData top products are limited to 10 results', function () {
         now()->endOfDay()->format('Y-m-d'),
     );
 
-    expect($data['topProducts'])->toHaveCount(10);
+    expect($data['topProducts'])->toHaveCount(15);
 });
 
 test('GetSystemReportData returns correct startDate endDate and generatedAt in result', function () {
