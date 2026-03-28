@@ -2,6 +2,7 @@
 
 namespace App\Actions\Reports;
 
+use App\Enums\SaleStatus;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use Illuminate\Support\Carbon;
@@ -17,7 +18,7 @@ class GetSystemReportData
         $sales = Sale::query()
             ->with('items')
             ->whereBetween('created_at', [$start, $end])
-            ->where('status', '!=', 'cancelled')
+            ->where('status', SaleStatus::Paid)
             ->get();
 
         $totalRevenue = $sales->sum(fn ($sale) => $sale->getRawOriginal('total_amount'));
@@ -58,7 +59,7 @@ class GetSystemReportData
             ->select('product_id')
             ->selectRaw('SUM(quantity) as total_quantity')
             ->selectRaw('SUM(subtotal) as total_revenue')
-            ->whereHas('sale', fn ($query) => $query->whereBetween('created_at', [$start, $end])->where('status', '!=', 'cancelled'))
+            ->whereHas('sale', fn ($query) => $query->whereBetween('created_at', [$start, $end])->where('status', SaleStatus::Paid))
             ->groupBy('product_id')
             ->orderByDesc('total_quantity')
             ->with('product')
