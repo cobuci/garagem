@@ -6,6 +6,8 @@ use Database\Factories\SettingFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 /**
  * @property int     $id
@@ -20,8 +22,9 @@ use Illuminate\Support\Carbon;
  * @property ?Carbon $updated_at
  * @property array   $skipped_categories
  */
-class Setting extends Model
+class Setting extends Model implements AuditableContract
 {
+    use Auditable;
     /** @use HasFactory<SettingFactory> */
     use HasFactory;
 

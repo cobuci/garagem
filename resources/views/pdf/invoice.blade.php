@@ -134,7 +134,7 @@
         <div class="header-right">
             <div class="info-label">{{ __('sales.sale_info') }}</div>
             <div class="info-value"><span style="color: #6b7280;">{{ __('sales.date') }}:</span> {{ $sale->created_at->format('d/m/Y H:i') }}</div>
-            <div class="info-value"><span style="color: #6b7280;">{{ __('sales.payment_method') }}:</span> {{ __("sales.payments.{$sale->payment_method}") }}</div>
+            <div class="info-value"><span style="color: #6b7280;">{{ __('sales.payment_method') }}:</span> {{ $sale->payment_method->label() }}</div>
             <div class="info-value"><span style="color: #6b7280;">{{ __('sales.status') }}:</span> {{ __("sales.{$sale->status->value}") }}</div>
         </div>
         <div class="clear"></div>

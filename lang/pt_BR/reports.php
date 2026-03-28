@@ -13,7 +13,9 @@ return [
         'credit_card' => 'Cartão de Crédito',
         'debit_card'  => 'Cartão de Débito',
         'cash'        => 'Dinheiro',
+        'money'       => 'Dinheiro',
         'pix'         => 'PIX',
+        'others'      => 'Outros',
     ],
     'periods' => [
         'today'         => 'Hoje',
@@ -44,6 +46,7 @@ return [
     'export' => [
         'title'               => 'Relatório Completo',
         'subtitle'            => 'Exporte todos os dados para PDF e receba por e-mail',
+        'quick_select'        => 'Seleção rápida',
         'start_date'          => 'Data Inicial',
         'end_date'            => 'Data Final',
         'button'              => 'Gerar e Enviar Relatório',
@@ -89,5 +92,8 @@ return [
         'final_period_balance'    => 'Saldo Final do Período',
         'generated_by'            => 'Gerado por',
         'prepared_for'            => 'Preparado para',
+        'paid'                    => 'Pago',
+        'pending'                 => 'Pendente',
+        'qty'                     => 'Qtd',
     ],
 ];

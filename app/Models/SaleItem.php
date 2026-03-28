@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 /**
  * @property int     $id
@@ -22,8 +24,9 @@ use Illuminate\Support\Carbon;
  * @property-read Sale $sale
  * @property-read Product $product
  */
-class SaleItem extends Model
+class SaleItem extends Model implements AuditableContract
 {
+    use Auditable;
     /** @use HasFactory<SaleItemFactory> */
     use HasFactory;
 

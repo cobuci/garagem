@@ -8,9 +8,35 @@
     />
 
     <x-modal-card wire:model.defer="showModal" :title="__('reports.export.title')" align="center" max-width="lg">
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
             {{ __('reports.export.subtitle') }}
         </p>
+
+        <div class="mb-5 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700">
+            <p class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">
+                {{ __('reports.export.quick_select') }}
+            </p>
+            <div class="grid grid-cols-4 gap-2">
+                @foreach([
+                    'today'        => __('reports.periods.today'),
+                    'yesterday'    => __('reports.periods.yesterday'),
+                    'last_7_days'  => __('reports.periods.last_7_days'),
+                    'last_30_days' => __('reports.periods.last_30_days'),
+                    'this_month'   => __('reports.periods.this_month'),
+                    'last_month'   => __('reports.periods.last_month'),
+                    'this_year'    => __('reports.periods.this_year'),
+                    'last_year'    => __('reports.periods.last_year'),
+                ] as $key => $label)
+                    <button
+                        type="button"
+                        wire:click="applyPeriod('{{ $key }}')"
+                        class="py-1.5 px-2 text-xs font-medium rounded-md text-center border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-primary-50 hover:border-primary-400 hover:text-primary-700 dark:hover:bg-primary-900/30 dark:hover:border-primary-500 dark:hover:text-primary-400 transition-colors cursor-pointer"
+                    >
+                        {{ $label }}
+                    </button>
+                @endforeach
+            </div>
+        </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             <x-datetime-picker

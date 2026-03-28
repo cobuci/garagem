@@ -9,6 +9,8 @@ use App\Models\Sale;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
 use function Pest\Laravel\get;
@@ -177,12 +179,30 @@ it('only users with DeleteCustomer permission can delete a customer', function (
 });
 
 it('can call downloadInvoice method', function () {
+    Queue::fake();
     $customer = Customer::factory()->create();
     $sale = Sale::factory()->create(['customer_id' => $customer->id]);
 
     Livewire::test(Show::class, ['customer' => $customer])
         ->call('downloadInvoice', $sale->id)
         ->assertStatus(200);
+});
+
+it('can download invoice png when it is ready', function () {
+    Storage::fake();
+    $customer = Customer::factory()->create();
+    $sale = Sale::factory()->create([
+        'customer_id'      => $customer->id,
+        'invoice_status'   => 'ready',
+        'invoice_path'     => 'invoices/ready.pdf',
+        'invoice_png_path' => 'invoices/ready.png',
+    ]);
+
+    Storage::put('invoices/ready.png', 'dummy png content');
+
+    Livewire::test(Show::class, ['customer' => $customer])
+        ->call('downloadInvoicePng', $sale->id)
+        ->assertFileDownloaded("{$sale->id}.png");
 });
 
 it('cannot mark a sale as paid without EditSale permission', function () {

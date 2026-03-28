@@ -7,6 +7,8 @@ use App\Enums\TransactionType;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 /**
  * @property int     $id
@@ -18,9 +20,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property ?Carbon $payment_date
  * @property ?Carbon $due_date
  * @property bool    $is_paid
+ * @property-read Product $product
  */
-class ProductPurchase extends Model
+class ProductPurchase extends Model implements AuditableContract
 {
+    use Auditable;
+
     protected $guarded = ['id'];
 
     protected function casts(): array

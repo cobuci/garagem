@@ -148,7 +148,7 @@ test('it includes pending sales in report but not cancelled', function () {
     ]);
 
     Sale::where('payment_method', 'pix')->update(['total_amount' => 10000]);
-    Sale::where('payment_method', 'cash')->update(['total_amount' => 5000]);
+    Sale::where('payment_method', 'money')->update(['total_amount' => 5000]);
 
     Livewire::test(SalesByPaymentMethod::class)
         ->assertSet('chartDataArray.series', [50.0, 100.0])

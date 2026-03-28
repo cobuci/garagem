@@ -75,6 +75,8 @@ return [
     'no_sales_found'             => 'No sales found.',
     'download_invoice'           => 'Download Invoice',
     'download_invoice_ready'     => 'Invoice Ready (Download)',
+    'download_invoice_pdf'       => 'Download PDF',
+    'download_invoice_png'       => 'Download PNG',
     'generating_invoice'         => 'Generating Invoice...',
     'invoice'                    => 'Invoice',
     'invoice_number'             => 'Invoice Number',

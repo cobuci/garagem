@@ -15,6 +15,10 @@
                 <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
                 <span class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('dashboard.profit') }}</span>
             </div>
+            <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+                <span class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('dashboard.not_paid') }}</span>
+            </div>
         </div>
     </div>
 
@@ -23,6 +27,7 @@
             labels: @js($chartData['labels']),
             sales: @js($chartData['sales']),
             profit: @js($chartData['profit']),
+            pending: @js($chartData['pending']),
             init() {
                 let chart = new ApexCharts(this.$refs.chart, {
                     chart: {
@@ -41,6 +46,10 @@
                         {
                             name: '{{ __('dashboard.profit') }}',
                             data: this.profit
+                        },
+                        {
+                            name: '{{ __('dashboard.not_paid') }}',
+                            data: this.pending
                         }
                     ],
                     fill: {
@@ -55,10 +64,11 @@
                     dataLabels: { enabled: false },
                     stroke: {
                         curve: 'smooth',
-                        width: 3,
-                        colors: ['#6366f1', '#10b981']
+                        width: [3, 3, 2],
+                        colors: ['#6366f1', '#10b981', '#f59e0b'],
+                        dashArray: [0, 0, 5]
                     },
-                    colors: ['#6366f1', '#10b981'],
+                    colors: ['#6366f1', '#10b981', '#f59e0b'],
                     grid: {
                         borderColor: 'rgba(156, 163, 175, 0.1)',
                         strokeDashArray: 4,

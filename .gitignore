@@ -25,4 +25,5 @@ yarn-error.log
 /.github
 /.junie
 *.md
+!README.md
 laradumps.yaml

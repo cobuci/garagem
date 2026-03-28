@@ -90,8 +90,12 @@
         <div class="grid">
             <div class="col-2 card">
                 <h4>{{ __('reports.pdf.total_sales_gross') }}</h4>
-                <div class="value">R$ {{ number_format($totalRevenue / 100, 2, ',', '.') }}</div>
-                <div class="sub-value">{{ $salesByPaymentMethod->sum('count') }} {{ __('reports.pdf.transactions') }}</div>
+                <div class="value">R$ {{ number_format(($totalRevenue + $totalPendingAmount) / 100, 2, ',', '.') }}</div>
+                <div class="sub-value" style="margin-top: 6px;">
+                    <span class="text-green">&#10003; {{ __('reports.pdf.paid') }}: R$ {{ number_format($totalRevenue / 100, 2, ',', '.') }} ({{ $paidSalesCount }})</span>
+                    &nbsp;&nbsp;
+                    <span style="color: #d97706;">&#8987; {{ __('reports.pdf.pending') }}: R$ {{ number_format($totalPendingAmount / 100, 2, ',', '.') }} ({{ $pendingSalesCount }})</span>
+                </div>
             </div>
             <div class="col-2 card" style="margin-right: 0;">
                 <h4>{{ __('reports.pdf.net_revenue') }}</h4>
@@ -115,41 +119,58 @@
 
         <!-- Sales by Payment Method -->
         <div class="section-title">{{ __('reports.pdf.sales_by_payment_method') }}</div>
+        @php $totalPaid = $salesByPaymentMethod->sum('paid_amount'); $grandTotal = $totalPaid + $salesByPaymentMethod->sum('pending_amount'); @endphp
         <table>
             <thead>
                 <tr>
-                    <th style="width: 35%;">{{ __('reports.pdf.method') }}</th>
-                    <th class="text-right" style="width: 20%;">{{ __('reports.pdf.transactions') }}</th>
-                    <th class="text-right" style="width: 25%;">{{ __('reports.pdf.total_amount') }}</th>
-                    <th class="text-right" style="width: 20%;">{{ __('reports.pdf.share') }}</th>
+                    <th style="width: 18%;">{{ __('reports.pdf.method') }}</th>
+                    <th class="text-right" style="width: 14%;">{{ __('reports.pdf.paid') }} ({{ __('reports.pdf.qty') }})</th>
+                    <th class="text-right" style="width: 16%;">{{ __('reports.pdf.paid') }} (R$)</th>
+                    <th class="text-right" style="width: 14%;">{{ __('reports.pdf.pending') }} ({{ __('reports.pdf.qty') }})</th>
+                    <th class="text-right" style="width: 16%;">{{ __('reports.pdf.pending') }} (R$)</th>
+                    <th class="text-right" style="width: 11%;">{{ __('reports.pdf.share') }}</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($salesByPaymentMethod as $method => $data)
+                    @php $methodTotal = $data['paid_amount'] + $data['pending_amount']; @endphp
                     <tr>
-                        <td><span class="badge">{{ ucfirst($method) }}</span></td>
-                        <td class="text-right">{{ $data['count'] }}</td>
-                        <td class="text-right font-bold">R$ {{ number_format($data['amount'] / 100, 2, ',', '.') }}</td>
-                        <td class="text-right text-blue">{{ number_format(($data['amount'] / $totalRevenue) * 100, 1) }}%</td>
+                        <td><span class="badge">{{ $method }}</span></td>
+                        <td class="text-right text-green">{{ $data['paid_count'] }}</td>
+                        <td class="text-right font-bold text-green">R$ {{ number_format($data['paid_amount'] / 100, 2, ',', '.') }}</td>
+                        <td class="text-right" style="color: #d97706;">{{ $data['pending_count'] }}</td>
+                        <td class="text-right font-bold" style="color: #d97706;">R$ {{ number_format($data['pending_amount'] / 100, 2, ',', '.') }}</td>
+                        <td class="text-right text-blue">{{ $grandTotal > 0 ? number_format(($methodTotal / $grandTotal) * 100, 1) : '0,0' }}%</td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
 
-        <!-- Top Products -->
-        <div class="section-title">{{ __('reports.pdf.top_selling_products') }}</div>
+    </div>
+
+    <!-- Page 2: Top Products -->
+    <div style="page-break-before: always;"></div>
+
+    <div class="header">
+        <h1>{{ __('reports.pdf.top_selling_products') }}</h1>
+        <p>{{ __('reports.pdf.reporting_period') }}: <span style="color: white; font-weight: 600;">{{ $startDate }}</span> to <span style="color: white; font-weight: 600;">{{ $endDate }}</span></p>
+    </div>
+
+    <div class="container">
         <table>
             <thead>
                 <tr>
-                    <th style="width: 40%;">{{ __('reports.pdf.product') }}</th>
-                    <th class="text-right" style="width: 15%;">{{ __('reports.pdf.units') }}</th>
+                    <th style="width: 5%;">#</th>
+                    <th style="width: 42%;">{{ __('reports.pdf.product') }}</th>
+                    <th class="text-right" style="width: 13%;">{{ __('reports.pdf.units') }}</th>
                     <th class="text-right" style="width: 20%;">{{ __('reports.pdf.unit_price_avg') }}</th>
-                    <th class="text-right" style="width: 25%;">{{ __('reports.pdf.revenue') }}</th>
+                    <th class="text-right" style="width: 20%;">{{ __('reports.pdf.revenue') }}</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($topProducts as $item)
+                @foreach($topProducts as $i => $item)
                     <tr>
+                        <td style="color: #94a3b8;">{{ $i + 1 }}</td>
                         <td class="font-bold">{{ $item->product->name }}</td>
                         <td class="text-right">{{ $item->total_quantity }}</td>
                         <td class="text-right">R$ {{ number_format(($item->total_revenue / $item->total_quantity) / 100, 2, ',', '.') }}</td>
@@ -158,7 +179,6 @@
                 @endforeach
             </tbody>
         </table>
-
     </div>
 
     <div class="footer">

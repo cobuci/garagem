@@ -4,13 +4,17 @@ namespace App\Models;
 
 use App\Casts\MoneyCast;
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Auditable;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 /**
  * @property int $current_balance
  * @property int $target_balance
  */
-class AccountBalance extends Model
+class AccountBalance extends Model implements AuditableContract
 {
+    use Auditable;
+
     protected $guarded = ['id'];
 
     public static function singleton(): self
