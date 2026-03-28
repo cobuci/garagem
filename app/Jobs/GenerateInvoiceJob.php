@@ -9,6 +9,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Browsershot\Browsershot;
 
 class GenerateInvoiceJob implements ShouldQueue
 {
@@ -23,17 +24,36 @@ class GenerateInvoiceJob implements ShouldQueue
     {
         $this->sale->update(['invoice_status' => 'generating']);
 
+        $sale = $this->sale->load(['customer', 'items.product']);
+        $settings = Setting::singleton();
+
         $pdf = Pdf::loadView('pdf.invoice', [
-            'sale'     => $this->sale->load(['customer', 'items.product']),
-            'settings' => Setting::singleton(),
+            'sale'     => $sale,
+            'settings' => $settings,
         ]);
 
-        $fileName = "invoices/{$this->sale->id}.pdf";
-        Storage::put($fileName, $pdf->output());
+        $pdfFileName = "invoices/{$this->sale->id}.pdf";
+        Storage::put($pdfFileName, $pdf->output());
+
+        $html = view('pdf.invoice', ['sale' => $sale, 'settings' => $settings])->render();
+        $pngFileName = "invoices/{$this->sale->id}.png";
+        $pngAbsPath = Storage::path($pngFileName);
+
+        Storage::makeDirectory('invoices');
+
+        $browsershot = Browsershot::html($html)
+            ->setNodeBinary(config('services.browsershot.node_binary'))
+            ->setNpmBinary(config('services.browsershot.npm_binary'))
+            ->setNodeModulePath(base_path('node_modules'))
+            ->windowSize(900, 1200)
+            ->setScreenshotType('png');
+
+        $browsershot->save($pngAbsPath);
 
         $this->sale->update([
-            'invoice_status' => 'ready',
-            'invoice_path'   => $fileName,
+            'invoice_status'   => 'ready',
+            'invoice_path'     => $pdfFileName,
+            'invoice_png_path' => $pngFileName,
         ]);
     }
 

@@ -135,7 +135,7 @@
                 @foreach($salesByPaymentMethod as $method => $data)
                     @php $methodTotal = $data['paid_amount'] + $data['pending_amount']; @endphp
                     <tr>
-                        <td><span class="badge">{{ ucfirst($method) }}</span></td>
+                        <td><span class="badge">{{ $method }}</span></td>
                         <td class="text-right text-green">{{ $data['paid_count'] }}</td>
                         <td class="text-right font-bold text-green">R$ {{ number_format($data['paid_amount'] / 100, 2, ',', '.') }}</td>
                         <td class="text-right" style="color: #d97706;">{{ $data['pending_count'] }}</td>

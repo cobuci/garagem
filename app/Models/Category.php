@@ -23,8 +23,8 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
  */
 class Category extends Model implements AuditableContract
 {
-    /** @use HasFactory<CategoryFactory> */
     use Auditable;
+    /** @use HasFactory<CategoryFactory> */
     use HasFactory;
     use SoftDeletes;
 

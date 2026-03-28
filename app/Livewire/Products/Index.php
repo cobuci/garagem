@@ -49,10 +49,11 @@ class Index extends Component
             ->where('stock_quantity', '>', 0)
             ->selectRaw('SUM(unit_cost * stock_quantity) as total_cost')
             ->selectRaw('SUM(sale_price * stock_quantity) as total_sale')
+            ->toBase()
             ->first();
 
-        $totalCost = ((float) $stats->total_cost) / 100;
-        $totalSale = ((float) $stats->total_sale) / 100;
+        $totalCost = ((float) ($stats->total_cost ?? 0)) / 100;
+        $totalSale = ((float) ($stats->total_sale ?? 0)) / 100;
         $totalProfit = $totalSale - $totalCost;
 
         return [

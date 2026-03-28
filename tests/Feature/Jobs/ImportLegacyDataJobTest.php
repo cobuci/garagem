@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Gender;
+use App\Enums\PaymentMethod;
 use App\Enums\SaleStatus;
 use App\Jobs\ImportLegacyDataJob;
 use App\Models\Customer;
@@ -94,7 +95,7 @@ INSERT INTO `orders` (`id`, `order_id`, `product_id`, `product_name`, `product_b
         ->and(SaleItem::count())->toBe(1);
 
     $sale = Sale::first();
-    expect($sale->payment_method)->toBe('PIX')
+    expect($sale->payment_method)->toBe(PaymentMethod::Pix)
         ->and($sale->status)->toBe(SaleStatus::Paid)
         ->and((float) $sale->total_amount)->toBe(8.00)
         ->and((float) $sale->discount_amount)->toBe(0.00)

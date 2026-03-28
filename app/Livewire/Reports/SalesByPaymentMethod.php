@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Reports;
 
+use App\Enums\PaymentMethod;
 use App\Enums\Permission;
 use App\Enums\SaleStatus;
 use App\Models\Sale;
@@ -43,14 +44,8 @@ class SalesByPaymentMethod extends Component
             ->orderBy('payment_method')
             ->get();
 
-        $labels = $metrics->pluck('payment_method')->map(function ($method) {
-            return match (strtolower($method)) {
-                'credit_card' => __('reports.payment_methods.credit_card'),
-                'debit_card'  => __('reports.payment_methods.debit_card'),
-                'cash'        => __('reports.payment_methods.cash'),
-                'pix'         => __('reports.payment_methods.pix'),
-                default       => $method,
-            };
+        $labels = $metrics->pluck('payment_method')->map(function (PaymentMethod $method) {
+            return __('reports.payment_methods.' . $method->value);
         })->all();
 
         $series = $metrics->pluck('total_sum')->map(function ($val) {

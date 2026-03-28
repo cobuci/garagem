@@ -4,6 +4,7 @@ namespace App\Livewire\Audits;
 
 use App\Enums\Permission;
 use App\Models\AccountBalance;
+use App\Models\Audit;
 use App\Models\Category;
 use App\Models\Customer;
 use App\Models\FinancialTransaction;
@@ -21,7 +22,6 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
-use OwenIt\Auditing\Models\Audit;
 
 /**
  * @property-read LengthAwarePaginator $audits

@@ -13,7 +13,9 @@ return [
         'credit_card' => 'Cartão de Crédito',
         'debit_card'  => 'Cartão de Débito',
         'cash'        => 'Dinheiro',
+        'money'       => 'Dinheiro',
         'pix'         => 'PIX',
+        'others'      => 'Outros',
     ],
     'periods' => [
         'today'         => 'Hoje',

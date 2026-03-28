@@ -56,7 +56,7 @@ class GetSystemReportData
 
     protected function getSalesByPaymentMethod(Collection $paidSales, Collection $pendingSales): Collection
     {
-        $paid = $paidSales->groupBy('payment_method')
+        $paid = $paidSales->groupBy(fn (Sale $sale) => $sale->payment_method->label())
             ->map(fn (Collection $group) => [
                 'paid_count'     => $group->count(),
                 'paid_amount'    => $group->sum(fn ($sale) => $sale->getRawOriginal('total_amount')),
@@ -64,7 +64,7 @@ class GetSystemReportData
                 'pending_amount' => 0,
             ]);
 
-        $pending = $pendingSales->groupBy('payment_method');
+        $pending = $pendingSales->groupBy(fn (Sale $sale) => $sale->payment_method->label());
 
         foreach ($pending as $method => $group) {
             $existing = $paid->get($method, [

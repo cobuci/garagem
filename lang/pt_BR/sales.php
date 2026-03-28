@@ -75,6 +75,8 @@ return [
     'no_sales_found'             => 'Nenhuma venda encontrada.',
     'download_invoice'           => 'Baixar Fatura',
     'download_invoice_ready'     => 'Fatura Pronta (Baixar)',
+    'download_invoice_pdf'       => 'Baixar PDF',
+    'download_invoice_png'       => 'Baixar PNG',
     'generating_invoice'         => 'Gerando Fatura...',
     'invoice'                    => 'Fatura',
     'invoice_number'             => 'Nº da Fatura',

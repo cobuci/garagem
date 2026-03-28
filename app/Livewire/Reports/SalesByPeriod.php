@@ -129,7 +129,7 @@ class SalesByPeriod extends Component
         return match ($groupBy) {
             'hour'  => "DATE_FORMAT(sales.created_at, '%H:00') as period_label, DATE_FORMAT(sales.created_at, '%H') as sort_key, {$totalSales}, {$totalProfit}",
             'day'   => "DATE_FORMAT(sales.created_at, '%d/%m') as period_label, DATE(sales.created_at) as sort_key, {$totalSales}, {$totalProfit}",
-            'month' => "DATE_FORMAT(sales.created_at, '%m/%Y') as period_label, DATE_FORMAT(sales.created_at, '%Y-%m') as sort_key, {$totalSales}, {$totalProfit}",
+            default => "DATE_FORMAT(sales.created_at, '%m/%Y') as period_label, DATE_FORMAT(sales.created_at, '%Y-%m') as sort_key, {$totalSales}, {$totalProfit}",
         };
     }
 }
