@@ -160,7 +160,7 @@
                         <x-icon name="shopping-cart" class="w-6 h-6 text-gray-400" />
                         @if(count($form->items) > 0)
                             <span class="absolute -top-2 -right-2 bg-primary-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full ring-2 ring-white dark:ring-gray-900 animate-bounce">
-                                {{ count($form->items) }}
+                                {{ collect($form->items)->sum('quantity') }}
                             </span>
                         @endif
                     </div>
@@ -362,7 +362,7 @@
             <x-icon name="shopping-cart" class="w-6 h-6" />
             @if(count($form->items) > 0)
                 <span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full ring-2 ring-white">
-                    {{ count($form->items) }}
+                    {{ collect($form->items)->sum('quantity') }}
                 </span>
             @endif
         </div>
