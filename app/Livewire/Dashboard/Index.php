@@ -81,17 +81,12 @@ class Index extends Component
         $yesterday = Carbon::yesterday();
 
         $salesMetrics = Sale::query()
-            ->selectRaw('SUM(CASE WHEN DATE(created_at) = ? THEN net_amount ELSE 0 END) as today_sales', [$today->toDateString()])
-            ->selectRaw('SUM(CASE WHEN DATE(created_at) = ? THEN net_amount ELSE 0 END) as yesterday_sales', [$yesterday->toDateString()])
+            ->selectRaw('SUM(CASE WHEN DATE(created_at) = ? AND status = ? THEN net_amount ELSE 0 END) as today_sales', [$today->toDateString(), SaleStatus::Paid->value])
+            ->selectRaw('SUM(CASE WHEN DATE(created_at) = ? AND status = ? THEN net_amount ELSE 0 END) as yesterday_sales', [$yesterday->toDateString(), SaleStatus::Paid->value])
+            ->selectRaw('SUM(CASE WHEN DATE(created_at) = ? AND status = ? THEN net_amount ELSE 0 END) as today_pending', [$today->toDateString(), SaleStatus::Pending->value])
+            ->selectRaw('SUM(CASE WHEN DATE(created_at) = ? AND status = ? THEN net_amount ELSE 0 END) as yesterday_pending', [$yesterday->toDateString(), SaleStatus::Pending->value])
             ->whereIn(DB::raw('DATE(created_at)'), [$today->toDateString(), $yesterday->toDateString()])
-            ->where('status', SaleStatus::Paid)
-            ->first();
-
-        $pendingMetrics = Sale::query()
-            ->selectRaw('SUM(CASE WHEN DATE(created_at) = ? THEN net_amount ELSE 0 END) as today_pending', [$today->toDateString()])
-            ->selectRaw('SUM(CASE WHEN DATE(created_at) = ? THEN net_amount ELSE 0 END) as yesterday_pending', [$yesterday->toDateString()])
-            ->whereIn(DB::raw('DATE(created_at)'), [$today->toDateString(), $yesterday->toDateString()])
-            ->where('status', SaleStatus::Pending)
+            ->whereIn('status', [SaleStatus::Paid, SaleStatus::Pending])
             ->first();
 
         $itemCosts = SaleItem::query()
@@ -100,26 +95,20 @@ class Index extends Component
 
         $profitMetrics = Sale::query()
             ->joinSub($itemCosts, 'item_costs', 'sales.id', '=', 'item_costs.sale_id')
-            ->selectRaw('SUM(CASE WHEN DATE(sales.created_at) = ? THEN sales.net_amount - item_costs.total_cost ELSE 0 END) as today_profit', [$today->toDateString()])
-            ->selectRaw('SUM(CASE WHEN DATE(sales.created_at) = ? THEN sales.net_amount - item_costs.total_cost ELSE 0 END) as yesterday_profit', [$yesterday->toDateString()])
+            ->selectRaw('SUM(CASE WHEN DATE(sales.created_at) = ? AND sales.status = ? THEN sales.net_amount - item_costs.total_cost ELSE 0 END) as today_profit', [$today->toDateString(), SaleStatus::Paid->value])
+            ->selectRaw('SUM(CASE WHEN DATE(sales.created_at) = ? AND sales.status = ? THEN sales.net_amount - item_costs.total_cost ELSE 0 END) as yesterday_profit', [$yesterday->toDateString(), SaleStatus::Paid->value])
+            ->selectRaw('SUM(CASE WHEN DATE(sales.created_at) = ? AND sales.status = ? THEN sales.net_amount - item_costs.total_cost ELSE 0 END) as today_pending_profit', [$today->toDateString(), SaleStatus::Pending->value])
             ->whereIn(DB::raw('DATE(sales.created_at)'), [$today->toDateString(), $yesterday->toDateString()])
-            ->where('sales.status', SaleStatus::Paid)
-            ->first();
-
-        $pendingProfitMetrics = Sale::query()
-            ->joinSub($itemCosts, 'item_costs', 'sales.id', '=', 'item_costs.sale_id')
-            ->selectRaw('SUM(CASE WHEN DATE(sales.created_at) = ? THEN sales.net_amount - item_costs.total_cost ELSE 0 END) as today_pending_profit', [$today->toDateString()])
-            ->whereIn(DB::raw('DATE(sales.created_at)'), [$today->toDateString()])
-            ->where('sales.status', SaleStatus::Pending)
+            ->whereIn('sales.status', [SaleStatus::Paid, SaleStatus::Pending])
             ->first();
 
         $salesToday = $salesMetrics->today_sales ?? 0;
         $salesYesterday = $salesMetrics->yesterday_sales ?? 0;
-        $pendingToday = $pendingMetrics->today_pending ?? 0;
-        $pendingYesterday = $pendingMetrics->yesterday_pending ?? 0;
+        $pendingToday = $salesMetrics->today_pending ?? 0;
+        $pendingYesterday = $salesMetrics->yesterday_pending ?? 0;
         $profitToday = $profitMetrics->today_profit ?? 0;
         $profitYesterday = $profitMetrics->yesterday_profit ?? 0;
-        $pendingProfitToday = $pendingProfitMetrics->today_pending_profit ?? 0;
+        $pendingProfitToday = $profitMetrics->today_pending_profit ?? 0;
 
         return [
             'sales'                  => $salesToday / 100,
@@ -153,19 +142,11 @@ class Index extends Component
         $previousMonth = Carbon::now()->subMonth();
 
         $salesMetrics = Sale::query()
-            ->selectRaw('SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? THEN net_amount ELSE 0 END) as current_sales', [$currentMonth->month, $currentMonth->year])
-            ->selectRaw('SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? THEN net_amount ELSE 0 END) as previous_sales', [$previousMonth->month, $previousMonth->year])
-            ->where('status', SaleStatus::Paid)
-            ->where(function (Builder $q) use ($currentMonth, $previousMonth) {
-                $q->where(fn (Builder $sq) => $sq->whereMonth('created_at', $currentMonth->month)->whereYear('created_at', $currentMonth->year))
-                    ->orWhere(fn (Builder $sq) => $sq->whereMonth('created_at', $previousMonth->month)->whereYear('created_at', $previousMonth->year));
-            })
-            ->first();
-
-        $pendingMetrics = Sale::query()
-            ->selectRaw('SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? THEN net_amount ELSE 0 END) as current_pending', [$currentMonth->month, $currentMonth->year])
-            ->selectRaw('SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? THEN net_amount ELSE 0 END) as previous_pending', [$previousMonth->month, $previousMonth->year])
-            ->where('status', SaleStatus::Pending)
+            ->selectRaw('SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? AND status = ? THEN net_amount ELSE 0 END) as current_sales', [$currentMonth->month, $currentMonth->year, SaleStatus::Paid->value])
+            ->selectRaw('SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? AND status = ? THEN net_amount ELSE 0 END) as previous_sales', [$previousMonth->month, $previousMonth->year, SaleStatus::Paid->value])
+            ->selectRaw('SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? AND status = ? THEN net_amount ELSE 0 END) as current_pending', [$currentMonth->month, $currentMonth->year, SaleStatus::Pending->value])
+            ->selectRaw('SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? AND status = ? THEN net_amount ELSE 0 END) as previous_pending', [$previousMonth->month, $previousMonth->year, SaleStatus::Pending->value])
+            ->whereIn('status', [SaleStatus::Paid, SaleStatus::Pending])
             ->where(function (Builder $q) use ($currentMonth, $previousMonth) {
                 $q->where(fn (Builder $sq) => $sq->whereMonth('created_at', $currentMonth->month)->whereYear('created_at', $currentMonth->year))
                     ->orWhere(fn (Builder $sq) => $sq->whereMonth('created_at', $previousMonth->month)->whereYear('created_at', $previousMonth->year));
@@ -178,30 +159,23 @@ class Index extends Component
 
         $profitMetrics = Sale::query()
             ->joinSub($itemCosts, 'item_costs', 'sales.id', '=', 'item_costs.sale_id')
-            ->selectRaw('SUM(CASE WHEN MONTH(sales.created_at) = ? AND YEAR(sales.created_at) = ? THEN sales.net_amount - item_costs.total_cost ELSE 0 END) as current_profit', [$currentMonth->month, $currentMonth->year])
-            ->selectRaw('SUM(CASE WHEN MONTH(sales.created_at) = ? AND YEAR(sales.created_at) = ? THEN sales.net_amount - item_costs.total_cost ELSE 0 END) as previous_profit', [$previousMonth->month, $previousMonth->year])
-            ->where('sales.status', SaleStatus::Paid)
+            ->selectRaw('SUM(CASE WHEN MONTH(sales.created_at) = ? AND YEAR(sales.created_at) = ? AND sales.status = ? THEN sales.net_amount - item_costs.total_cost ELSE 0 END) as current_profit', [$currentMonth->month, $currentMonth->year, SaleStatus::Paid->value])
+            ->selectRaw('SUM(CASE WHEN MONTH(sales.created_at) = ? AND YEAR(sales.created_at) = ? AND sales.status = ? THEN sales.net_amount - item_costs.total_cost ELSE 0 END) as previous_profit', [$previousMonth->month, $previousMonth->year, SaleStatus::Paid->value])
+            ->selectRaw('SUM(CASE WHEN MONTH(sales.created_at) = ? AND YEAR(sales.created_at) = ? AND sales.status = ? THEN sales.net_amount - item_costs.total_cost ELSE 0 END) as current_pending_profit', [$currentMonth->month, $currentMonth->year, SaleStatus::Pending->value])
+            ->whereIn('sales.status', [SaleStatus::Paid, SaleStatus::Pending])
             ->where(function (Builder $q) use ($currentMonth, $previousMonth) {
                 $q->where(fn (Builder $sq) => $sq->whereMonth('sales.created_at', $currentMonth->month)->whereYear('sales.created_at', $currentMonth->year))
                     ->orWhere(fn (Builder $sq) => $sq->whereMonth('sales.created_at', $previousMonth->month)->whereYear('sales.created_at', $previousMonth->year));
             })
             ->first();
 
-        $pendingProfitMetrics = Sale::query()
-            ->joinSub($itemCosts, 'item_costs', 'sales.id', '=', 'item_costs.sale_id')
-            ->selectRaw('SUM(CASE WHEN MONTH(sales.created_at) = ? AND YEAR(sales.created_at) = ? THEN sales.net_amount - item_costs.total_cost ELSE 0 END) as current_pending_profit', [$currentMonth->month, $currentMonth->year])
-            ->where('sales.status', SaleStatus::Pending)
-            ->whereMonth('sales.created_at', $currentMonth->month)
-            ->whereYear('sales.created_at', $currentMonth->year)
-            ->first();
-
         $salesMonth = $salesMetrics->current_sales ?? 0;
         $salesLastMonth = $salesMetrics->previous_sales ?? 0;
-        $pendingMonth = $pendingMetrics->current_pending ?? 0;
-        $pendingLastMonth = $pendingMetrics->previous_pending ?? 0;
+        $pendingMonth = $salesMetrics->current_pending ?? 0;
+        $pendingLastMonth = $salesMetrics->previous_pending ?? 0;
         $profitMonth = $profitMetrics->current_profit ?? 0;
         $profitLastMonth = $profitMetrics->previous_profit ?? 0;
-        $pendingProfitMonth = $pendingProfitMetrics->current_pending_profit ?? 0;
+        $pendingProfitMonth = $profitMetrics->current_pending_profit ?? 0;
 
         return [
             'sales'                  => $salesMonth / 100,
@@ -284,7 +258,7 @@ class Index extends Component
     #[Computed]
     public function goalMetrics(): array
     {
-        $monthlyMetrics = $this->monthlyMetrics();
+        $monthlyMetrics = $this->monthlyMetrics;
         $monthlySales = $monthlyMetrics['sales'];
         $pendingSales = $monthlyMetrics['pending_sales'];
         $target = $this->targetBalance;
