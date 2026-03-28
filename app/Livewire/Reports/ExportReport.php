@@ -29,6 +29,21 @@ class ExportReport extends Component
         $this->endDate = now()->format('Y-m-d');
     }
 
+    public function applyPeriod(string $period): void
+    {
+        [$this->startDate, $this->endDate] = match ($period) {
+            'today'        => [now()->format('Y-m-d'), now()->format('Y-m-d')],
+            'yesterday'    => [now()->subDay()->format('Y-m-d'), now()->subDay()->format('Y-m-d')],
+            'last_7_days'  => [now()->subDays(6)->format('Y-m-d'), now()->format('Y-m-d')],
+            'last_30_days' => [now()->subDays(29)->format('Y-m-d'), now()->format('Y-m-d')],
+            'this_month'   => [now()->startOfMonth()->format('Y-m-d'), now()->format('Y-m-d')],
+            'last_month'   => [now()->subMonth()->startOfMonth()->format('Y-m-d'), now()->subMonth()->endOfMonth()->format('Y-m-d')],
+            'this_year'    => [now()->startOfYear()->format('Y-m-d'), now()->format('Y-m-d')],
+            'last_year'    => [now()->subYear()->startOfYear()->format('Y-m-d'), now()->subYear()->endOfYear()->format('Y-m-d')],
+            default        => [$this->startDate, $this->endDate],
+        };
+    }
+
     public function export(): void
     {
         $this->authorize(Permission::ViewReport->value);

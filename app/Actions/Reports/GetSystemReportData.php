@@ -15,28 +15,38 @@ class GetSystemReportData
         $start = Carbon::parse($startDate)->startOfDay();
         $end = Carbon::parse($endDate)->endOfDay();
 
-        $sales = Sale::query()
+        $paidSales = Sale::query()
             ->with('items')
             ->whereBetween('created_at', [$start, $end])
             ->where('status', SaleStatus::Paid)
             ->get();
 
-        $totalRevenue = $sales->sum(fn ($sale) => $sale->getRawOriginal('total_amount'));
-        $totalDiscount = $sales->sum(fn ($sale) => $sale->getRawOriginal('discount_amount'));
-        $totalFees = $sales->sum(fn ($sale) => $sale->getRawOriginal('fee_amount'));
+        $pendingSales = Sale::query()
+            ->whereBetween('created_at', [$start, $end])
+            ->where('status', SaleStatus::Pending)
+            ->get();
+
+        $totalRevenue = $paidSales->sum(fn ($sale) => $sale->getRawOriginal('total_amount'));
+        $totalDiscount = $paidSales->sum(fn ($sale) => $sale->getRawOriginal('discount_amount'));
+        $totalFees = $paidSales->sum(fn ($sale) => $sale->getRawOriginal('fee_amount'));
         $totalCost = 0;
-        foreach ($sales as $sale) {
+        foreach ($paidSales as $sale) {
             foreach ($sale->items as $item) {
                 $totalCost += (int) ($item->getRawOriginal('unit_cost') ?? 0) * $item->quantity;
             }
         }
 
+        $totalPendingAmount = $pendingSales->sum(fn ($sale) => $sale->getRawOriginal('total_amount'));
+
         return [
             'totalRevenue'         => $totalRevenue,
+            'totalPendingAmount'   => $totalPendingAmount,
+            'paidSalesCount'       => $paidSales->count(),
+            'pendingSalesCount'    => $pendingSales->count(),
             'totalDiscount'        => $totalDiscount,
             'totalFees'            => $totalFees,
             'netSales'             => $totalRevenue - $totalDiscount - $totalFees - $totalCost,
-            'salesByPaymentMethod' => $this->getSalesByPaymentMethod($sales),
+            'salesByPaymentMethod' => $this->getSalesByPaymentMethod($paidSales, $pendingSales),
             'topProducts'          => $this->getTopProducts($start, $end),
             'startDate'            => $startDate,
             'endDate'              => $endDate,
@@ -44,13 +54,32 @@ class GetSystemReportData
         ];
     }
 
-    protected function getSalesByPaymentMethod(Collection $sales): Collection
+    protected function getSalesByPaymentMethod(Collection $paidSales, Collection $pendingSales): Collection
     {
-        return $sales->groupBy('payment_method')
+        $paid = $paidSales->groupBy('payment_method')
             ->map(fn (Collection $group) => [
-                'count'  => $group->count(),
-                'amount' => $group->sum(fn ($sale) => $sale->getRawOriginal('total_amount')),
+                'paid_count'     => $group->count(),
+                'paid_amount'    => $group->sum(fn ($sale) => $sale->getRawOriginal('total_amount')),
+                'pending_count'  => 0,
+                'pending_amount' => 0,
             ]);
+
+        $pending = $pendingSales->groupBy('payment_method');
+
+        foreach ($pending as $method => $group) {
+            $existing = $paid->get($method, [
+                'paid_count'     => 0,
+                'paid_amount'    => 0,
+                'pending_count'  => 0,
+                'pending_amount' => 0,
+            ]);
+
+            $existing['pending_count'] = $group->count();
+            $existing['pending_amount'] = $group->sum(fn ($sale) => $sale->getRawOriginal('total_amount'));
+            $paid->put($method, $existing);
+        }
+
+        return $paid->sortByDesc(fn (array $data) => $data['paid_amount'] + $data['pending_amount']);
     }
 
     protected function getTopProducts(Carbon $start, Carbon $end): Collection
@@ -59,11 +88,13 @@ class GetSystemReportData
             ->select('product_id')
             ->selectRaw('SUM(quantity) as total_quantity')
             ->selectRaw('SUM(subtotal) as total_revenue')
-            ->whereHas('sale', fn ($query) => $query->whereBetween('created_at', [$start, $end])->where('status', SaleStatus::Paid))
+            ->whereHas('sale', fn ($query) => $query
+                ->whereBetween('created_at', [$start, $end])
+                ->whereIn('status', [SaleStatus::Paid, SaleStatus::Pending]))
             ->groupBy('product_id')
             ->orderByDesc('total_quantity')
             ->with('product')
-            ->limit(10)
+            ->limit(15)
             ->get();
     }
 }
