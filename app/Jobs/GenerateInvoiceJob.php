@@ -44,11 +44,13 @@ class GenerateInvoiceJob implements ShouldQueue
         $browsershot = Browsershot::html($html)
             ->setNodeBinary(config('services.browsershot.node_binary'))
             ->setNpmBinary(config('services.browsershot.npm_binary'))
-            ->setChromePath('/usr/bin/chromium-browser')
             ->setNodeModulePath(base_path('node_modules'))
-            ->noSandbox()
             ->windowSize(900, 1200)
             ->setScreenshotType('png');
+
+        if (config('services.browsershot.no_sandbox')) {
+            $browsershot->noSandbox();
+        }
 
         $browsershot->save($pngAbsPath);
 
