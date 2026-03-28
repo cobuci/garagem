@@ -189,6 +189,24 @@ class Show extends Component
         return null;
     }
 
+    public function downloadInvoicePng(int $saleId): ?StreamedResponse
+    {
+        $sale = Sale::find($saleId);
+
+        if (! $sale) {
+            return null;
+        }
+
+        if ($sale->invoice_status === 'ready' && $sale->invoice_png_path && Storage::exists($sale->invoice_png_path)) {
+            return Storage::download($sale->invoice_png_path, "{$sale->id}.png");
+        }
+
+        $sale->update(['invoice_status' => 'generating']);
+        GenerateInvoiceJob::dispatch($sale);
+
+        return null;
+    }
+
     public function render(): View
     {
         return view('livewire.customers.show');

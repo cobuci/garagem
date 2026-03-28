@@ -14,7 +14,7 @@
                 </div>
                 <div>
                     <p class="text-xs font-semibold text-gray-500 uppercase">{{ __('sales.payment_method') }}</p>
-                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ __("sales.payments.{$selectedSale->payment_method}") }}</p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $selectedSale->payment_method->label() }}</p>
                 </div>
                 <div>
                     <p class="text-xs font-semibold text-gray-500 uppercase">{{ __('sales.net_amount') }}</p>
@@ -100,11 +100,47 @@
                                       wire:click="downloadInvoice({{ $selectedSale->id }})"
                                       class="w-full sm:w-auto" />
                         @else
-                            <x-button secondary outline
-                                      icon="arrow-down-tray"
-                                      label="{{ $selectedSale->invoice_status === 'ready' ? __('sales.download_invoice_ready') : __('sales.download_invoice') }}"
-                                      wire:click="downloadInvoice({{ $selectedSale->id }})"
-                                      class="w-full sm:w-auto" />
+                            <div class="relative inline-flex w-full sm:w-auto" x-data="{ open: false }">
+                                <x-button secondary outline
+                                          icon="arrow-down-tray"
+                                          label="{{ $selectedSale->invoice_status === 'ready' ? __('sales.download_invoice_ready') : __('sales.download_invoice') }}"
+                                          wire:click="downloadInvoice({{ $selectedSale->id }})"
+                                          class="w-full sm:w-auto rounded-r-none border-r-0" />
+                                <button
+                                    @click="open = !open"
+                                    type="button"
+                                    class="inline-flex items-center px-2 border border-secondary-300 dark:border-secondary-600 rounded-r-md bg-white dark:bg-secondary-800 text-secondary-700 dark:text-secondary-300 hover:bg-secondary-50 dark:hover:bg-secondary-700 focus:outline-none transition"
+                                    aria-haspopup="true"
+                                    :aria-expanded="open"
+                                >
+                                    <x-heroicons::outline.chevron-down class="w-4 h-4" />
+                                </button>
+                                <div
+                                    x-show="open"
+                                    @click.outside="open = false"
+                                    x-transition
+                                    class="absolute right-0 bottom-full mb-1 w-44 rounded-md shadow-lg bg-white dark:bg-secondary-800 border border-secondary-200 dark:border-secondary-600 z-50"
+                                >
+                                    <button
+                                        type="button"
+                                        wire:click="downloadInvoice({{ $selectedSale->id }})"
+                                        @click="open = false"
+                                        class="flex items-center gap-2 w-full px-4 py-2 text-sm text-secondary-700 dark:text-secondary-300 hover:bg-secondary-50 dark:hover:bg-secondary-700 rounded-t-md"
+                                    >
+                                        <x-heroicons::outline.document class="w-4 h-4" />
+                                        {{ __('sales.download_invoice_pdf') }}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        wire:click="downloadInvoicePng({{ $selectedSale->id }})"
+                                        @click="open = false"
+                                        class="flex items-center gap-2 w-full px-4 py-2 text-sm text-secondary-700 dark:text-secondary-300 hover:bg-secondary-50 dark:hover:bg-secondary-700 rounded-b-md"
+                                    >
+                                        <x-heroicons::outline.photo class="w-4 h-4" />
+                                        {{ __('sales.download_invoice_png') }}
+                                    </button>
+                                </div>
+                            </div>
                         @endif
                     </div>
                 @endif
