@@ -67,50 +67,36 @@ describe('POST /api/v1/sales/push', function (): void {
             ])
             ->assertOk();
 
-        expect($response->json('success'))->toBeTrue();
-        expect($response->json('data.created'))->toHaveCount(1);
-        expect($response->json('data.failed'))->toBeEmpty();
-
         $created = $response->json('data.created.0');
-        expect($created['local_id'])->toBe($localId);
-        expect($created['server_id'])->toBeInt();
+
+        expect($response->json('success'))->toBeTrue()
+            ->and($response->json('data.created'))->toHaveCount(1)
+            ->and($response->json('data.failed'))->toBeEmpty()
+            ->and($created['local_id'])->toBe($localId)
+            ->and($created['server_id'])->toBeInt();
 
         $mobileSale = MobileSale::query()->find($created['server_id']);
-        expect($mobileSale)->not->toBeNull();
-        expect($mobileSale->local_id)->toBe($localId);
-        expect($mobileSale->total_amount_cents)->toBe(3980);
-        expect($mobileSale->customer_name)->toBe('John Doe');
-        expect($mobileSale->status)->toBe(MobileSaleStatus::Pending);
 
-        expect(MobileSaleItem::query()->where('mobile_sale_id', $mobileSale->id)->count())->toBe(1);
+        expect($mobileSale)->not->toBeNull()
+            ->and($mobileSale->local_id)->toBe($localId)
+            ->and($mobileSale->total_amount_cents)->toBe(3980)
+            ->and($mobileSale->customer_name)->toBe('John Doe')
+            ->and($mobileSale->status)->toBe(MobileSaleStatus::Pending)
+            ->and(MobileSaleItem::query()->where('mobile_sale_id', $mobileSale->id)->count())->toBe(1);
     });
 
     it('creates a batch of sales and returns all in created[]', function (): void {
         $product = Product::factory()->create();
 
-        $sales = collect(range(1, 3))->map(fn () => [
-            'local_id'           => (string) Str::uuid(),
-            'customer_id'        => null,
-            'customer_name'      => 'Batch Customer',
-            'total_amount_cents' => 1000,
-            'created_at'         => now()->toIso8601String(),
-            'items'              => [
-                [
-                    'product_id'       => $product->id,
-                    'unit_price_cents' => 1000,
-                    'quantity'         => 1,
-                    'subtotal_cents'   => 1000,
-                ],
-            ],
-        ])->all();
+        $sales = collect(range(1, 3))->map(fn () => validSalePayload(productId: $product->id))->all();
 
         $response = $this->actingAs($this->user, 'sanctum')
             ->postJson('/api/v1/sales/push', ['sales' => $sales])
             ->assertOk();
 
-        expect($response->json('data.created'))->toHaveCount(3);
-        expect($response->json('data.failed'))->toBeEmpty();
-        expect(MobileSale::query()->count())->toBe(3);
+        expect($response->json('data.created'))->toHaveCount(3)
+            ->and($response->json('data.failed'))->toBeEmpty()
+            ->and(MobileSale::query()->count())->toBe(3);
     });
 
     it('accepts a sale with null customer_id and a free-text customer name', function (): void {
@@ -118,32 +104,14 @@ describe('POST /api/v1/sales/push', function (): void {
 
         $response = $this->actingAs($this->user, 'sanctum')
             ->postJson('/api/v1/sales/push', [
-                'sales' => [
-                    [
-                        'local_id'           => (string) Str::uuid(),
-                        'customer_id'        => null,
-                        'customer_name'      => 'Maria Avulsa',
-                        'total_amount_cents' => 500,
-                        'created_at'         => now()->toIso8601String(),
-                        'items'              => [
-                            [
-                                'product_id'       => $product->id,
-                                'unit_price_cents' => 500,
-                                'quantity'         => 1,
-                                'subtotal_cents'   => 500,
-                            ],
-                        ],
-                    ],
-                ],
+                'sales' => [validSalePayload(customerName: 'Maria Avulsa', productId: $product->id)],
             ])
             ->assertOk();
 
-        expect($response->json('data.created'))->toHaveCount(1);
+        $mobileSale = MobileSale::query()->find($response->json('data.created.0.server_id'));
 
-        $serverId = $response->json('data.created.0.server_id');
-        $mobileSale = MobileSale::query()->find($serverId);
-        expect($mobileSale->customer_id)->toBeNull();
-        expect($mobileSale->customer_name)->toBe('Maria Avulsa');
+        expect($mobileSale->customer_id)->toBeNull()
+            ->and($mobileSale->customer_name)->toBe('Maria Avulsa');
     });
 
     it('accepts a sale linked to an existing customer', function (): void {
@@ -152,49 +120,63 @@ describe('POST /api/v1/sales/push', function (): void {
 
         $response = $this->actingAs($this->user, 'sanctum')
             ->postJson('/api/v1/sales/push', [
-                'sales' => [
-                    [
-                        'local_id'           => (string) Str::uuid(),
-                        'customer_id'        => $customer->id,
-                        'customer_name'      => $customer->name,
-                        'total_amount_cents' => 800,
-                        'created_at'         => now()->toIso8601String(),
-                        'items'              => [
-                            [
-                                'product_id'       => $product->id,
-                                'unit_price_cents' => 800,
-                                'quantity'         => 1,
-                                'subtotal_cents'   => 800,
-                            ],
-                        ],
-                    ],
-                ],
+                'sales' => [validSalePayload(customerId: $customer->id, productId: $product->id)],
             ])
             ->assertOk();
 
-        $serverId = $response->json('data.created.0.server_id');
-        expect(MobileSale::query()->find($serverId)->customer_id)->toBe($customer->id);
+        $mobileSale = MobileSale::query()->find($response->json('data.created.0.server_id'));
+
+        expect($mobileSale->customer_id)->toBe($customer->id);
     });
 
     it('preserves the device created_at timestamp', function (): void {
         $product = Product::factory()->create();
         $deviceTs = '2026-01-15T08:30:00+00:00';
 
+        $payload = validSalePayload(productId: $product->id);
+        $payload['created_at'] = $deviceTs;
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/sales/push', ['sales' => [$payload]])
+            ->assertOk();
+
+        $mobileSale = MobileSale::query()->find($response->json('data.created.0.server_id'));
+
+        expect($mobileSale->device_created_at->toDateString())->toBe('2026-01-15');
+    });
+
+    it('updates an existing pending sale on re-push', function (): void {
+        $product = Product::factory()->create();
+        $localId = (string) Str::uuid();
+
+        $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/sales/push', [
+                'sales' => [
+                    array_merge(validSalePayload(productId: $product->id), [
+                        'local_id'      => $localId,
+                        'customer_name' => 'Original Name',
+                    ]),
+                ],
+            ])
+            ->assertOk();
+
+        $newProduct = Product::factory()->create();
+
         $response = $this->actingAs($this->user, 'sanctum')
             ->postJson('/api/v1/sales/push', [
                 'sales' => [
                     [
-                        'local_id'           => (string) Str::uuid(),
+                        'local_id'           => $localId,
                         'customer_id'        => null,
-                        'customer_name'      => 'Test',
-                        'total_amount_cents' => 100,
-                        'created_at'         => $deviceTs,
+                        'customer_name'      => 'Updated Name',
+                        'total_amount_cents' => 2000,
+                        'created_at'         => now()->toIso8601String(),
                         'items'              => [
                             [
-                                'product_id'       => $product->id,
-                                'unit_price_cents' => 100,
+                                'product_id'       => $newProduct->id,
+                                'unit_price_cents' => 2000,
                                 'quantity'         => 1,
-                                'subtotal_cents'   => 100,
+                                'subtotal_cents'   => 2000,
                             ],
                         ],
                     ],
@@ -202,62 +184,69 @@ describe('POST /api/v1/sales/push', function (): void {
             ])
             ->assertOk();
 
-        $serverId = $response->json('data.created.0.server_id');
-        $mobileSale = MobileSale::query()->find($serverId);
-        expect($mobileSale->device_created_at->toDateString())->toBe('2026-01-15');
+        expect($response->json('data.created'))->toHaveCount(1)
+            ->and($response->json('data.failed'))->toBeEmpty()
+            ->and($response->json('data.created.0.local_id'))->toBe($localId)
+            ->and(MobileSale::query()->where('local_id', $localId)->count())->toBe(1);
+
+        $mobileSale = MobileSale::query()->where('local_id', $localId)->first();
+
+        expect($mobileSale->customer_name)->toBe('Updated Name')
+            ->and($mobileSale->total_amount_cents)->toBe(2000)
+            ->and($mobileSale->items()->count())->toBe(1)
+            ->and($mobileSale->items()->first()->product_id)->toBe($newProduct->id);
+    });
+
+    it('rejects a re-push of a synced sale and reports it in failed[]', function (): void {
+        $product = Product::factory()->create();
+        $localId = (string) Str::uuid();
+
+        MobileSale::factory()->create(['local_id' => $localId, 'status' => MobileSaleStatus::Synced]);
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/sales/push', [
+                'sales' => [
+                    array_merge(validSalePayload(productId: $product->id), [
+                        'local_id'      => $localId,
+                        'customer_name' => 'Attempt Update',
+                    ]),
+                ],
+            ])
+            ->assertOk();
+
+        expect($response->json('data.created'))->toBeEmpty()
+            ->and($response->json('data.failed'))->toHaveCount(1)
+            ->and($response->json('data.failed.0.local_id'))->toBe($localId)
+            ->and($response->json('data.failed.0.error'))->toBeString()->not->toBeEmpty();
     });
 
     it('reports a failed sale in failed[] without aborting the rest of the batch', function (): void {
         $product = Product::factory()->create();
-        $duplicateId = (string) Str::uuid();
-
-        // Pre-create a MobileSale with the same local_id to trigger a unique constraint violation
-        MobileSale::factory()->create(['local_id' => $duplicateId]);
-
+        $syncedLocalId = (string) Str::uuid();
         $goodLocalId = (string) Str::uuid();
+
+        MobileSale::factory()->create(['local_id' => $syncedLocalId, 'status' => MobileSaleStatus::Synced]);
 
         $response = $this->actingAs($this->user, 'sanctum')
             ->postJson('/api/v1/sales/push', [
                 'sales' => [
-                    [
-                        'local_id'           => $duplicateId,
-                        'customer_id'        => null,
-                        'customer_name'      => 'Duplicate',
-                        'total_amount_cents' => 100,
-                        'created_at'         => now()->toIso8601String(),
-                        'items'              => [
-                            [
-                                'product_id'       => $product->id,
-                                'unit_price_cents' => 100,
-                                'quantity'         => 1,
-                                'subtotal_cents'   => 100,
-                            ],
-                        ],
-                    ],
-                    [
-                        'local_id'           => $goodLocalId,
-                        'customer_id'        => null,
-                        'customer_name'      => 'Good',
-                        'total_amount_cents' => 200,
-                        'created_at'         => now()->toIso8601String(),
-                        'items'              => [
-                            [
-                                'product_id'       => $product->id,
-                                'unit_price_cents' => 200,
-                                'quantity'         => 1,
-                                'subtotal_cents'   => 200,
-                            ],
-                        ],
-                    ],
+                    array_merge(validSalePayload(productId: $product->id), [
+                        'local_id'      => $syncedLocalId,
+                        'customer_name' => 'Will Fail',
+                    ]),
+                    array_merge(validSalePayload(productId: $product->id), [
+                        'local_id'      => $goodLocalId,
+                        'customer_name' => 'Good',
+                    ]),
                 ],
             ])
             ->assertOk();
 
-        expect($response->json('data.created'))->toHaveCount(1);
-        expect($response->json('data.failed'))->toHaveCount(1);
-        expect($response->json('data.created.0.local_id'))->toBe($goodLocalId);
-        expect($response->json('data.failed.0.local_id'))->toBe($duplicateId);
-        expect($response->json('data.failed.0.error'))->toBeString()->not->toBeEmpty();
+        expect($response->json('data.created'))->toHaveCount(1)
+            ->and($response->json('data.failed'))->toHaveCount(1)
+            ->and($response->json('data.created.0.local_id'))->toBe($goodLocalId)
+            ->and($response->json('data.failed.0.local_id'))->toBe($syncedLocalId)
+            ->and($response->json('data.failed.0.error'))->toBeString()->not->toBeEmpty();
     });
 
     it('returns 422 when sales array is missing', function (): void {
@@ -265,9 +254,9 @@ describe('POST /api/v1/sales/push', function (): void {
             ->postJson('/api/v1/sales/push', [])
             ->assertUnprocessable();
 
-        expect($response->json('success'))->toBeFalse();
-        expect($response->json('message'))->toBe('Validation failed.');
-        expect($response->json('errors'))->toHaveKey('sales');
+        expect($response->json('success'))->toBeFalse()
+            ->and($response->json('message'))->toBe('Validation failed.')
+            ->and($response->json('errors'))->toHaveKey('sales');
     });
 
     it('returns 422 when an item is missing required fields', function (): void {
@@ -291,7 +280,7 @@ describe('POST /api/v1/sales/push', function (): void {
             ])
             ->assertUnprocessable();
 
-        expect($response->json('success'))->toBeFalse();
-        expect($response->json('errors'))->toHaveKey('sales.0.items.0.product_id');
+        expect($response->json('success'))->toBeFalse()
+            ->and($response->json('errors'))->toHaveKey('sales.0.items.0.product_id');
     });
 });

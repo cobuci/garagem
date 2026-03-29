@@ -21,7 +21,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon           $device_created_at
  * @property ?Carbon          $created_at
  * @property ?Carbon          $updated_at
- * @property-read ?Customer    $customer
+ * @property-read ?Customer   $customer
  * @property-read Collection<int, MobileSaleItem> $items
  */
 class MobileSale extends Model
