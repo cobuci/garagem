@@ -68,12 +68,26 @@
     <x-slot name="footer">
         <div class="flex justify-between w-full">
             @if($selectedMobileSale)
-                <x-button
-                    primary
-                    icon="shopping-cart"
-                    label="{{ __('mobile_sales.open_in_pos') }}"
-                    href="{{ route('sales.create', ['mobileSaleId' => $selectedMobileSale->id]) }}"
-                />
+                <div class="flex items-center gap-2">
+                    <x-button
+                        primary
+                        icon="shopping-cart"
+                        label="{{ __('mobile_sales.open_in_pos') }}"
+                        href="{{ route('sales.create', ['mobileSaleId' => $selectedMobileSale->id]) }}"
+                    />
+                    @can(\App\Enums\Permission::DeleteSale->value)
+                        @if($selectedMobileSale->status !== \App\Enums\MobileSaleStatus::Synced)
+                            <x-button
+                                flat
+                                negative
+                                icon="trash"
+                                label="{{ __('mobile_sales.delete') }}"
+                                wire:confirm="{{ __('mobile_sales.delete_confirm') }}"
+                                wire:click="delete({{ $selectedMobileSale->id }})"
+                            />
+                        @endif
+                    @endcan
+                </div>
             @endif
             <x-button flat label="{{ __('mobile_sales.close') }}" x-on:click="close" />
         </div>

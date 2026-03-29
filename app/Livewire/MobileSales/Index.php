@@ -11,6 +11,7 @@ use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
+use WireUi\Traits\WireUiActions;
 
 /**
  * @property-read LengthAwarePaginator $mobileSales
@@ -21,6 +22,7 @@ use Livewire\WithPagination;
 class Index extends Component
 {
     use AuthorizesRequests;
+    use WireUiActions;
     use WithPagination;
 
     public ?int $selectedMobileSaleId = null;
@@ -69,6 +71,31 @@ class Index extends Component
     {
         $this->selectedMobileSaleId = $mobileSaleId;
         $this->showDetailsModal = true;
+    }
+
+    public function delete(MobileSale $mobileSale): void
+    {
+        $this->authorize(PermissionEnum::DeleteSale->value);
+
+        if ($mobileSale->status === MobileSaleStatus::Synced) {
+            $this->notification()->error(
+                title: __('mobile_sales.delete_error_title'),
+                description: __('mobile_sales.delete_error_synced'),
+            );
+
+            return;
+        }
+
+        $mobileSale->delete();
+
+        $this->showDetailsModal = false;
+        $this->selectedMobileSaleId = null;
+        unset($this->mobileSales, $this->totalSales, $this->totalPending);
+
+        $this->notification()->success(
+            title: __('mobile_sales.delete_success_title'),
+            description: __('mobile_sales.delete_success_description'),
+        );
     }
 
     public function render(): View

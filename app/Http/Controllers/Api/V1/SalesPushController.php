@@ -22,7 +22,7 @@ class SalesPushController extends Controller
             $localId = $saleData['local_id'];
 
             try {
-                $serverId = DB::transaction(fn (): int => $this->upsert($saleData));
+                $serverId = DB::transaction(fn (): ?int => $this->upsert($saleData));
 
                 $created[] = ['local_id' => $localId, 'server_id' => $serverId];
             } catch (Throwable $e) {
@@ -37,11 +37,15 @@ class SalesPushController extends Controller
     }
 
     /** @param array<string, mixed> $data */
-    private function upsert(array $data): int
+    private function upsert(array $data): ?int
     {
         $mobileSale = MobileSale::query()
             ->where('local_id', $data['local_id'])
             ->first();
+
+        if (! empty($data['deleted_at'])) {
+            return $this->processDeletion($mobileSale, $data['deleted_at']);
+        }
 
         if (! $mobileSale instanceof MobileSale) {
             return $this->createMobileSale($data)->id;
@@ -52,6 +56,21 @@ class SalesPushController extends Controller
         }
 
         return $this->updateMobileSale($mobileSale, $data)->id;
+    }
+
+    private function processDeletion(?MobileSale $mobileSale, string $deletedAt): ?int
+    {
+        if (! $mobileSale instanceof MobileSale) {
+            return null;
+        }
+
+        if ($mobileSale->status === MobileSaleStatus::Synced) {
+            throw new RuntimeException('Sale has already been finalised and cannot be deleted.');
+        }
+
+        $mobileSale->update(['deleted_at' => $deletedAt]);
+
+        return $mobileSale->id;
     }
 
     /** @param array<string, mixed> $data */
