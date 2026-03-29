@@ -139,7 +139,7 @@ class Index extends Component
         }
 
         $currentMonth = Carbon::now();
-        $previousMonth = Carbon::now()->subMonth();
+        $previousMonth = Carbon::now()->subMonthNoOverflow();
 
         $salesMetrics = Sale::query()
             ->selectRaw('SUM(CASE WHEN MONTH(created_at) = ? AND YEAR(created_at) = ? AND status = ? THEN net_amount ELSE 0 END) as current_sales', [$currentMonth->month, $currentMonth->year, SaleStatus::Paid->value])
@@ -201,7 +201,7 @@ class Index extends Component
             ];
         }
 
-        $startDate = Carbon::now()->subMonths(5)->startOfMonth();
+        $startDate = Carbon::now()->subMonthsNoOverflow(5)->startOfMonth();
 
         $salesByMonth = Sale::query()
             ->selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, SUM(net_amount) as total_sales')
@@ -238,7 +238,7 @@ class Index extends Component
         $pendingData = [];
 
         for ($i = 5; $i >= 0; $i--) {
-            $date = Carbon::now()->subMonths($i);
+            $date = Carbon::now()->subMonthsNoOverflow($i);
             $key = "{$date->year}-{$date->month}";
 
             $labels[] = $date->translatedFormat('M');
