@@ -25,8 +25,8 @@ use Spatie\Permission\Traits\HasRoles;
  */
 class User extends Authenticatable implements HasLocalePreference
 {
-    /** @use HasFactory<UserFactory> */
     use HasApiTokens;
+    /** @use HasFactory<UserFactory> */
     use HasFactory;
     use HasOneTimePasswords;
     use HasRoles;
