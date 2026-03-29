@@ -283,4 +283,121 @@ describe('POST /api/v1/sales/push', function (): void {
         expect($response->json('success'))->toBeFalse()
             ->and($response->json('errors'))->toHaveKey('sales.0.items.0.product_id');
     });
+
+    it('soft-deletes a pending sale when deleted_at is provided', function (): void {
+        $product = Product::factory()->create();
+        $localId = (string) Str::uuid();
+        $deletedAt = '2026-03-29T14:22:00-03:00';
+
+        $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/sales/push', [
+                'sales' => [array_merge(validSalePayload(productId: $product->id), ['local_id' => $localId])],
+            ])
+            ->assertOk();
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/sales/push', [
+                'sales' => [
+                    ['local_id' => $localId, 'deleted_at' => $deletedAt],
+                ],
+            ])
+            ->assertOk();
+
+        $created = $response->json('data.created.0');
+
+        expect($response->json('success'))->toBeTrue()
+            ->and($response->json('data.created'))->toHaveCount(1)
+            ->and($created['local_id'])->toBe($localId)
+            ->and($created['server_id'])->toBeInt()
+            ->and($response->json('data.failed'))->toBeEmpty();
+
+        expect(MobileSale::query()->where('local_id', $localId)->exists())->toBeFalse()
+            ->and(MobileSale::withTrashed()->where('local_id', $localId)->exists())->toBeTrue();
+    });
+
+    it('preserves the device deleted_at timestamp on the server record', function (): void {
+        $product = Product::factory()->create();
+        $localId = (string) Str::uuid();
+        $deletedAt = '2026-03-29T14:22:00+00:00';
+
+        $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/sales/push', [
+                'sales' => [array_merge(validSalePayload(productId: $product->id), ['local_id' => $localId])],
+            ])
+            ->assertOk();
+
+        $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/sales/push', [
+                'sales' => [['local_id' => $localId, 'deleted_at' => $deletedAt]],
+            ])
+            ->assertOk();
+
+        $mobileSale = MobileSale::withTrashed()->where('local_id', $localId)->first();
+
+        expect($mobileSale->deleted_at->toDateString())->toBe('2026-03-29');
+    });
+
+    it('silently ignores deletion when the sale does not exist on the server', function (): void {
+        $localId = (string) Str::uuid();
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/sales/push', [
+                'sales' => [
+                    ['local_id' => $localId, 'deleted_at' => now()->toIso8601String()],
+                ],
+            ])
+            ->assertOk();
+
+        expect($response->json('data.created'))->toHaveCount(1)
+            ->and($response->json('data.created.0.local_id'))->toBe($localId)
+            ->and($response->json('data.created.0.server_id'))->toBeNull()
+            ->and($response->json('data.failed'))->toBeEmpty();
+    });
+
+    it('rejects deletion of a synced sale and reports it in failed[]', function (): void {
+        $localId = (string) Str::uuid();
+
+        MobileSale::factory()->create(['local_id' => $localId, 'status' => MobileSaleStatus::Synced]);
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/sales/push', [
+                'sales' => [
+                    ['local_id' => $localId, 'deleted_at' => now()->toIso8601String()],
+                ],
+            ])
+            ->assertOk();
+
+        expect($response->json('data.created'))->toBeEmpty()
+            ->and($response->json('data.failed'))->toHaveCount(1)
+            ->and($response->json('data.failed.0.local_id'))->toBe($localId)
+            ->and($response->json('data.failed.0.error'))->toBeString()->not->toBeEmpty();
+
+        expect(MobileSale::withTrashed()->where('local_id', $localId)->whereNull('deleted_at')->exists())->toBeTrue();
+    });
+
+    it('handles a batch with mixed create, delete and failure', function (): void {
+        $product = Product::factory()->create();
+        $toCreateLocalId = (string) Str::uuid();
+        $toDeleteLocalId = (string) Str::uuid();
+        $syncedLocalId = (string) Str::uuid();
+
+        MobileSale::factory()->create(['local_id' => $toDeleteLocalId, 'status' => MobileSaleStatus::Pending]);
+        MobileSale::factory()->create(['local_id' => $syncedLocalId, 'status' => MobileSaleStatus::Synced]);
+
+        $response = $this->actingAs($this->user, 'sanctum')
+            ->postJson('/api/v1/sales/push', [
+                'sales' => [
+                    array_merge(validSalePayload(productId: $product->id), ['local_id' => $toCreateLocalId]),
+                    ['local_id' => $toDeleteLocalId, 'deleted_at' => now()->toIso8601String()],
+                    ['local_id' => $syncedLocalId, 'deleted_at' => now()->toIso8601String()],
+                ],
+            ])
+            ->assertOk();
+
+        expect($response->json('data.created'))->toHaveCount(2)
+            ->and($response->json('data.created.0.local_id'))->toBe($toCreateLocalId)
+            ->and($response->json('data.created.1.local_id'))->toBe($toDeleteLocalId)
+            ->and($response->json('data.failed'))->toHaveCount(1)
+            ->and($response->json('data.failed.0.local_id'))->toBe($syncedLocalId);
+    });
 });

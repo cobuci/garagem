@@ -95,3 +95,57 @@ test('mobile sales are ordered by device_created_at descending', function () {
                 && $sales->last()->id === $older->id;
         });
 });
+
+describe('delete', function () {
+    beforeEach(function () {
+        $this->user->givePermissionTo(Permission::DeleteSale->value);
+    });
+
+    test('user without delete permission gets 403', function () {
+        $userWithoutPermission = User::factory()->create();
+        $userWithoutPermission->givePermissionTo(Permission::ViewSale->value);
+        $sale = MobileSale::factory()->create(['status' => MobileSaleStatus::Pending]);
+
+        Livewire::actingAs($userWithoutPermission)
+            ->test(Index::class)
+            ->call('delete', $sale->id)
+            ->assertForbidden();
+
+        expect(MobileSale::find($sale->id))->not->toBeNull();
+    });
+
+    test('can delete a pending mobile sale', function () {
+        $sale = MobileSale::factory()->create(['status' => MobileSaleStatus::Pending]);
+
+        Livewire::actingAs($this->user)
+            ->test(Index::class)
+            ->call('showDetails', $sale->id)
+            ->call('delete', $sale->id)
+            ->assertSet('showDetailsModal', false)
+            ->assertSet('selectedMobileSaleId', null);
+
+        expect(MobileSale::find($sale->id))->toBeNull()
+            ->and(MobileSale::withTrashed()->find($sale->id))->not->toBeNull();
+    });
+
+    test('cannot delete a synced mobile sale', function () {
+        $sale = MobileSale::factory()->create(['status' => MobileSaleStatus::Synced]);
+
+        Livewire::actingAs($this->user)
+            ->test(Index::class)
+            ->call('delete', $sale->id);
+
+        expect(MobileSale::find($sale->id))->not->toBeNull();
+    });
+
+    test('deleted sale is removed from the list', function () {
+        $sale = MobileSale::factory()->create(['status' => MobileSaleStatus::Pending]);
+
+        Livewire::actingAs($this->user)
+            ->test(Index::class)
+            ->assertSet('totalSales', 1)
+            ->call('delete', $sale->id)
+            ->assertSet('totalSales', 0)
+            ->assertSet('mobileSales', fn ($sales) => $sales->count() === 0);
+    });
+});
