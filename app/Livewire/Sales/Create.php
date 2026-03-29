@@ -6,6 +6,7 @@ use App\Enums\Permission as PermissionEnum;
 use App\Livewire\Forms\SaleForm;
 use App\Models\Category;
 use App\Models\Customer;
+use App\Models\MobileSale;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -28,6 +29,43 @@ class Create extends Component
     public function mount(): void
     {
         $this->authorize(PermissionEnum::CreateSale->value);
+
+        $mobileSaleId = (int) request()->query('mobileSaleId');
+
+        if ($mobileSaleId) {
+            $this->prefillFromMobileSale($mobileSaleId);
+        }
+    }
+
+    private function prefillFromMobileSale(int $mobileSaleId): void
+    {
+        $mobileSale = MobileSale::with(['customer', 'items.product'])->find($mobileSaleId);
+
+        if (! $mobileSale) {
+            return;
+        }
+
+        if ($mobileSale->customer_id) {
+            $this->form->customerId = $mobileSale->customer_id;
+        }
+
+        foreach ($mobileSale->items as $item) {
+            $product = $item->product;
+
+            if (! $product) {
+                continue;
+            }
+
+            $this->form->items[$product->id] = [
+                'id'         => $product->id,
+                'name'       => $product->name,
+                'brand'      => $product->brand,
+                'weight'     => $product->weight,
+                'unit_price' => $product->getRawOriginal('sale_price'),
+                'unit_cost'  => $product->getRawOriginal('unit_cost'),
+                'quantity'   => $item->quantity,
+            ];
+        }
     }
 
     #[Computed]
