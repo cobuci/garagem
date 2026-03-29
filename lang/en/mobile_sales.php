@@ -19,4 +19,5 @@ return [
     'subtotal'             => 'Subtotal',
     'local_id'             => 'Local ID',
     'device_date'          => 'Device Date',
+    'open_in_pos'          => 'Open in POS',
 ];

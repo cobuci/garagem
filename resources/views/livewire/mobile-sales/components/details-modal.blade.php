@@ -66,7 +66,15 @@
     @endif
 
     <x-slot name="footer">
-        <div class="flex justify-end w-full">
+        <div class="flex justify-between w-full">
+            @if($selectedMobileSale)
+                <x-button
+                    primary
+                    icon="shopping-cart"
+                    label="{{ __('mobile_sales.open_in_pos') }}"
+                    href="{{ route('sales.create', ['mobileSaleId' => $selectedMobileSale->id]) }}"
+                />
+            @endif
             <x-button flat label="{{ __('mobile_sales.close') }}" x-on:click="close" />
         </div>
     </x-slot>
