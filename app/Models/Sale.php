@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Casts\MoneyCast;
 use App\Casts\PaymentMethodCast;
+use App\Contracts\Syncable;
 use App\Enums\PaymentMethod;
 use App\Enums\SaleStatus;
 use App\Enums\TransactionType;
+use App\Traits\HasMobileSync;
 use Database\Factories\SaleFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -38,13 +40,34 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
  * @property-read ?Customer $customer
  * @property-read Collection<int, SaleItem> $items
  */
-class Sale extends Model implements AuditableContract
+class Sale extends Model implements AuditableContract, Syncable
 {
     use Auditable;
     /** @use HasFactory<SaleFactory> */
     use HasFactory;
+    use HasMobileSync;
 
     protected $guarded = ['id'];
+
+    /** @return list<string> */
+    public function getSyncableFields(): array
+    {
+        return [
+            'id',
+            'customer_id',
+            'payment_method',
+            'total_amount',
+            'discount_amount',
+            'fee_amount',
+            'fee_percentage',
+            'pass_fee_to_customer',
+            'net_amount',
+            'is_gift',
+            'status',
+            'created_at',
+            'updated_at',
+        ];
+    }
 
     /** @var list<string> */
     protected array $auditExclude = [

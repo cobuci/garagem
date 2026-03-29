@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Casts\MoneyCast;
+use App\Contracts\Syncable;
+use App\Traits\HasMobileSync;
 use Database\Factories\SaleItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,13 +26,29 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
  * @property-read Sale $sale
  * @property-read Product $product
  */
-class SaleItem extends Model implements AuditableContract
+class SaleItem extends Model implements AuditableContract, Syncable
 {
     use Auditable;
     /** @use HasFactory<SaleItemFactory> */
     use HasFactory;
+    use HasMobileSync;
 
     protected $guarded = ['id'];
+
+    /** @return list<string> */
+    public function getSyncableFields(): array
+    {
+        return [
+            'id',
+            'sale_id',
+            'product_id',
+            'quantity',
+            'unit_price',
+            'subtotal',
+            'created_at',
+            'updated_at',
+        ];
+    }
 
     protected function casts(): array
     {

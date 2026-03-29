@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Contracts\Syncable;
 use App\Enums\Gender;
+use App\Traits\HasMobileSync;
 use App\Traits\HasSearch;
 use Database\Factories\CustomerFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -32,17 +34,35 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
  * @method static Builder<static> filters(array $filters)
  * @method        Builder<static> scopeFilters(Builder<static> $query, array $filters)
  */
-class Customer extends Model implements AuditableContract
+class Customer extends Model implements AuditableContract, Syncable
 {
     /* @use HasFactory<CustomerFactory> */
     use Auditable;
     use HasFactory;
+    use HasMobileSync;
     use HasSearch;
     use SoftDeletes;
 
     protected $guarded = ['id'];
 
     protected array $searchable = ['name', 'email', 'phone'];
+
+    /** @return list<string> */
+    public function getSyncableFields(): array
+    {
+        return [
+            'id',
+            'name',
+            'gender',
+            'phone',
+            'email',
+            'zip_code',
+            'street',
+            'neighborhood',
+            'created_at',
+            'updated_at',
+        ];
+    }
 
     protected $casts = [
         'gender' => Gender::class,
