@@ -11,6 +11,7 @@ return [
     'dashboard'          => 'Dashboard',
     'pos'                => 'Point of Sale',
     'orders'             => 'Sales History',
+    'mobile_sales'       => 'Mobile Sales',
     'customers'          => 'Customers',
     'reports'            => 'Reports',
     'inventory'          => 'Inventory',

@@ -95,6 +95,13 @@ class Sidebar extends Component
                         'permission' => PermissionEnum::ViewSale->value,
                     ],
                     [
+                        'label'      => __('sidebar.mobile_sales'),
+                        'icon'       => 'device-phone-mobile',
+                        'route'      => 'mobile-sales.index',
+                        'active'     => request()->routeIs('mobile-sales.*'),
+                        'permission' => PermissionEnum::ViewSale->value,
+                    ],
+                    [
                         'label'      => __('sidebar.bills_payable'),
                         'icon'       => 'banknotes',
                         'route'      => 'bills-payable.index',

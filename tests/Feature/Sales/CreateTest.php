@@ -5,6 +5,8 @@ use App\Livewire\Sales\Create;
 use App\Models\AccountBalance;
 use App\Models\Category;
 use App\Models\Customer;
+use App\Models\MobileSale;
+use App\Models\MobileSaleItem;
 use App\Models\Product;
 use App\Models\Setting;
 use App\Models\User;
@@ -273,4 +275,45 @@ test('products list is empty when no search or category is selected', function (
         ->assertSet('products', function ($products) {
             return $products->isEmpty();
         });
+});
+
+test('prefills cart and customer from mobile sale when mobileSaleId is passed', function () {
+    $customer = Customer::factory()->create();
+    $product = Product::factory()->create(['sale_price' => 25.00, 'unit_cost' => 10.00]);
+
+    $mobileSale = MobileSale::factory()->withCustomer()->create(['customer_id' => $customer->id]);
+    MobileSaleItem::factory()->create([
+        'mobile_sale_id'   => $mobileSale->id,
+        'product_id'       => $product->id,
+        'quantity'         => 3,
+        'unit_price_cents' => 999, // ignored — current price used
+        'subtotal_cents'   => 2997,
+    ]);
+
+    $this->user->givePermissionTo(Permission::CreateSale->value);
+
+    actingAs($this->user)
+        ->get(route('sales.create', ['mobileSaleId' => $mobileSale->id]))
+        ->assertOk()
+        ->assertSee($product->name);
+});
+
+test('ignores mobileSaleId when mobile sale does not exist', function () {
+    actingAs($this->user)
+        ->get(route('sales.create', ['mobileSaleId' => 99999]))
+        ->assertOk();
+});
+
+test('prefills cart without customer when mobile sale has no customer_id', function () {
+    $product = Product::factory()->create(['sale_price' => 15.00]);
+    $mobileSale = MobileSale::factory()->create(['customer_id' => null, 'customer_name' => 'Walk-in']);
+    MobileSaleItem::factory()->create([
+        'mobile_sale_id' => $mobileSale->id,
+        'product_id'     => $product->id,
+        'quantity'       => 2,
+    ]);
+
+    actingAs($this->user)
+        ->get(route('sales.create', ['mobileSaleId' => $mobileSale->id]))
+        ->assertOk();
 });

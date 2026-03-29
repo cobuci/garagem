@@ -11,6 +11,7 @@ return [
     'dashboard'          => 'Dashboard',
     'pos'                => 'Vender (PDV)',
     'orders'             => 'Histórico de Vendas',
+    'mobile_sales'       => 'Vendas Mobile',
     'customers'          => 'Clientes',
     'reports'            => 'Relatórios',
     'inventory'          => 'Estoque',
