@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 /**
@@ -19,6 +20,7 @@ use Illuminate\Support\Carbon;
  * @property int              $total_amount_cents
  * @property MobileSaleStatus $status
  * @property Carbon           $device_created_at
+ * @property ?Carbon          $deleted_at
  * @property ?Carbon          $created_at
  * @property ?Carbon          $updated_at
  * @property-read ?Customer   $customer
@@ -28,6 +30,7 @@ class MobileSale extends Model
 {
     /** @use HasFactory<MobileSaleFactory> */
     use HasFactory;
+    use SoftDeletes;
 
     protected $guarded = ['id'];
 
