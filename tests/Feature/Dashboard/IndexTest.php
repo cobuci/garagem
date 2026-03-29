@@ -183,7 +183,7 @@ it('calculates monthly metrics correctly', function () {
 
     $saleLastMonth = Sale::query()->create([
         'status'          => SaleStatus::Paid,
-        'created_at'      => now()->subMonth()->startOfMonth(),
+        'created_at'      => now()->subMonthNoOverflow()->startOfMonth(),
         'total_amount'    => 200.00,
         'discount_amount' => 20.00,
         'fee_amount'      => 5.00,
@@ -210,7 +210,7 @@ it('provides correct chart data for the last 6 months', function () {
     $product = Product::factory()->create(['unit_cost' => 10, 'sale_price' => 20]);
 
     for ($i = 0; $i < 6; $i++) {
-        $date = now()->subMonths($i);
+        $date = now()->subMonthsNoOverflow($i);
         $sale = Sale::query()->create([
             'status'         => SaleStatus::Paid,
             'created_at'     => $date,

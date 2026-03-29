@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Casts\MoneyCast;
+use App\Contracts\Syncable;
+use App\Traits\HasMobileSync;
 use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -30,14 +32,33 @@ use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
  * @property ?string    $label
  * @property Category   $category
  */
-class Product extends Model implements AuditableContract
+class Product extends Model implements AuditableContract, Syncable
 {
     use Auditable;
     /** @use HasFactory<ProductFactory> */
     use HasFactory;
+    use HasMobileSync;
     use SoftDeletes;
 
     protected $guarded = ['id'];
+
+    /** @return list<string> */
+    public function getSyncableFields(): array
+    {
+        return [
+            'id',
+            'category_id',
+            'name',
+            'brand',
+            'weight',
+            'upc',
+            'stock_quantity',
+            'sale_price',
+            'expiration_date',
+            'created_at',
+            'updated_at',
+        ];
+    }
 
     protected function casts(): array
     {
