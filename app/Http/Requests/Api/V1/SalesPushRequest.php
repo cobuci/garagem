@@ -22,11 +22,11 @@ class SalesPushRequest extends FormRequest
         return [
             'sales'                            => ['required', 'array', 'min:1'],
             'sales.*.local_id'                 => ['required', 'string'],
-            'sales.*.deleted_at'               => ['nullable', 'date'],
+            'sales.*.deleted_at'               => ['nullable', 'integer', 'min:0'],
             'sales.*.customer_id'              => ['nullable', 'integer', 'exists:customers,id'],
             'sales.*.customer_name'            => ['nullable', 'string', 'max:255'],
             'sales.*.total_amount_cents'       => ['required_without:sales.*.deleted_at', 'nullable', 'integer', 'min:0'],
-            'sales.*.created_at'               => ['required_without:sales.*.deleted_at', 'nullable', 'date'],
+            'sales.*.created_at'               => ['required_without:sales.*.deleted_at', 'nullable', 'integer', 'min:0'],
             'sales.*.items'                    => ['required_without:sales.*.deleted_at', 'nullable', 'array', 'min:1'],
             'sales.*.items.*.product_id'       => ['required', 'integer', 'exists:products,id'],
             'sales.*.items.*.unit_price_cents' => ['required', 'integer', 'min:0'],

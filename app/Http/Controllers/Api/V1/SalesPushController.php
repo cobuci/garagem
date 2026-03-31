@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\SalesPushRequest;
 use App\Models\MobileSale;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 use Throwable;
@@ -58,7 +59,7 @@ class SalesPushController extends Controller
         return $this->updateMobileSale($mobileSale, $data)->id;
     }
 
-    private function processDeletion(?MobileSale $mobileSale, string $deletedAt): ?int
+    private function processDeletion(?MobileSale $mobileSale, int $deletedAtMs): ?int
     {
         if (! $mobileSale instanceof MobileSale) {
             return null;
@@ -68,7 +69,7 @@ class SalesPushController extends Controller
             throw new RuntimeException('Sale has already been finalised and cannot be deleted.');
         }
 
-        $mobileSale->update(['deleted_at' => $deletedAt]);
+        $mobileSale->update(['deleted_at' => Carbon::createFromTimestampMs($deletedAtMs)]);
 
         return $mobileSale->id;
     }
@@ -81,7 +82,7 @@ class SalesPushController extends Controller
             'customer_id'        => $data['customer_id'],
             'customer_name'      => $data['customer_name'] ?? null,
             'total_amount_cents' => $data['total_amount_cents'],
-            'device_created_at'  => $data['created_at'],
+            'device_created_at'  => Carbon::createFromTimestampMs($data['created_at']),
         ]);
 
         $this->syncItems($mobileSale, $data['items']);
