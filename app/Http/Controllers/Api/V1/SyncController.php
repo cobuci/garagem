@@ -5,34 +5,28 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\SyncRequest;
 use App\Http\Responses\Api\Concerns\HasApiResponses;
-use App\Jobs\SyncModelJob;
 use App\Services\Sync\PullSyncService;
-use App\Services\Sync\SyncRegistry;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class SyncController extends Controller
 {
     use HasApiResponses;
 
-    public function __invoke(SyncRequest $request, SyncRegistry $registry): JsonResponse
+    public function __invoke(SyncRequest $request, PullSyncService $pullSyncService): JsonResponse
     {
-        $syncToken = Str::uuid()->toString();
-        $syncedAt = now()->toIso8601String();
-        $since = $request->input('last_synced_at');
+        $since = $request->input('last_synced_at')
+            ? Carbon::parse($request->input('last_synced_at'))
+            : null;
 
-        $registry->initSession($syncToken, $syncedAt, $since);
+        $syncedAt = DB::selectOne('SELECT NOW(3) AS now')->now;
 
-        foreach (array_keys(PullSyncService::SYNCABLE_MODELS) as $modelKey) {
-            $registry->markPending($syncToken, $modelKey);
+        $pull = $pullSyncService->syncAll($since);
 
-            SyncModelJob::dispatch($syncToken, $modelKey, $since);
-        }
-
-        return $this->accepted('Sync started.', [
-            'sync_token' => $syncToken,
-            'synced_at'  => $syncedAt,
-            'models'     => array_keys(PullSyncService::SYNCABLE_MODELS),
+        return $this->ok('Sync completed.', [
+            'synced_at' => $syncedAt,
+            'pull'      => $pull,
         ]);
     }
 }
