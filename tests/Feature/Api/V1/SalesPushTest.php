@@ -23,7 +23,7 @@ function validSalePayload(?int $customerId = null, ?string $customerName = 'John
         'customer_id'        => $customerId,
         'customer_name'      => $customerName,
         'total_amount_cents' => 3980,
-        'created_at'         => '2026-03-29T10:00:00-03:00',
+        'created_at'         => 1774789200000,
         'items'              => [
             [
                 'product_id'       => $productId ?? Product::factory()->create()->id,
@@ -53,7 +53,7 @@ describe('POST /api/v1/sales/push', function (): void {
                         'customer_id'        => null,
                         'customer_name'      => 'John Doe',
                         'total_amount_cents' => 3980,
-                        'created_at'         => '2026-03-29T10:00:00-03:00',
+                        'created_at'         => 1774789200000,
                         'items'              => [
                             [
                                 'product_id'       => $product->id,
@@ -131,10 +131,9 @@ describe('POST /api/v1/sales/push', function (): void {
 
     it('preserves the device created_at timestamp', function (): void {
         $product = Product::factory()->create();
-        $deviceTs = '2026-01-15T08:30:00+00:00';
 
         $payload = validSalePayload(productId: $product->id);
-        $payload['created_at'] = $deviceTs;
+        $payload['created_at'] = 1768465800000;
 
         $response = $this->actingAs($this->user, 'sanctum')
             ->postJson('/api/v1/sales/push', ['sales' => [$payload]])
@@ -170,7 +169,7 @@ describe('POST /api/v1/sales/push', function (): void {
                         'customer_id'        => null,
                         'customer_name'      => 'Updated Name',
                         'total_amount_cents' => 2000,
-                        'created_at'         => now()->toIso8601String(),
+                        'created_at'         => 1774789200000,
                         'items'              => [
                             [
                                 'product_id'       => $newProduct->id,
@@ -266,10 +265,9 @@ describe('POST /api/v1/sales/push', function (): void {
                     [
                         'local_id'           => (string) Str::uuid(),
                         'total_amount_cents' => 100,
-                        'created_at'         => now()->toIso8601String(),
+                        'created_at'         => 1774789200000,
                         'items'              => [
                             [
-                                // product_id intentionally missing
                                 'unit_price_cents' => 100,
                                 'quantity'         => 1,
                                 'subtotal_cents'   => 100,
@@ -287,7 +285,6 @@ describe('POST /api/v1/sales/push', function (): void {
     it('soft-deletes a pending sale when deleted_at is provided', function (): void {
         $product = Product::factory()->create();
         $localId = (string) Str::uuid();
-        $deletedAt = '2026-03-29T14:22:00-03:00';
 
         $this->actingAs($this->user, 'sanctum')
             ->postJson('/api/v1/sales/push', [
@@ -298,7 +295,7 @@ describe('POST /api/v1/sales/push', function (): void {
         $response = $this->actingAs($this->user, 'sanctum')
             ->postJson('/api/v1/sales/push', [
                 'sales' => [
-                    ['local_id' => $localId, 'deleted_at' => $deletedAt],
+                    ['local_id' => $localId, 'deleted_at' => 1774794120000],
                 ],
             ])
             ->assertOk();
@@ -318,7 +315,6 @@ describe('POST /api/v1/sales/push', function (): void {
     it('preserves the device deleted_at timestamp on the server record', function (): void {
         $product = Product::factory()->create();
         $localId = (string) Str::uuid();
-        $deletedAt = '2026-03-29T14:22:00+00:00';
 
         $this->actingAs($this->user, 'sanctum')
             ->postJson('/api/v1/sales/push', [
@@ -328,7 +324,7 @@ describe('POST /api/v1/sales/push', function (): void {
 
         $this->actingAs($this->user, 'sanctum')
             ->postJson('/api/v1/sales/push', [
-                'sales' => [['local_id' => $localId, 'deleted_at' => $deletedAt]],
+                'sales' => [['local_id' => $localId, 'deleted_at' => 1774794120000]],
             ])
             ->assertOk();
 
@@ -343,7 +339,7 @@ describe('POST /api/v1/sales/push', function (): void {
         $response = $this->actingAs($this->user, 'sanctum')
             ->postJson('/api/v1/sales/push', [
                 'sales' => [
-                    ['local_id' => $localId, 'deleted_at' => now()->toIso8601String()],
+                    ['local_id' => $localId, 'deleted_at' => 1774794120000],
                 ],
             ])
             ->assertOk();
@@ -362,7 +358,7 @@ describe('POST /api/v1/sales/push', function (): void {
         $response = $this->actingAs($this->user, 'sanctum')
             ->postJson('/api/v1/sales/push', [
                 'sales' => [
-                    ['local_id' => $localId, 'deleted_at' => now()->toIso8601String()],
+                    ['local_id' => $localId, 'deleted_at' => 1774794120000],
                 ],
             ])
             ->assertOk();
@@ -388,8 +384,8 @@ describe('POST /api/v1/sales/push', function (): void {
             ->postJson('/api/v1/sales/push', [
                 'sales' => [
                     array_merge(validSalePayload(productId: $product->id), ['local_id' => $toCreateLocalId]),
-                    ['local_id' => $toDeleteLocalId, 'deleted_at' => now()->toIso8601String()],
-                    ['local_id' => $syncedLocalId, 'deleted_at' => now()->toIso8601String()],
+                    ['local_id' => $toDeleteLocalId, 'deleted_at' => 1774794120000],
+                    ['local_id' => $syncedLocalId, 'deleted_at' => 1774794120000],
                 ],
             ])
             ->assertOk();
