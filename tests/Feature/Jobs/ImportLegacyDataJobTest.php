@@ -4,12 +4,15 @@ use App\Enums\Gender;
 use App\Enums\PaymentMethod;
 use App\Enums\SaleStatus;
 use App\Jobs\ImportLegacyDataJob;
+use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+
+use function Pest\Laravel\assertDatabaseCount;
 
 uses(RefreshDatabase::class);
 
@@ -25,7 +28,7 @@ INSERT INTO `customers` (`id`, `name`, `email`, `phone`, `gender`, `zipcode`, `s
     $path = 'test-customers.sql';
     Storage::put($path, $sql);
 
-    (new ImportLegacyDataJob($path))->handle();
+    new ImportLegacyDataJob($path)->handle();
 
     expect(Customer::count())->toBe(2);
 
@@ -62,14 +65,13 @@ INSERT INTO `customers` (`id`, `name`, `email`, `phone`, `gender`, `zipcode`, `s
     $path = 'test-duplicate-names.sql';
     Storage::put($path, $sql);
 
-    (new ImportLegacyDataJob($path))->handle();
+    new ImportLegacyDataJob($path)->handle();
 
-    // Should have 3 Lauros: "Lauro", "Lauro 1", "Lauro 2"
     expect(Customer::where('name', 'Lauro')->exists())->toBeTrue()
         ->and(Customer::where('name', 'Lauro 1')->exists())->toBeTrue()
-        ->and(Customer::where('name', 'Lauro 2')->exists())->toBeTrue();
+        ->and(Customer::where('name', 'Lauro 2')->exists())->toBeTrue()
+        ->and(Customer::count())->toBe(3);
 
-    expect(Customer::count())->toBe(3);
 });
 
 it('imports sales and orders from legacy sql', function () {
@@ -89,7 +91,7 @@ INSERT INTO `orders` (`id`, `order_id`, `product_id`, `product_name`, `product_b
     $path = 'test-sales.sql';
     Storage::put($path, $sql);
 
-    (new ImportLegacyDataJob($path))->handle();
+    new ImportLegacyDataJob($path)->handle();
 
     expect(Sale::count())->toBe(1)
         ->and(SaleItem::count())->toBe(1);
@@ -120,7 +122,7 @@ INSERT INTO `sales` (`id`, `order_id`, `cost`, `discount`, `price`, `customer_id
     $path = 'test-non-existent-customer.sql';
     Storage::put($path, $sql);
 
-    (new ImportLegacyDataJob($path))->handle();
+    new ImportLegacyDataJob($path)->handle();
 
     $sale = Sale::find(3);
     expect($sale->customer_id)->toBeNull();
@@ -144,4 +146,62 @@ INSERT INTO `orders` (`id`, `order_id`, `product_id`, `product_name`, `product_b
 
     expect(Sale::count())->toBe(1)
         ->and(SaleItem::count())->toBe(0);
+});
+
+it('rolls back everything if an error occurs during import', function () {
+    Storage::fake();
+
+    $sql = "
+INSERT INTO `categories` (`id`, `name`, `icon`, `created_at`, `updated_at`) VALUES
+(1, 'Category 1', 'fa-tag', '2023-01-01 10:00:00', '2023-01-01 10:00:00');
+
+INSERT INTO `customers` (`id`, `name`, `email`, `phone`, `gender`, `zipcode`, `street`, `number`, `district`, `created_at`, `updated_at`) VALUES
+(1, 'Victor Cobuci', 'victor@example.com', '11999999999', 'M', '06755030', 'Rua Gilda de Abreu', '46', 'Jardim Santa Rosa', '2023-01-01 10:00:00', '2023-01-01 10:00:00');
+    ";
+
+    $path = 'test-rollback.sql';
+    Storage::put($path, $sql);
+
+    $job = Mockery::mock(ImportLegacyDataJob::class)->makePartial()->shouldAllowMockingProtectedMethods();
+    $job->filePath = $path;
+    $job->shouldReceive('importSales')->andThrow(new Exception('Forced failure'));
+
+    try {
+        $job->handle();
+    } catch (Exception $e) {
+        // Expected
+    }
+
+    expect(Category::count())->toBe(0)
+        ->and(Customer::count())->toBe(0);
+});
+
+it('does not trigger financial side effects during import', function () {
+    Storage::fake();
+
+    $sql = "
+INSERT INTO `sales` (`id`, `order_id`, `cost`, `discount`, `price`, `customer_id`, `customer_name`, `payment_method`, `payment_status`, `created_at`, `updated_at`) VALUES
+(3, '623bd168c54c4', 4.50, NULL, 8.00, NULL, 'Alessandra', 'PIX', '1', '2022-03-23 23:03:20', NULL);
+    ";
+
+    $path = 'test-no-events.sql';
+    Storage::put($path, $sql);
+
+    new ImportLegacyDataJob($path)->handle();
+
+    expect(Sale::count())->toBe(1);
+
+    assertDatabaseCount('financial_transactions', 0);
+});
+
+it('deletes the file from storage on failure', function () {
+    Storage::fake();
+    $path = 'test-failure-cleanup.sql';
+    Storage::put($path, 'invalid sql');
+
+    $job = new ImportLegacyDataJob($path);
+
+    $job->failed(new Exception('Test exception'));
+
+    Storage::disk()->assertMissing($path);
 });
