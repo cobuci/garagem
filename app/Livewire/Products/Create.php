@@ -36,6 +36,14 @@ class Create extends Component
         $this->dispatch('product:created');
     }
 
+    public function updatedCreateDrawer(bool $value): void
+    {
+        if (! $value) {
+            $this->form->reset();
+            $this->resetErrorBag();
+        }
+    }
+
     public function render(): View
     {
         return view('livewire.products.create');

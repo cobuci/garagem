@@ -76,6 +76,14 @@ class Index extends Component
         $this->showDrawer = false;
     }
 
+    public function updatedShowDrawer(bool $value): void
+    {
+        if (! $value) {
+            $this->form->reset();
+            $this->resetErrorBag();
+        }
+    }
+
     public function generatePassword(): void
     {
         $this->form->generatePassword();
