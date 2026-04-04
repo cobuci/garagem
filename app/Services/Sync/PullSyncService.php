@@ -20,28 +20,85 @@ class PullSyncService
         'customers'  => Customer::class,
     ];
 
+    public const int PAGE_SIZE = 200;
+
     /**
-     * @return array<string, array{upsert: list<array<string, mixed>>, deleted: list<int>}>
+     * @param  array<string, int>|null                                                                                                                     $cursors
+     * @return array{pull: array<string, array{upsert: list<array<string, mixed>>, deleted: list<int>}>, has_more: bool, cursors: array<string, int>|null}
      */
-    public function syncAll(?Carbon $since): array
+    public function syncAll(?Carbon $since, ?array $cursors): array
     {
         $payload = [];
+        $hasMore = false;
+        $nextCursors = [];
 
         foreach (self::SYNCABLE_MODELS as $key => $modelClass) {
-            $payload[$key] = $this->syncModel(new $modelClass, $since);
+            $afterId = $cursors[$key] ?? null;
+            $modelData = $this->syncModel(new $modelClass, $since, $afterId);
+
+            $isFullSync = $since === null;
+            $hasUpsert = ! empty($modelData['upsert']);
+            $hasDeleted = ! empty($modelData['deleted']);
+
+            if ($isFullSync && $cursors !== null && ! array_key_exists($key, $cursors)) {
+                if ($hasDeleted) {
+                    $payload[$key] = [
+                        'upsert'  => [],
+                        'deleted' => $modelData['deleted'],
+                    ];
+                }
+
+                continue;
+            }
+
+            if ($isFullSync && $cursors === null) {
+                $payload[$key] = [
+                    'upsert'  => $modelData['upsert'],
+                    'deleted' => $modelData['deleted'],
+                ];
+            } elseif ($hasUpsert || $hasDeleted) {
+                $payload[$key] = [
+                    'upsert'  => $modelData['upsert'],
+                    'deleted' => $modelData['deleted'],
+                ];
+            }
+
+            if ($modelData['has_more']) {
+                $hasMore = true;
+                $nextCursors[$key] = end($modelData['upsert'])['id'];
+            }
         }
 
-        return $payload;
+        return [
+            'pull'     => $payload,
+            'has_more' => $hasMore,
+            'cursors'  => $hasMore ? $nextCursors : null,
+        ];
     }
 
     /**
-     * @return array{upsert: list<array<string, mixed>>, deleted: list<int>}
+     * @return array{upsert: list<array<string, mixed>>, deleted: list<int>, has_more: bool}
      */
-    public function syncModel(Category|Customer|Product $model, ?Carbon $since): array
+    public function syncModel(Category|Customer|Product $model, ?Carbon $since, ?int $afterId): array
     {
-        $upsert = $model::query()
-            ->modifiedSince($since)
-            ->get()
+        $isFullSync = $since === null;
+        $limit = $isFullSync ? self::PAGE_SIZE + 1 : null;
+
+        $query = $model::query()
+            ->modifiedSince($since);
+
+        if ($isFullSync) {
+            $query->forFullSyncPage($afterId, $limit);
+        }
+
+        $records = $query->get();
+        $hasMore = $isFullSync && $records->count() > self::PAGE_SIZE;
+
+        if ($hasMore) {
+            $records = $records->slice(0, self::PAGE_SIZE);
+        }
+
+        $upsert = $records
             ->map(fn (Category|Customer|Product $record) => $record->toSyncArray())
             ->values()
             ->all();
@@ -53,8 +110,9 @@ class PullSyncService
             ->all();
 
         return [
-            'upsert'  => $upsert,
-            'deleted' => $deleted,
+            'upsert'   => $upsert,
+            'deleted'  => $deleted,
+            'has_more' => $hasMore,
         ];
     }
 }

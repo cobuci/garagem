@@ -59,7 +59,6 @@ class Customer extends Model implements AuditableContract, Syncable
             'zip_code',
             'street',
             'neighborhood',
-            'created_at',
             'updated_at',
         ];
     }

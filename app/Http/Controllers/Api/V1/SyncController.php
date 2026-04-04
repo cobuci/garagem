@@ -8,7 +8,6 @@ use App\Http\Responses\Api\Concerns\HasApiResponses;
 use App\Services\Sync\PullSyncService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class SyncController extends Controller
 {
@@ -17,16 +16,20 @@ class SyncController extends Controller
     public function __invoke(SyncRequest $request, PullSyncService $pullSyncService): JsonResponse
     {
         $since = $request->input('last_synced_at')
-            ? Carbon::parse($request->input('last_synced_at'))
+            ? Carbon::parse($request->input('last_synced_at'))->setTimezone(config('app.timezone'))
             : null;
 
-        $syncedAt = DB::selectOne('SELECT NOW(3) AS now')->now;
+        $cursors = $request->input('cursors');
 
-        $pull = $pullSyncService->syncAll($since);
+        $result = $pullSyncService->syncAll($since, $cursors);
+
+        $syncedAt = Carbon::now()->toISOString();
 
         return $this->ok('Sync completed.', [
             'synced_at' => $syncedAt,
-            'pull'      => $pull,
+            'has_more'  => $result['has_more'],
+            'cursors'   => $result['cursors'],
+            'pull'      => $result['pull'],
         ]);
     }
 }
