@@ -13,6 +13,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <livewire:reports.top-products lazy />
+        <livewire:reports.most-profitable-products lazy />
         <livewire:reports.sales-by-period lazy />
         <livewire:reports.sales-by-payment-method lazy />
         @if(class_exists(\App\Livewire\Reports\LowStockProducts::class))
