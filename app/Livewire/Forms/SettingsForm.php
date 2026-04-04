@@ -40,7 +40,7 @@ class SettingsForm extends Form
             'state'              => ['nullable', 'string', 'max:255'],
             'zip_code'           => ['nullable', 'string', 'max:20'],
             'skipped_categories' => ['nullable', 'array'],
-            'locale'             => ['required', 'string'],
+            'locale'             => ['required', 'string', 'in:pt_BR,en'],
             'name'               => ['required', 'string', 'max:255'],
         ];
     }

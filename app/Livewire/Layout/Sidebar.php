@@ -15,7 +15,7 @@ class Sidebar extends Component
     public function switchUser(int $userId): void
     {
         if (app()->isProduction()) {
-            return;
+            abort(403, 'User switching is disabled in production.');
         }
 
         Auth::loginUsingId($userId);

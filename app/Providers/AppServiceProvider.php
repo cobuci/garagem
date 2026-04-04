@@ -4,10 +4,13 @@ namespace App\Providers;
 
 use App\Models\Setting;
 use Carbon\CarbonImmutable;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -21,12 +24,24 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
         $this->configureAppName();
         $this->configureMail();
+        $this->configureRateLimiting();
 
         Model::unguard();
 
         if (app()->environment('production')) {
             URL::forceScheme('https');
         }
+    }
+
+    protected function configureRateLimiting(): void
+    {
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
+
+        RateLimiter::for('otp', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip());
+        });
     }
 
     protected function configureMail(): void

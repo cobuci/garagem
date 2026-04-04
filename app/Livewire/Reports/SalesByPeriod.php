@@ -16,6 +16,16 @@ class SalesByPeriod extends Component
 
     public string $period = 'last_30_days';
 
+    public function rules(): array
+    {
+        return [
+            'period' => [
+                'required',
+                'in:today,yesterday,last_7_days,last_week,last_30_days,this_month,last_month,last_6_months,this_year,last_year',
+            ],
+        ];
+    }
+
     public array $chartDataArray = [];
 
     public function mount(): void
@@ -26,6 +36,7 @@ class SalesByPeriod extends Component
 
     public function updatedPeriod(): void
     {
+        $this->validate();
         $this->updateChartData();
     }
 

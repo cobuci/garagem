@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Customers;
 
+use App\Enums\Permission;
 use App\Livewire\Forms\CustomerForm;
 use Illuminate\View\View;
 use Livewire\Attributes\On;
@@ -26,6 +27,8 @@ class Create extends Component
 
     public function save(): void
     {
+        $this->authorize(Permission::CreateCustomer->value);
+
         $this->form->store();
 
         $this->notification()->success(__('customers.created'));
