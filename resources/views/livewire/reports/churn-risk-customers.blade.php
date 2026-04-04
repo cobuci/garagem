@@ -16,17 +16,53 @@
             <p class="text-base font-semibold text-gray-700 dark:text-gray-200">{{ __('reports.churn_risk.empty') }}</p>
             <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">{{ __('reports.churn_risk.empty_subtitle') }}</p>
         </div>
-    @else
+    @endif
+    @if (! $customers->isEmpty())
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left">
                 <thead>
                     <tr class="border-b border-gray-100 dark:border-gray-700">
-                        <th class="pb-3 pr-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">{{ __('reports.churn_risk.columns.name') }}</th>
-                        <th class="pb-3 pr-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide text-right">{{ __('reports.churn_risk.columns.purchases') }}</th>
-                        <th class="pb-3 pr-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide text-right hidden sm:table-cell">{{ __('reports.churn_risk.columns.avg_interval') }}</th>
-                        <th class="pb-3 pr-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide text-right">{{ __('reports.churn_risk.columns.days_since') }}</th>
-                        <th class="pb-3 pr-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide text-center">{{ __('reports.churn_risk.columns.urgency') }}</th>
-                        <th class="pb-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide text-right hidden md:table-cell">{{ __('reports.churn_risk.columns.total_spent') }}</th>
+                        @php
+                            $thBase = 'pb-3 pr-4 text-xs font-semibold uppercase tracking-wide select-none';
+                            $thSortable = $thBase . ' cursor-pointer hover:text-gray-700 dark:hover:text-gray-200 transition-colors group/th';
+                            $thActive = 'text-gray-800 dark:text-gray-100';
+                            $thInactive = 'text-gray-500 dark:text-gray-400';
+
+                            $icon = function (string $field) use ($sortField, $sortDirection): string {
+                                if ($sortField !== $field) {
+                                    return '<svg class="inline w-3 h-3 ml-0.5 opacity-30 group-hover/th:opacity-60 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 15l5 5 5-5M7 9l5-5 5 5"/></svg>';
+                                }
+                                if ($sortDirection === 'asc') {
+                                    return '<svg class="inline w-3 h-3 ml-0.5 opacity-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 9l5-5 5 5"/></svg>';
+                                }
+                                return '<svg class="inline w-3 h-3 ml-0.5 opacity-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 15l5 5 5-5"/></svg>';
+                            };
+                        @endphp
+
+                        <th wire:click="sort('name')"
+                            class="{{ $thSortable }} {{ $sortField === 'name' ? $thActive : $thInactive }}">
+                            {{ __('reports.churn_risk.columns.name') }}{!! $icon('name') !!}
+                        </th>
+                        <th wire:click="sort('total_purchases')"
+                            class="{{ $thSortable }} {{ $sortField === 'total_purchases' ? $thActive : $thInactive }} text-right">
+                            {{ __('reports.churn_risk.columns.purchases') }}{!! $icon('total_purchases') !!}
+                        </th>
+                        <th wire:click="sort('avg_interval')"
+                            class="{{ $thSortable }} {{ $sortField === 'avg_interval' ? $thActive : $thInactive }} text-right hidden sm:table-cell">
+                            {{ __('reports.churn_risk.columns.avg_interval') }}{!! $icon('avg_interval') !!}
+                        </th>
+                        <th wire:click="sort('days_since_last')"
+                            class="{{ $thSortable }} {{ $sortField === 'days_since_last' ? $thActive : $thInactive }} text-right">
+                            {{ __('reports.churn_risk.columns.days_since') }}{!! $icon('days_since_last') !!}
+                        </th>
+                        <th wire:click="sort('urgency')"
+                            class="{{ $thSortable }} {{ $sortField === 'urgency' ? $thActive : $thInactive }} text-center">
+                            {{ __('reports.churn_risk.columns.urgency') }}{!! $icon('urgency') !!}
+                        </th>
+                        <th wire:click="sort('total_spent')"
+                            class="{{ $thSortable }} {{ $sortField === 'total_spent' ? $thActive : $thInactive }} text-right hidden md:table-cell">
+                            {{ __('reports.churn_risk.columns.total_spent') }}{!! $icon('total_spent') !!}
+                        </th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50 dark:divide-gray-700/50">
@@ -36,6 +72,16 @@
                                 (float) $customer->days_since_last,
                                 (float) $customer->avg_interval_days
                             );
+                            $urgencyTextClass = match ($urgency) {
+                                'critical' => 'text-red-600 dark:text-red-400',
+                                'high'     => 'text-orange-500 dark:text-orange-400',
+                                default    => 'text-yellow-600 dark:text-yellow-400',
+                            };
+                            $urgencyBadgeClass = match ($urgency) {
+                                'critical' => 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
+                                'high'     => 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
+                                default    => 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300',
+                            };
                         @endphp
                         <tr class="group hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
                             <td class="py-3 pr-4">
@@ -51,28 +97,14 @@
                                 {{ number_format($customer->avg_interval_days, 1) }}
                                 <span class="text-xs text-gray-400">{{ __('reports.churn_risk.days') }}</span>
                             </td>
-                            <td class="py-3 pr-4 text-right font-semibold tabular-nums
-                                @if ($urgency === 'critical') text-red-600 dark:text-red-400
-                                @elseif ($urgency === 'high') text-orange-500 dark:text-orange-400
-                                @else text-yellow-600 dark:text-yellow-400
-                                @endif">
+                            <td class="py-3 pr-4 text-right font-semibold tabular-nums {{ $urgencyTextClass }}">
                                 {{ number_format($customer->days_since_last) }}
                                 <span class="text-xs font-normal text-gray-400">{{ __('reports.churn_risk.days') }}</span>
                             </td>
                             <td class="py-3 pr-4 text-center">
-                                @if ($urgency === 'critical')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300">
-                                        {{ __('reports.churn_risk.urgency.critical') }}
-                                    </span>
-                                @elseif ($urgency === 'high')
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300">
-                                        {{ __('reports.churn_risk.urgency.high') }}
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300">
-                                        {{ __('reports.churn_risk.urgency.medium') }}
-                                    </span>
-                                @endif
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold {{ $urgencyBadgeClass }}">
+                                    {{ __('reports.churn_risk.urgency.' . $urgency) }}
+                                </span>
                             </td>
                             <td class="py-3 text-right text-gray-600 dark:text-gray-300 tabular-nums hidden md:table-cell">
                                 R$ {{ number_format($customer->total_spent / 100, 2, ',', '.') }}

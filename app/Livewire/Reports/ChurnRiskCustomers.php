@@ -16,9 +16,41 @@ class ChurnRiskCustomers extends Component
     use AuthorizesRequests;
     use WithPagination;
 
+    public string $sortField = 'days_since_last';
+
+    public string $sortDirection = 'desc';
+
+    /** @var array<string, string> */
+    protected array $allowedSortFields = [
+        'name'            => 'customers.name',
+        'total_purchases' => 'total_purchases',
+        'avg_interval'    => 'avg_interval_days',
+        'days_since_last' => 'days_since_last',
+        'urgency'         => 'days_since_last',
+        'total_spent'     => 'total_spent',
+    ];
+
     public function mount(): void
     {
         $this->authorize(Permission::ViewReport->value);
+    }
+
+    public function sort(string $field): void
+    {
+        if (! array_key_exists($field, $this->allowedSortFields)) {
+            return;
+        }
+
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+            $this->resetPage();
+
+            return;
+        }
+
+        $this->sortField = $field;
+        $this->sortDirection = 'asc';
+        $this->resetPage();
     }
 
     public function render(): View
@@ -39,6 +71,8 @@ class ChurnRiskCustomers extends Component
     private function getAtRiskCustomers(): LengthAwarePaginator
     {
         $cancelled = SaleStatus::Cancelled->value;
+        $orderCol = $this->allowedSortFields[$this->sortField] ?? 'days_since_last';
+        $orderDir = $this->sortDirection === 'asc' ? 'asc' : 'desc';
 
         return DB::table('customers')
             ->join('sales', 'sales.customer_id', '=', 'customers.id')
@@ -60,7 +94,7 @@ class ChurnRiskCustomers extends Component
             ->havingRaw(
                 'DATEDIFF(NOW(), MAX(sales.created_at)) > 2 * (DATEDIFF(MAX(sales.created_at), MIN(sales.created_at)) / NULLIF(COUNT(sales.id) - 1, 0))',
             )
-            ->orderByDesc('days_since_last')
+            ->orderBy($orderCol, $orderDir)
             ->paginate(10);
     }
 

@@ -118,3 +118,63 @@ test('it excludes customers with sporadic purchase pattern over 180 day average 
         ->test(ChurnRiskCustomers::class)
         ->assertViewHas('customers', fn ($customers) => ! $customers->contains('name', 'Cliente Esporádico'));
 });
+
+test('sorting by name orders customers alphabetically', function () {
+    $user = User::factory()->create();
+    $user->assignRole('admin');
+
+    foreach (['Zara', 'Ana', 'Marco'] as $name) {
+        $customer = Customer::factory()->create(['name' => $name]);
+        Sale::factory()->create(['customer_id' => $customer->id, 'status' => SaleStatus::Paid, 'created_at' => Carbon::now()->subDays(50)]);
+        Sale::factory()->create(['customer_id' => $customer->id, 'status' => SaleStatus::Paid, 'created_at' => Carbon::now()->subDays(40)]);
+        Sale::factory()->create(['customer_id' => $customer->id, 'status' => SaleStatus::Paid, 'created_at' => Carbon::now()->subDays(30)]);
+    }
+
+    $component = Livewire::actingAs($user)
+        ->test(ChurnRiskCustomers::class)
+        ->call('sort', 'name');
+
+    $component->assertSet('sortField', 'name')
+        ->assertSet('sortDirection', 'asc')
+        ->assertViewHas('customers', function ($customers) {
+            $names = $customers->pluck('name')->values()->toArray();
+
+            return array_search('Ana', $names) < array_search('Marco', $names)
+                && array_search('Marco', $names) < array_search('Zara', $names);
+        });
+});
+
+test('sorting toggles direction when clicking the same field twice', function () {
+    $user = User::factory()->create();
+    $user->assignRole('admin');
+
+    Livewire::actingAs($user)
+        ->test(ChurnRiskCustomers::class)
+        ->assertSet('sortField', 'days_since_last')
+        ->assertSet('sortDirection', 'desc')
+        ->call('sort', 'days_since_last')
+        ->assertSet('sortDirection', 'asc')
+        ->call('sort', 'days_since_last')
+        ->assertSet('sortDirection', 'desc');
+});
+
+test('sorting resets to page 1', function () {
+    $user = User::factory()->create();
+    $user->assignRole('admin');
+
+    Livewire::actingAs($user)
+        ->test(ChurnRiskCustomers::class)
+        ->call('sort', 'name')
+        ->assertSet('sortField', 'name')
+        ->assertSet('sortDirection', 'asc');
+});
+
+test('ignores invalid sort fields', function () {
+    $user = User::factory()->create();
+    $user->assignRole('admin');
+
+    Livewire::actingAs($user)
+        ->test(ChurnRiskCustomers::class)
+        ->call('sort', 'invalid_field')
+        ->assertSet('sortField', 'days_since_last');
+});
