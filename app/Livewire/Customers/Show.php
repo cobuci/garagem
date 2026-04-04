@@ -44,6 +44,10 @@ class Show extends Component
 
     public bool $showDeleteModal = false;
 
+    public bool $showMarkAllAsPaidModal = false;
+
+    public bool $confirmedMarkAllAsPaid = false;
+
     public function mount(Customer $customer): void
     {
         $this->authorize(Permission::ViewCustomer->value);
@@ -132,6 +136,30 @@ class Show extends Component
     {
         $this->selectedSaleId = $saleId;
         $this->showConfirmCancelModal = true;
+    }
+
+    public function confirmMarkAllAsPaid(): void
+    {
+        $this->authorize(Permission::EditSale->value);
+        $this->confirmedMarkAllAsPaid = false;
+        $this->showMarkAllAsPaidModal = true;
+    }
+
+    public function markAllAsPaid(): void
+    {
+        $this->authorize(Permission::EditSale->value);
+
+        if (! $this->confirmedMarkAllAsPaid) {
+            return;
+        }
+
+        $this->customer->sales()
+            ->where('status', SaleStatus::Pending)
+            ->update(['status' => SaleStatus::Paid]);
+
+        $this->showMarkAllAsPaidModal = false;
+        $this->confirmedMarkAllAsPaid = false;
+        $this->notification()->success(__('customers.mark_all_as_paid_success'));
     }
 
     public function cancelSale(): void
