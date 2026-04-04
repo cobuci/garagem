@@ -33,8 +33,28 @@ return [
     'most_sold_products'           => 'Produtos mais vendidos no período selecionado',
     'most_profitable_products'     => 'Produtos Mais Lucrativos',
     'products_with_highest_profit' => 'Produtos que geraram maior lucro total (Preço - Custo)',
+    'sales_by_hour_and_day'        => 'Pico de Vendas por Horário',
+    'sales_heatmap_overview'       => 'Volume de vendas por hora e dia da semana',
     'quantity'                     => 'Quantidade',
     'units'                        => 'unidades',
+
+    'heatmap' => [
+        'low'     => 'Baixo',
+        'medium'  => 'Médio',
+        'high'    => 'Alto',
+        'peak'    => 'Pico',
+        'no_data' => 'Sem vendas',
+    ],
+
+    'days' => [
+        'sun' => 'Dom',
+        'mon' => 'Seg',
+        'tue' => 'Ter',
+        'wed' => 'Qua',
+        'thu' => 'Qui',
+        'fri' => 'Sex',
+        'sat' => 'Sáb',
+    ],
 
     'low_stock_products' => [
         'title'          => 'Produtos com Baixo Estoque',

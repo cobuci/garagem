@@ -33,8 +33,28 @@ return [
     'most_sold_products'           => 'Most sold products in the selected period',
     'most_profitable_products'     => 'Most Profitable Products',
     'products_with_highest_profit' => 'Products that generated the highest total profit (Price - Cost)',
+    'sales_by_hour_and_day'        => 'Sales Peak by Hour',
+    'sales_heatmap_overview'       => 'Sales volume by hour and day of the week',
     'quantity'                     => 'Quantity',
     'units'                        => 'units',
+
+    'heatmap' => [
+        'low'     => 'Low',
+        'medium'  => 'Medium',
+        'high'    => 'High',
+        'peak'    => 'Peak',
+        'no_data' => 'No sales',
+    ],
+
+    'days' => [
+        'sun' => 'Sun',
+        'mon' => 'Mon',
+        'tue' => 'Tue',
+        'wed' => 'Wed',
+        'thu' => 'Thu',
+        'fri' => 'Fri',
+        'sat' => 'Sat',
+    ],
 
     'low_stock_products' => [
         'title'          => 'Low Stock Products',
