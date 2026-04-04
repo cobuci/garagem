@@ -29,10 +29,12 @@ return [
         'this_year'     => 'This Year',
         'last_year'     => 'Last Year',
     ],
-    'top_products'       => 'Top Products',
-    'most_sold_products' => 'Most sold products in the selected period',
-    'quantity'           => 'Quantity',
-    'units'              => 'units',
+    'top_products'                 => 'Top Products',
+    'most_sold_products'           => 'Most sold products in the selected period',
+    'most_profitable_products'     => 'Most Profitable Products',
+    'products_with_highest_profit' => 'Products that generated the highest total profit (Price - Cost)',
+    'quantity'                     => 'Quantity',
+    'units'                        => 'units',
 
     'low_stock_products' => [
         'title'          => 'Low Stock Products',

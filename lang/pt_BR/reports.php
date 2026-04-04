@@ -29,10 +29,12 @@ return [
         'this_year'     => 'Este Ano',
         'last_year'     => 'Ano Passado',
     ],
-    'top_products'       => 'Principais Produtos',
-    'most_sold_products' => 'Produtos mais vendidos no período selecionado',
-    'quantity'           => 'Quantidade',
-    'units'              => 'unidades',
+    'top_products'                 => 'Principais Produtos',
+    'most_sold_products'           => 'Produtos mais vendidos no período selecionado',
+    'most_profitable_products'     => 'Produtos Mais Lucrativos',
+    'products_with_highest_profit' => 'Produtos que geraram maior lucro total (Preço - Custo)',
+    'quantity'                     => 'Quantidade',
+    'units'                        => 'unidades',
 
     'low_stock_products' => [
         'title'          => 'Produtos com Baixo Estoque',
