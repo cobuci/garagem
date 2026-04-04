@@ -183,4 +183,11 @@ return [
             'last_year'      => 'Last Year',
         ],
     ],
+
+    'tabs' => [
+        'overview'  => 'Overview',
+        'products'  => 'Products',
+        'customers' => 'Customers',
+        'inventory' => 'Inventory',
+    ],
 ];

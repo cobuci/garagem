@@ -183,4 +183,11 @@ return [
             'last_year'      => 'Ano Passado',
         ],
     ],
+
+    'tabs' => [
+        'overview'  => 'Visão Geral',
+        'products'  => 'Produtos',
+        'customers' => 'Clientes',
+        'inventory' => 'Estoque',
+    ],
 ];
