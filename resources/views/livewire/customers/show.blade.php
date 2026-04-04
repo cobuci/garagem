@@ -1,7 +1,7 @@
 @use(App\Enums\Permission)
 @use(App\Enums\SaleStatus)
 <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="flex items-center space-x-4">
             <a href="{{ route('customers.index') }}" wire:navigate
                class="p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition shadow-sm">
@@ -12,10 +12,11 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('customers.profile_subtitle') }}</p>
             </div>
         </div>
-        <div class="flex space-x-3">
+        <div class="flex gap-3">
             @can(Permission::EditCustomer->value)
                 <x-button
                     white
+                    class="flex-1 sm:flex-none"
                     :label="__('customers.edit')"
                     wire:click="$dispatch('edit:customer', { customer: {{ $customer->id }} })"
                     shadow="sm"
@@ -26,6 +27,7 @@
                 <x-button
                     negative
                     outline
+                    class="flex-1 sm:flex-none"
                     :label="__('customers.delete')"
                     @click="$wire.set('showDeleteModal', true)"
                     shadow="sm"
@@ -71,27 +73,40 @@
     <div
         class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
         <div
-            class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 flex items-center justify-between">
+            class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <h3 class="font-bold text-gray-900 dark:text-white">{{ __('orders.history') }}</h3>
-            <div class="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
-                <button
-                    wire:click="filterByStatus(null)"
-                    class="px-3 py-1 text-xs font-medium rounded-md transition {{ is_null($status) ? 'bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300' }}"
-                >
-                    {{ __('sales.all_sales') }}
-                </button>
-                <button
-                    wire:click="filterByStatus('paid')"
-                    class="px-3 py-1 text-xs font-medium rounded-md transition {{ $status === 'paid' ? 'bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300' }}"
-                >
-                    {{ __('sales.paid_sales') }}
-                </button>
-                <button
-                    wire:click="filterByStatus('pending')"
-                    class="px-3 py-1 text-xs font-medium rounded-md transition {{ $status === 'pending' ? 'bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300' }}"
-                >
-                    {{ __('sales.pending_sales') }}
-                </button>
+            <div class="flex flex-col sm:flex-row gap-3">
+                @can(Permission::EditSale->value)
+                    <x-button
+                        primary
+                        outline
+                        xs
+                        :label="__('customers.mark_all_as_paid')"
+                        wire:click="confirmMarkAllAsPaid"
+                        :disabled="$this->totalDue <= 0"
+                    />
+                @endcan
+
+                <div class="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-lg self-start sm:self-auto">
+                    <button
+                        wire:click="filterByStatus(null)"
+                        class="px-3 py-1 text-xs font-medium rounded-md transition {{ is_null($status) ? 'bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300' }}"
+                    >
+                        {{ __('sales.all_sales') }}
+                    </button>
+                    <button
+                        wire:click="filterByStatus('paid')"
+                        class="px-3 py-1 text-xs font-medium rounded-md transition {{ $status === 'paid' ? 'bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300' }}"
+                    >
+                        {{ __('sales.paid_sales') }}
+                    </button>
+                    <button
+                        wire:click="filterByStatus('pending')"
+                        class="px-3 py-1 text-xs font-medium rounded-md transition {{ $status === 'pending' ? 'bg-white dark:bg-gray-700 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300' }}"
+                    >
+                        {{ __('sales.pending_sales') }}
+                    </button>
+                </div>
             </div>
         </div>
         <div class="overflow-x-auto">
@@ -162,6 +177,7 @@
     @include('livewire.sales.components.details-modal', ['selectedSale' => $this->selectedSale])
     @include('livewire.sales.components.confirm-payment-modal', ['selectedSale' => $this->selectedSale])
     @include('livewire.sales.components.confirm-cancel-modal', ['selectedSale' => $this->selectedSale])
+    @include('livewire.customers.components.confirm-mark-all-as-paid-modal')
 
     <x-modal-card wire:model="showDeleteModal" :title="__('customers.delete')">
         <div class="space-y-4">
