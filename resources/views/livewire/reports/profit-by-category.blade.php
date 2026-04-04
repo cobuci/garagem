@@ -68,10 +68,10 @@
             updateChart() {
                 if (this.chart) {
                     this.chart.updateOptions({
-                        yaxis: { labels: { style: { colors: '#9ca3af' } }, categories: this.labels },
+                        xaxis: { categories: this.labels },
                         series: [
-                            { name: '{{ __('reports.profit_by_category.revenue') }}', data: this.revenue },
-                            { name: '{{ __('reports.profit_by_category.profit') }}', data: this.profit }
+                            { name: '{{ __('reports.profit_by_category.revenue') }}', type: 'column', data: this.revenue },
+                            { name: '{{ __('reports.profit_by_category.profit') }}', type: 'line', data: this.profit }
                         ]
                     });
                 }
@@ -88,7 +88,7 @@
 
                 this.chart = new ApexCharts(this.$refs.chart, {
                     chart: {
-                        type: 'bar',
+                        type: 'line',
                         height: 400,
                         toolbar: { show: false },
                         zoom: { enabled: false },
@@ -96,53 +96,63 @@
                         background: 'transparent',
                         animations: { enabled: true }
                     },
+                    stroke: {
+                        width: [0, 4],
+                        curve: 'smooth'
+                    },
                     plotOptions: {
                         bar: {
-                            horizontal: true,
-                            barHeight: '70%',
-                            borderRadius: 4,
-                            dataLabels: {
-                                position: 'top',
-                            },
+                            columnWidth: '50%',
+                            borderRadius: 4
                         }
                     },
                     series: [
                         {
                             name: '{{ __('reports.profit_by_category.revenue') }}',
+                            type: 'column',
                             data: this.revenue
                         },
                         {
                             name: '{{ __('reports.profit_by_category.profit') }}',
+                            type: 'line',
                             data: this.profit
                         }
                     ],
-                    dataLabels: {
-                        enabled: true,
-                        textAnchor: 'start',
-                        style: {
-                            colors: ['#fff'],
-                            fontSize: '11px'
-                        },
-                        formatter: function (val) {
-                            return 'R$ ' + val.toLocaleString('pt-BR');
-                        },
-                        offsetX: 0,
+                    fill: {
+                        opacity: [0.85, 1],
+                        gradient: {
+                            inverseColors: false,
+                            shade: 'light',
+                            type: "vertical",
+                            opacityFrom: 0.85,
+                            opacityTo: 0.55,
+                            stops: [0, 100, 100, 100]
+                        }
                     },
-                    stroke: {
-                        show: true,
-                        width: 1,
-                        colors: ['#fff']
+                    markers: {
+                        size: 5,
+                        strokeWidth: 3,
+                        hover: { size: 7 }
                     },
                     colors: ['#6366f1', '#10b981'],
                     grid: {
                         borderColor: 'rgba(156, 163, 175, 0.1)',
                         strokeDashArray: 4,
-                        padding: { left: 10, right: 30, top: 0, bottom: 0 }
+                        padding: { left: 10, right: 10, top: 0, bottom: 0 }
                     },
                     xaxis: {
                         categories: this.labels,
                         axisBorder: { show: false },
                         axisTicks: { show: false },
+                        labels: {
+                            style: {
+                                colors: '#9ca3af',
+                                fontSize: '11px',
+                                fontFamily: 'Inter, ui-sans-serif, system-ui'
+                            }
+                        }
+                    },
+                    yaxis: {
                         labels: {
                             style: {
                                 colors: '#9ca3af',
@@ -154,17 +164,9 @@
                             }
                         }
                     },
-                    yaxis: {
-                        labels: {
-                            style: {
-                                colors: '#9ca3af',
-                                fontSize: '12px',
-                                fontWeight: 600,
-                                fontFamily: 'Inter, ui-sans-serif, system-ui'
-                            }
-                        }
-                    },
                     tooltip: {
+                        shared: true,
+                        intersect: false,
                         theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
                         y: {
                             formatter: function(val) {
