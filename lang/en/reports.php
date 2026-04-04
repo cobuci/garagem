@@ -29,10 +29,54 @@ return [
         'this_year'     => 'This Year',
         'last_year'     => 'Last Year',
     ],
-    'top_products'       => 'Top Products',
-    'most_sold_products' => 'Most sold products in the selected period',
-    'quantity'           => 'Quantity',
-    'units'              => 'units',
+    'top_products'                 => 'Top Products',
+    'most_sold_products'           => 'Most sold products in the selected period',
+    'most_profitable_products'     => 'Most Profitable Products',
+    'products_with_highest_profit' => 'Products that generated the highest total profit (Price - Cost)',
+    'sales_by_hour_and_day'        => 'Sales Peak by Hour',
+    'sales_heatmap_overview'       => 'Sales volume by hour and day of the week',
+    'quantity'                     => 'Quantity',
+    'units'                        => 'units',
+
+    'churn_risk' => [
+        'title'          => 'Churn Risk Customers',
+        'subtitle'       => 'Customers who have not purchased in more than 2× their average interval',
+        'at_risk_count'  => ':count customer at risk|:count customers at risk',
+        'days'           => 'days',
+        'empty'          => 'No customers at risk!',
+        'empty_subtitle' => 'All customers are within their normal purchasing pattern.',
+        'columns'        => [
+            'name'         => 'Customer',
+            'purchases'    => 'Purchases',
+            'avg_interval' => 'Avg. Interval',
+            'days_since'   => 'Without Purchase',
+            'urgency'      => 'Urgency',
+            'total_spent'  => 'Total Spent',
+        ],
+        'urgency' => [
+            'critical' => 'Critical',
+            'high'     => 'High',
+            'medium'   => 'Medium',
+        ],
+    ],
+
+    'heatmap' => [
+        'low'     => 'Low',
+        'medium'  => 'Medium',
+        'high'    => 'High',
+        'peak'    => 'Peak',
+        'no_data' => 'No sales',
+    ],
+
+    'days' => [
+        'sun' => 'Sun',
+        'mon' => 'Mon',
+        'tue' => 'Tue',
+        'wed' => 'Wed',
+        'thu' => 'Thu',
+        'fri' => 'Fri',
+        'sat' => 'Sat',
+    ],
 
     'low_stock_products' => [
         'title'          => 'Low Stock Products',
@@ -95,5 +139,55 @@ return [
         'paid'                    => 'Paid',
         'pending'                 => 'Pending',
         'qty'                     => 'Qty',
+    ],
+
+    'stock_turnover' => [
+        'title'          => 'Stock Days vs. Turnover',
+        'subtitle'       => 'Products with stock and their estimated sales speed',
+        'count_label'    => ':count product in alert|:count products in alert',
+        'days'           => 'days',
+        'empty'          => 'All under control!',
+        'empty_subtitle' => 'No products with stock at risk of stockout.',
+        'days_label'     => 'd',
+        'columns'        => [
+            'product'        => 'Product',
+            'category'       => 'Category',
+            'stock'          => 'Stock',
+            'units_per_day'  => 'Units/Day',
+            'days_remaining' => 'Days Remaining',
+            'status'         => 'Status',
+        ],
+        'status' => [
+            'critical' => 'Critical',
+            'low'      => 'Low',
+            'ok'       => 'OK',
+        ],
+    ],
+
+    'profit_by_category' => [
+        'title'    => 'Profitability by Category',
+        'subtitle' => 'Revenue and net profit grouped by product category',
+        'revenue'  => 'Revenue',
+        'profit'   => 'Profit',
+    ],
+
+    'average_ticket_evolution' => [
+        'title'      => 'Average Ticket Evolution',
+        'subtitle'   => 'Average order value month by month (excluding gifts and cancellations)',
+        'avg_ticket' => 'Avg. Ticket',
+        'periods'    => [
+            'last_3_months'  => 'Last 3 Months',
+            'last_6_months'  => 'Last 6 Months',
+            'last_12_months' => 'Last 12 Months',
+            'this_year'      => 'This Year',
+            'last_year'      => 'Last Year',
+        ],
+    ],
+
+    'tabs' => [
+        'overview'  => 'Overview',
+        'products'  => 'Products',
+        'customers' => 'Customers',
+        'inventory' => 'Inventory',
     ],
 ];

@@ -42,5 +42,13 @@ test('it displays the report title and subtitle for authorized user', function (
     Livewire::test(Index::class)
         ->assertSee(__('reports.title'))
         ->assertSee(__('reports.subtitle'))
-        ->assertSeeLivewire(SalesByPeriod::class);
+        ->assertSee(__('reports.tabs.overview'))
+        ->assertSee(__('reports.tabs.products'))
+        ->assertSee(__('reports.tabs.customers'))
+        ->assertSee(__('reports.tabs.inventory'))
+        ->assertSeeLivewire(SalesByPeriod::class)
+        ->assertDontSeeLivewire('reports.top-products')
+        ->set('activeTab', 'products')
+        ->assertSeeLivewire('reports.top-products')
+        ->assertDontSeeLivewire(SalesByPeriod::class);
 });
