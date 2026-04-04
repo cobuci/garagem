@@ -88,13 +88,21 @@
 
                 this.chart = new ApexCharts(this.$refs.chart, {
                     chart: {
-                        type: 'area',
+                        type: 'bar',
                         height: 350,
                         toolbar: { show: false },
                         zoom: { enabled: false },
                         fontFamily: 'Inter, ui-sans-serif, system-ui',
                         background: 'transparent',
                         animations: { enabled: true }
+                    },
+                    plotOptions: {
+                        bar: {
+                            horizontal: false,
+                            columnWidth: '55%',
+                            borderRadius: 4,
+                            endingShape: 'rounded'
+                        },
                     },
                     series: [
                         {
@@ -106,20 +114,11 @@
                             data: this.profit
                         }
                     ],
-                    fill: {
-                        type: 'gradient',
-                        gradient: {
-                            shadeIntensity: 1,
-                            opacityFrom: 0.45,
-                            opacityTo: 0.05,
-                            stops: [20, 100, 100, 100]
-                        }
-                    },
                     dataLabels: { enabled: false },
                     stroke: {
-                        curve: 'smooth',
-                        width: 3,
-                        colors: ['#6366f1', '#10b981']
+                        show: true,
+                        width: 2,
+                        colors: ['transparent']
                     },
                     colors: ['#6366f1', '#10b981'],
                     grid: {
