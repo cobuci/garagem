@@ -24,7 +24,7 @@ class SyncController extends Controller
 
         $result = $pullSyncService->syncAll($since, $cursors);
 
-        $syncedAt = DB::selectOne('SELECT NOW(3) AS now')->now;
+        $syncedAt = DB::selectOne("SELECT DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') AS now")->now;
 
         return $this->ok('Sync completed.', [
             'synced_at' => $syncedAt,
