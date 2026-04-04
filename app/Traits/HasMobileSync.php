@@ -31,13 +31,23 @@ trait HasMobileSync
             ->where('deleted_at', '>', $since);
     }
 
+    public function scopeForFullSyncPage(Builder $query, ?int $afterId, int $limit): Builder
+    {
+        return $query
+            ->orderBy('id')
+            ->when($afterId !== null, fn ($q) => $q->where('id', '>', $afterId))
+            ->limit($limit);
+    }
+
     /** @return array<string, mixed> */
     public function toSyncArray(): array
     {
         $fields = $this->getSyncableFields();
 
         if (empty($fields)) {
-            return $this->toArray();
+            throw new \LogicException(
+                static::class . ' must implement getSyncableFields() with at least one field.',
+            );
         }
 
         return collect($this->getAttributes())

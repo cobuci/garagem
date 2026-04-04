@@ -15,6 +15,8 @@ class SyncRequest extends FormRequest
     {
         return [
             'last_synced_at' => ['nullable', 'date'],
+            'cursors'        => ['nullable', 'array'],
+            'cursors.*'      => ['integer', 'min:0'],
         ];
     }
 }

@@ -20,13 +20,17 @@ class SyncController extends Controller
             ? Carbon::parse($request->input('last_synced_at'))
             : null;
 
-        $syncedAt = DB::selectOne('SELECT NOW(3) AS now')->now;
+        $cursors = $request->input('cursors');
 
-        $pull = $pullSyncService->syncAll($since);
+        $result = $pullSyncService->syncAll($since, $cursors);
+
+        $syncedAt = DB::selectOne('SELECT NOW(3) AS now')->now;
 
         return $this->ok('Sync completed.', [
             'synced_at' => $syncedAt,
-            'pull'      => $pull,
+            'has_more'  => $result['has_more'],
+            'cursors'   => $result['cursors'],
+            'pull'      => $result['pull'],
         ]);
     }
 }
