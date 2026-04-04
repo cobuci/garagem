@@ -70,8 +70,8 @@
                     this.chart.updateOptions({
                         xaxis: { categories: this.labels },
                         series: [
-                            { name: '{{ __('reports.profit_by_category.revenue') }}', type: 'column', data: this.revenue },
-                            { name: '{{ __('reports.profit_by_category.profit') }}', type: 'line', data: this.profit }
+                            { name: '{{ __('reports.profit_by_category.revenue') }}', data: this.revenue },
+                            { name: '{{ __('reports.profit_by_category.profit') }}', data: this.profit }
                         ]
                     });
                 }
@@ -88,51 +88,38 @@
 
                 this.chart = new ApexCharts(this.$refs.chart, {
                     chart: {
-                        type: 'line',
-                        height: 400,
+                        type: 'area',
+                        height: 350,
                         toolbar: { show: false },
                         zoom: { enabled: false },
                         fontFamily: 'Inter, ui-sans-serif, system-ui',
                         background: 'transparent',
                         animations: { enabled: true }
                     },
-                    stroke: {
-                        width: [0, 4],
-                        curve: 'smooth'
-                    },
-                    plotOptions: {
-                        bar: {
-                            columnWidth: '50%',
-                            borderRadius: 4
-                        }
-                    },
                     series: [
                         {
                             name: '{{ __('reports.profit_by_category.revenue') }}',
-                            type: 'column',
                             data: this.revenue
                         },
                         {
                             name: '{{ __('reports.profit_by_category.profit') }}',
-                            type: 'line',
                             data: this.profit
                         }
                     ],
                     fill: {
-                        opacity: [0.85, 1],
+                        type: 'gradient',
                         gradient: {
-                            inverseColors: false,
-                            shade: 'light',
-                            type: "vertical",
-                            opacityFrom: 0.85,
-                            opacityTo: 0.55,
-                            stops: [0, 100, 100, 100]
+                            shadeIntensity: 1,
+                            opacityFrom: 0.45,
+                            opacityTo: 0.05,
+                            stops: [20, 100, 100, 100]
                         }
                     },
-                    markers: {
-                        size: 5,
-                        strokeWidth: 3,
-                        hover: { size: 7 }
+                    dataLabels: { enabled: false },
+                    stroke: {
+                        curve: 'smooth',
+                        width: 3,
+                        colors: ['#6366f1', '#10b981']
                     },
                     colors: ['#6366f1', '#10b981'],
                     grid: {
@@ -174,7 +161,7 @@
                             }
                         }
                     },
-                    legend: { show: true, position: 'top', horizontalAlign: 'right', labels: { colors: '#9ca3af' } }
+                    legend: { show: false }
                 });
                 this.chart.render();
             }
