@@ -70,8 +70,8 @@
                     this.chart.updateOptions({
                         xaxis: { categories: this.labels },
                         series: [
-                            { name: '{{ __('reports.profit_by_category.revenue') }}', data: this.revenue },
-                            { name: '{{ __('reports.profit_by_category.profit') }}', data: this.profit }
+                            { name: '{{ __('reports.profit_by_category.profit') }}', data: this.profit },
+                            { name: '{{ __('reports.profit_by_category.revenue') }}', data: this.revenue.map((rev, i) => Math.max(0, rev - this.profit[i])) }
                         ]
                     });
                 }
@@ -90,6 +90,7 @@
                     chart: {
                         type: 'bar',
                         height: 350,
+                        stacked: true,
                         toolbar: { show: false },
                         zoom: { enabled: false },
                         fontFamily: 'Inter, ui-sans-serif, system-ui',
@@ -99,19 +100,19 @@
                     plotOptions: {
                         bar: {
                             horizontal: false,
-                            columnWidth: '80%',
+                            columnWidth: '60%',
                             borderRadius: 4,
                             endingShape: 'rounded'
                         },
                     },
                     series: [
                         {
-                            name: '{{ __('reports.profit_by_category.revenue') }}',
-                            data: this.revenue
-                        },
-                        {
                             name: '{{ __('reports.profit_by_category.profit') }}',
                             data: this.profit
+                        },
+                        {
+                            name: '{{ __('reports.profit_by_category.revenue') }}',
+                            data: this.revenue.map((rev, i) => Math.max(0, rev - this.profit[i]))
                         }
                     ],
                     dataLabels: { enabled: false },
@@ -120,7 +121,7 @@
                         width: 2,
                         colors: ['transparent']
                     },
-                    colors: ['#6366f1', '#10b981'],
+                    colors: ['#10b981', '#6366f1'],
                     grid: {
                         borderColor: 'rgba(156, 163, 175, 0.1)',
                         strokeDashArray: 4,
