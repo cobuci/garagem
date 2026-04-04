@@ -23,4 +23,9 @@
             <livewire:reports.low-stock-products lazy />
         @endif
     </div>
+
+    <div class="w-full">
+        <livewire:reports.profit-by-category lazy />
+    </div>
+</div>
 </div>
