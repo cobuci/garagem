@@ -13,6 +13,17 @@
             </div>
         </div>
         <div class="flex space-x-3">
+            @can(Permission::EditSale->value)
+                <x-button
+                    primary
+                    outline
+                    :label="__('customers.mark_all_as_paid')"
+                    wire:click="confirmMarkAllAsPaid"
+                    :disabled="$this->totalDue <= 0"
+                    shadow="sm"
+                />
+            @endcan
+
             @can(Permission::EditCustomer->value)
                 <x-button
                     white
@@ -162,6 +173,7 @@
     @include('livewire.sales.components.details-modal', ['selectedSale' => $this->selectedSale])
     @include('livewire.sales.components.confirm-payment-modal', ['selectedSale' => $this->selectedSale])
     @include('livewire.sales.components.confirm-cancel-modal', ['selectedSale' => $this->selectedSale])
+    @include('livewire.customers.components.confirm-mark-all-as-paid-modal')
 
     <x-modal-card wire:model="showDeleteModal" :title="__('customers.delete')">
         <div class="space-y-4">
