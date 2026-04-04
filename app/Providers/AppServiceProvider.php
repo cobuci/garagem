@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Sale;
 use App\Models\Setting;
+use App\Observers\SaleObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         Model::unguard();
+        Sale::observe(SaleObserver::class);
 
         if (app()->environment('production')) {
             URL::forceScheme('https');
