@@ -41,7 +41,6 @@ class Category extends Model implements AuditableContract, Syncable
             'name',
             'icon',
             'sort_order',
-            'created_at',
             'updated_at',
         ];
     }

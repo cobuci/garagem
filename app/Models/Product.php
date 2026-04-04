@@ -55,7 +55,6 @@ class Product extends Model implements AuditableContract, Syncable
             'stock_quantity',
             'sale_price',
             'expiration_date',
-            'created_at',
             'updated_at',
         ];
     }
