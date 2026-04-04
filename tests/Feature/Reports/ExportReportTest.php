@@ -79,7 +79,6 @@ test('it can generate the report PDF', function () {
     $job->handle(new GetSystemReportData);
 
     Mail::assertSent(SystemReportMail::class);
-    // The file is deleted immediately after being sent, so we expect it to be missing
     Storage::disk('local')->assertMissing('reports/system_report_' . $user->id . '_' . $now->timestamp . '.pdf');
 
     Carbon::setTestNow();
