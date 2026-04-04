@@ -58,7 +58,6 @@ test('it excludes categories from sales outside the period', function () {
     $category = Category::factory()->create(['name' => 'Categoria Antiga XYZ']);
     $product = Product::factory()->create(['category_id' => $category->id]);
 
-    // Sale 90 days ago — outside last_30_days window
     $sale = Sale::factory()->create([
         'status'     => SaleStatus::Paid,
         'created_at' => Carbon::now()->subDays(90),
@@ -77,7 +76,6 @@ test('it shows category when period is extended to cover old sales', function ()
     $category = Category::factory()->create(['name' => 'Categoria Antiga XYZ2']);
     $product = Product::factory()->create(['category_id' => $category->id]);
 
-    // Sale 60 days ago — outside last_30_days but inside last_6_months
     $sale = Sale::factory()->create([
         'status'     => SaleStatus::Paid,
         'created_at' => Carbon::now()->subDays(60),
