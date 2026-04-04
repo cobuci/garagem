@@ -19,11 +19,19 @@
     @endif
     @if (! $customers->isEmpty())
         <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left">
+            <table class="w-full text-sm text-left table-fixed">
+                    <colgroup>
+                        <col class="w-auto min-w-0">
+                        <col class="w-24">
+                        <col class="w-32 hidden sm:table-column">
+                        <col class="w-36">
+                        <col class="w-24">
+                        <col class="w-32 hidden md:table-column">
+                    </colgroup>
                 <thead>
                     <tr class="border-b border-gray-100 dark:border-gray-700">
                         @php
-                            $thBase = 'pb-3 pr-4 text-xs font-semibold uppercase tracking-wide select-none';
+                            $thBase = 'pb-3 pr-4 text-xs font-semibold uppercase tracking-wide select-none whitespace-nowrap';
                             $thSortable = $thBase . ' cursor-pointer hover:text-gray-700 dark:hover:text-gray-200 transition-colors group/th';
                             $thActive = 'text-gray-800 dark:text-gray-100';
                             $thInactive = 'text-gray-500 dark:text-gray-400';
@@ -84,9 +92,10 @@
                             };
                         @endphp
                         <tr class="group hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
-                            <td class="py-3 pr-4">
+                            <td class="py-3 pr-4 min-w-0">
                                 <a href="{{ route('customers.show', $customer->id) }}"
-                                   class="font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                                   class="block truncate font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                   title="{{ $customer->name }}">
                                     {{ $customer->name }}
                                 </a>
                             </td>
