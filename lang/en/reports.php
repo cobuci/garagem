@@ -38,6 +38,28 @@ return [
     'quantity'                     => 'Quantity',
     'units'                        => 'units',
 
+    'churn_risk' => [
+        'title'          => 'Churn Risk Customers',
+        'subtitle'       => 'Customers who have not purchased in more than 2× their average interval',
+        'at_risk_count'  => ':count customer at risk|:count customers at risk',
+        'days'           => 'days',
+        'empty'          => 'No customers at risk!',
+        'empty_subtitle' => 'All customers are within their normal purchasing pattern.',
+        'columns'        => [
+            'name'         => 'Customer',
+            'purchases'    => 'Purchases',
+            'avg_interval' => 'Avg. Interval',
+            'days_since'   => 'Without Purchase',
+            'urgency'      => 'Urgency',
+            'total_spent'  => 'Total Spent',
+        ],
+        'urgency' => [
+            'critical' => 'Critical',
+            'high'     => 'High',
+            'medium'   => 'Medium',
+        ],
+    ],
+
     'heatmap' => [
         'low'     => 'Low',
         'medium'  => 'Medium',

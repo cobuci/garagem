@@ -38,6 +38,28 @@ return [
     'quantity'                     => 'Quantidade',
     'units'                        => 'unidades',
 
+    'churn_risk' => [
+        'title'          => 'Clientes em Risco de Churn',
+        'subtitle'       => 'Clientes que não compram há mais de 2× o seu intervalo médio habitual',
+        'at_risk_count'  => ':count cliente em risco|:count clientes em risco',
+        'days'           => 'dias',
+        'empty'          => 'Nenhum cliente em risco!',
+        'empty_subtitle' => 'Todos os clientes estão dentro do padrão normal de compras.',
+        'columns'        => [
+            'name'         => 'Cliente',
+            'purchases'    => 'Compras',
+            'avg_interval' => 'Intervalo Médio',
+            'days_since'   => 'Sem Comprar',
+            'urgency'      => 'Urgência',
+            'total_spent'  => 'Total Gasto',
+        ],
+        'urgency' => [
+            'critical' => 'Crítico',
+            'high'     => 'Alto',
+            'medium'   => 'Médio',
+        ],
+    ],
+
     'heatmap' => [
         'low'     => 'Baixo',
         'medium'  => 'Médio',

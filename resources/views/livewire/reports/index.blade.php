@@ -17,6 +17,7 @@
         <livewire:reports.sales-by-period lazy />
         <livewire:reports.sales-by-payment-method lazy />
         <livewire:reports.sales-by-hour-and-day lazy />
+        <livewire:reports.churn-risk-customers lazy />
         @if(class_exists(\App\Livewire\Reports\LowStockProducts::class))
             <livewire:reports.low-stock-products lazy />
         @endif
