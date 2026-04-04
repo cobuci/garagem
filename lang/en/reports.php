@@ -140,4 +140,34 @@ return [
         'pending'                 => 'Pending',
         'qty'                     => 'Qty',
     ],
+
+    'stock_turnover' => [
+        'title'          => 'Stock Days vs. Turnover',
+        'subtitle'       => 'Products with stock and their estimated sales speed',
+        'count_label'    => ':count product in alert|:count products in alert',
+        'days'           => 'days',
+        'empty'          => 'All under control!',
+        'empty_subtitle' => 'No products with stock at risk of stockout.',
+        'days_label'     => 'd',
+        'columns'        => [
+            'product'        => 'Product',
+            'category'       => 'Category',
+            'stock'          => 'Stock',
+            'units_per_day'  => 'Units/Day',
+            'days_remaining' => 'Days Remaining',
+            'status'         => 'Status',
+        ],
+        'status' => [
+            'critical' => 'Critical',
+            'low'      => 'Low',
+            'ok'       => 'OK',
+        ],
+    ],
+
+    'profit_by_category' => [
+        'title'    => 'Profitability by Category',
+        'subtitle' => 'Revenue and net profit grouped by product category',
+        'revenue'  => 'Revenue',
+        'profit'   => 'Profit',
+    ],
 ];

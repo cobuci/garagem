@@ -140,4 +140,34 @@ return [
         'pending'                 => 'Pendente',
         'qty'                     => 'Qtd',
     ],
+
+    'stock_turnover' => [
+        'title'          => 'Dias de Estoque vs. Rotatividade',
+        'subtitle'       => 'Produtos com estoque e sua velocidade de venda estimada',
+        'count_label'    => ':count produto em alerta|:count produtos em alerta',
+        'days'           => 'dias',
+        'empty'          => 'Tudo sob controle!',
+        'empty_subtitle' => 'Nenhum produto com estoque em risco de ruptura.',
+        'days_label'     => 'd',
+        'columns'        => [
+            'product'        => 'Produto',
+            'category'       => 'Categoria',
+            'stock'          => 'Estoque',
+            'units_per_day'  => 'Unid./Dia',
+            'days_remaining' => 'Dias Restantes',
+            'status'         => 'Status',
+        ],
+        'status' => [
+            'critical' => 'Crítico',
+            'low'      => 'Baixo',
+            'ok'       => 'OK',
+        ],
+    ],
+
+    'profit_by_category' => [
+        'title'    => 'Lucratividade por Categoria',
+        'subtitle' => 'Receita e lucro líquido agrupados por categoria de produto',
+        'revenue'  => 'Receita',
+        'profit'   => 'Lucro',
+    ],
 ];
