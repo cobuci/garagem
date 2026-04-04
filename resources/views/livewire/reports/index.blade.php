@@ -27,5 +27,9 @@
     <div class="w-full">
         <livewire:reports.profit-by-category lazy />
     </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <livewire:reports.average-ticket-evolution lazy />
+    </div>
 </div>
 </div>

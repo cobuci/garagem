@@ -170,4 +170,17 @@ return [
         'revenue'  => 'Revenue',
         'profit'   => 'Profit',
     ],
+
+    'average_ticket_evolution' => [
+        'title'      => 'Average Ticket Evolution',
+        'subtitle'   => 'Average order value month by month (excluding gifts and cancellations)',
+        'avg_ticket' => 'Avg. Ticket',
+        'periods'    => [
+            'last_3_months'  => 'Last 3 Months',
+            'last_6_months'  => 'Last 6 Months',
+            'last_12_months' => 'Last 12 Months',
+            'this_year'      => 'This Year',
+            'last_year'      => 'Last Year',
+        ],
+    ],
 ];

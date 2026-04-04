@@ -170,4 +170,17 @@ return [
         'revenue'  => 'Receita',
         'profit'   => 'Lucro',
     ],
+
+    'average_ticket_evolution' => [
+        'title'      => 'Evolução do Ticket Médio',
+        'subtitle'   => 'Valor médio por venda mês a mês (excluindo brindes e cancelamentos)',
+        'avg_ticket' => 'Ticket Médio',
+        'periods'    => [
+            'last_3_months'  => 'Últimos 3 Meses',
+            'last_6_months'  => 'Últimos 6 Meses',
+            'last_12_months' => 'Últimos 12 Meses',
+            'this_year'      => 'Este Ano',
+            'last_year'      => 'Ano Passado',
+        ],
+    ],
 ];
