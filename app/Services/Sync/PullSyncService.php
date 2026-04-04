@@ -40,22 +40,32 @@ class PullSyncService
             $hasUpsert = ! empty($modelData['upsert']);
             $hasDeleted = ! empty($modelData['deleted']);
 
-            if ($isFullSync || $hasUpsert || $hasDeleted) {
-                if ($isFullSync && $cursors !== null) {
-                    if (! array_key_exists($key, $cursors)) {
-                        continue;
-                    }
+            if ($isFullSync && $cursors !== null && ! array_key_exists($key, $cursors)) {
+                if ($hasDeleted) {
+                    $payload[$key] = [
+                        'upsert'  => [],
+                        'deleted' => $modelData['deleted'],
+                    ];
                 }
 
+                continue;
+            }
+
+            if ($isFullSync && $cursors === null) {
                 $payload[$key] = [
                     'upsert'  => $modelData['upsert'],
                     'deleted' => $modelData['deleted'],
                 ];
+            } elseif ($hasUpsert || $hasDeleted) {
+                $payload[$key] = [
+                    'upsert'  => $modelData['upsert'],
+                    'deleted' => $modelData['deleted'],
+                ];
+            }
 
-                if ($modelData['has_more']) {
-                    $hasMore = true;
-                    $nextCursors[$key] = end($modelData['upsert'])['id'];
-                }
+            if ($modelData['has_more']) {
+                $hasMore = true;
+                $nextCursors[$key] = end($modelData['upsert'])['id'];
             }
         }
 
@@ -71,12 +81,10 @@ class PullSyncService
      */
     public function syncModel(Category|Customer|Product $model, ?Carbon $since, ?int $afterId): array
     {
-        $fields = $model->getSyncableFields();
         $isFullSync = $since === null;
         $limit = $isFullSync ? self::PAGE_SIZE + 1 : null;
 
         $query = $model::query()
-            ->when(! empty($fields), fn ($query) => $query->select($fields))
             ->modifiedSince($since);
 
         if ($isFullSync) {

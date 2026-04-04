@@ -59,6 +59,19 @@ class Product extends Model implements AuditableContract, Syncable
         ];
     }
 
+    public function toSyncArray(): array
+    {
+        $fields = $this->getSyncableFields();
+
+        $data = collect($this->getAttributes())
+            ->only($fields)
+            ->toArray();
+
+        $data['sale_price'] = (int) $this->getRawOriginal('sale_price');
+
+        return $data;
+    }
+
     protected function casts(): array
     {
         return [
