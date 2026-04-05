@@ -48,6 +48,14 @@ class Edit extends Component
         $this->dispatch('product:updated');
     }
 
+    public function updatedEditDrawer(bool $value): void
+    {
+        if (! $value) {
+            $this->form->reset();
+            $this->resetErrorBag();
+        }
+    }
+
     public function render(): View
     {
         return view('livewire.products.edit');

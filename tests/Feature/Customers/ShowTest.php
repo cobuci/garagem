@@ -274,3 +274,53 @@ it('cannot cancel an already cancelled sale from customer page', function () {
 
     expect($sale->fresh()->status)->toBe(SaleStatus::Cancelled);
 });
+
+it('can mark all pending sales as paid', function () {
+    $customer = Customer::factory()->create();
+    $pendingSales = Sale::factory()->count(3)->create([
+        'customer_id' => $customer->id,
+        'status'      => SaleStatus::Pending,
+    ]);
+    $paidSale = Sale::factory()->create([
+        'customer_id' => $customer->id,
+        'status'      => SaleStatus::Paid,
+    ]);
+
+    Livewire::test(Show::class, ['customer' => $customer])
+        ->call('confirmMarkAllAsPaid')
+        ->assertSet('showMarkAllAsPaidModal', true)
+        ->set('confirmedMarkAllAsPaid', true)
+        ->call('markAllAsPaid')
+        ->assertSet('showMarkAllAsPaidModal', false);
+
+    expect($customer->sales()->where('status', SaleStatus::Pending)->count())->toBe(0)
+        ->and($customer->sales()->where('status', SaleStatus::Paid)->count())->toBe(4);
+});
+
+it('cannot mark all as paid without confirming checkbox', function () {
+    $customer = Customer::factory()->create();
+    Sale::factory()->create([
+        'customer_id' => $customer->id,
+        'status'      => SaleStatus::Pending,
+    ]);
+
+    Livewire::test(Show::class, ['customer' => $customer])
+        ->call('confirmMarkAllAsPaid')
+        ->set('confirmedMarkAllAsPaid', false)
+        ->call('markAllAsPaid')
+        ->assertSet('showMarkAllAsPaidModal', true);
+
+    expect($customer->sales()->where('status', SaleStatus::Pending)->count())->toBe(1);
+});
+
+it('disables mark all as paid button when no pending sales exist', function () {
+    $customer = Customer::factory()->create();
+    Sale::factory()->create([
+        'customer_id' => $customer->id,
+        'status'      => SaleStatus::Paid,
+    ]);
+
+    Livewire::test(Show::class, ['customer' => $customer])
+        ->assertSeeHtml('disabled="disabled"')
+        ->assertSee(__('customers.mark_all_as_paid'));
+});

@@ -27,4 +27,6 @@ return [
     'light_mode'         => 'Modo Claro',
     'switch_user'        => 'Trocar Usuário',
     'administration'     => 'Administração',
+    'whats_new'          => 'Novidades',
+    'new'                => 'Novo',
 ];

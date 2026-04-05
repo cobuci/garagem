@@ -37,18 +37,22 @@ class GenerateSystemReportJob implements ShouldQueue
         ]);
 
         $fileName = "reports/system_report_{$this->user->id}_" . now()->timestamp . '.pdf';
-        $pdfPath = storage_path("app/public/{$fileName}");
+        $pdfPath = Storage::path($fileName);
 
-        Storage::disk('public')->put($fileName, $pdf->output());
+        Storage::put($fileName, $pdf->output());
 
-        Mail::to($this->user->email)
-            ->send(
-                (new SystemReportMail(
-                    $this->user->name,
-                    $this->startDate,
-                    $this->endDate,
-                    $pdfPath,
-                ))->locale($this->user->locale),
-            );
+        try {
+            Mail::to($this->user->email)
+                ->send(
+                    (new SystemReportMail(
+                        $this->user->name,
+                        $this->startDate,
+                        $this->endDate,
+                        $pdfPath,
+                    ))->locale($this->user->locale),
+                );
+        } finally {
+            Storage::delete($fileName);
+        }
     }
 }

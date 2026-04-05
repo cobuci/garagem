@@ -29,10 +29,54 @@ return [
         'this_year'     => 'Este Ano',
         'last_year'     => 'Ano Passado',
     ],
-    'top_products'       => 'Principais Produtos',
-    'most_sold_products' => 'Produtos mais vendidos no período selecionado',
-    'quantity'           => 'Quantidade',
-    'units'              => 'unidades',
+    'top_products'                 => 'Principais Produtos',
+    'most_sold_products'           => 'Produtos mais vendidos no período selecionado',
+    'most_profitable_products'     => 'Produtos Mais Lucrativos',
+    'products_with_highest_profit' => 'Produtos que geraram maior lucro total (Preço - Custo)',
+    'sales_by_hour_and_day'        => 'Pico de Vendas por Horário',
+    'sales_heatmap_overview'       => 'Volume de vendas por hora e dia da semana',
+    'quantity'                     => 'Quantidade',
+    'units'                        => 'unidades',
+
+    'churn_risk' => [
+        'title'          => 'Clientes em Risco de Churn',
+        'subtitle'       => 'Clientes que não compram há mais de 2× o seu intervalo médio habitual',
+        'at_risk_count'  => ':count cliente em risco|:count clientes em risco',
+        'days'           => 'dias',
+        'empty'          => 'Nenhum cliente em risco!',
+        'empty_subtitle' => 'Todos os clientes estão dentro do padrão normal de compras.',
+        'columns'        => [
+            'name'         => 'Cliente',
+            'purchases'    => 'Compras',
+            'avg_interval' => 'Intervalo Médio',
+            'days_since'   => 'Sem Comprar',
+            'urgency'      => 'Urgência',
+            'total_spent'  => 'Total Gasto',
+        ],
+        'urgency' => [
+            'critical' => 'Crítico',
+            'high'     => 'Alto',
+            'medium'   => 'Médio',
+        ],
+    ],
+
+    'heatmap' => [
+        'low'     => 'Baixo',
+        'medium'  => 'Médio',
+        'high'    => 'Alto',
+        'peak'    => 'Pico',
+        'no_data' => 'Sem vendas',
+    ],
+
+    'days' => [
+        'sun' => 'Dom',
+        'mon' => 'Seg',
+        'tue' => 'Ter',
+        'wed' => 'Qua',
+        'thu' => 'Qui',
+        'fri' => 'Sex',
+        'sat' => 'Sáb',
+    ],
 
     'low_stock_products' => [
         'title'          => 'Produtos com Baixo Estoque',
@@ -95,5 +139,55 @@ return [
         'paid'                    => 'Pago',
         'pending'                 => 'Pendente',
         'qty'                     => 'Qtd',
+    ],
+
+    'stock_turnover' => [
+        'title'          => 'Dias de Estoque vs. Rotatividade',
+        'subtitle'       => 'Produtos com estoque e sua velocidade de venda estimada',
+        'count_label'    => ':count produto em alerta|:count produtos em alerta',
+        'days'           => 'dias',
+        'empty'          => 'Tudo sob controle!',
+        'empty_subtitle' => 'Nenhum produto com estoque em risco de ruptura.',
+        'days_label'     => 'd',
+        'columns'        => [
+            'product'        => 'Produto',
+            'category'       => 'Categoria',
+            'stock'          => 'Estoque',
+            'units_per_day'  => 'Unid./Dia',
+            'days_remaining' => 'Dias Restantes',
+            'status'         => 'Status',
+        ],
+        'status' => [
+            'critical' => 'Crítico',
+            'low'      => 'Baixo',
+            'ok'       => 'OK',
+        ],
+    ],
+
+    'profit_by_category' => [
+        'title'    => 'Lucratividade por Categoria',
+        'subtitle' => 'Receita e lucro líquido agrupados por categoria de produto',
+        'revenue'  => 'Receita',
+        'profit'   => 'Lucro',
+    ],
+
+    'average_ticket_evolution' => [
+        'title'      => 'Evolução do Ticket Médio',
+        'subtitle'   => 'Valor médio por venda mês a mês (excluindo brindes e cancelamentos)',
+        'avg_ticket' => 'Ticket Médio',
+        'periods'    => [
+            'last_3_months'  => 'Últimos 3 Meses',
+            'last_6_months'  => 'Últimos 6 Meses',
+            'last_12_months' => 'Últimos 12 Meses',
+            'this_year'      => 'Este Ano',
+            'last_year'      => 'Ano Passado',
+        ],
+    ],
+
+    'tabs' => [
+        'overview'  => 'Visão Geral',
+        'products'  => 'Produtos',
+        'customers' => 'Clientes',
+        'inventory' => 'Estoque',
     ],
 ];

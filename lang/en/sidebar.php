@@ -27,4 +27,6 @@ return [
     'light_mode'         => 'Light Mode',
     'switch_user'        => 'Switch User',
     'administration'     => 'Administration',
+    'whats_new'          => "What's New",
+    'new'                => 'New',
 ];

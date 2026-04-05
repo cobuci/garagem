@@ -27,7 +27,7 @@ class ImportLegacyDataJob implements ShouldQueue
 
     public int $timeout = 0;
 
-    public int $tries = 1;
+    public int $tries = 3;
 
     public function __construct(public string $filePath)
     {
@@ -44,12 +44,21 @@ class ImportLegacyDataJob implements ShouldQueue
 
         $sql = Storage::get($this->filePath);
 
-        $this->importCategories($sql);
-        $this->importProducts($sql);
-        $this->importCustomers($sql);
-        $this->importSales($sql);
-        $this->importSaleItems($sql);
+        DB::transaction(function () use ($sql) {
+            Sale::withoutEvents(function () use ($sql) {
+                $this->importCategories($sql);
+                $this->importProducts($sql);
+                $this->importCustomers($sql);
+                $this->importSales($sql);
+                $this->importSaleItems($sql);
+            });
+        });
 
+        Storage::delete($this->filePath);
+    }
+
+    public function failed(\Throwable $exception): void
+    {
         Storage::delete($this->filePath);
     }
 
@@ -59,34 +68,32 @@ class ImportLegacyDataJob implements ShouldQueue
             return;
         }
 
-        DB::transaction(function () use ($matches) {
-            $rows = $this->splitSqlRows($matches[1]);
+        $rows = $this->splitSqlRows($matches[1]);
 
-            foreach ($rows as $index => $row) {
-                $data = $this->parseSqlRow($row);
+        foreach ($rows as $index => $row) {
+            $data = $this->parseSqlRow($row);
 
-                if (count($data) < 5) {
-                    continue;
-                }
-
-                $id = (int) $data[0];
-                $name = $data[1];
-                $icon = isset($data[2]) ? $this->mapIcon($data[2]) : null;
-                $createdAt = $this->parseDate($data[3]);
-                $updatedAt = $this->parseDate($data[4]);
-
-                Category::updateOrCreate(
-                    ['id' => $id],
-                    [
-                        'name'       => $name,
-                        'icon'       => $icon,
-                        'sort_order' => $index + 1,
-                        'created_at' => $createdAt,
-                        'updated_at' => $updatedAt,
-                    ],
-                );
+            if (count($data) < 5) {
+                continue;
             }
-        });
+
+            $id = (int) $data[0];
+            $name = $data[1];
+            $icon = isset($data[2]) ? $this->mapIcon($data[2]) : null;
+            $createdAt = $this->parseDate($data[3]);
+            $updatedAt = $this->parseDate($data[4]);
+
+            Category::updateOrCreate(
+                ['id' => $id],
+                [
+                    'name'       => $name,
+                    'icon'       => $icon,
+                    'sort_order' => $index + 1,
+                    'created_at' => $createdAt,
+                    'updated_at' => $updatedAt,
+                ],
+            );
+        }
     }
 
     protected function importCustomers(string $sql): void
@@ -95,8 +102,68 @@ class ImportLegacyDataJob implements ShouldQueue
             return;
         }
 
-        DB::transaction(function () use ($matches) {
-            $rows = $this->splitSqlRows($matches[1]);
+        $rows = $this->splitSqlRows($matches[1]);
+
+        $existingCustomerNames = Customer::pluck('name')->all();
+
+        foreach ($rows as $row) {
+            $data = $this->parseSqlRow($row);
+
+            if (count($data) < 11) {
+                continue;
+            }
+
+            $id = (int) $data[0];
+            $name = $this->getUniqueCustomerName($data[1], $id, $existingCustomerNames);
+
+            if (! in_array($name, $existingCustomerNames)) {
+                $existingCustomerNames[] = $name;
+            }
+
+            $email = $this->cleanValue($data[2]);
+            $phone = $this->cleanValue($data[3]);
+            $genderRaw = strtoupper($data[4] ?? '');
+            $zipCode = $this->cleanValue($data[5]);
+            $street = $this->cleanValue($data[6]);
+            $address = $this->cleanValue($data[7]);
+            $neighborhood = $this->cleanValue($data[8]);
+            $createdAt = $this->parseDate($data[9]);
+            $updatedAt = $this->parseDate($data[10]);
+
+            $gender = match (true) {
+                str_starts_with($genderRaw, 'M') => Gender::Male,
+                str_starts_with($genderRaw, 'F') => Gender::Female,
+                default                          => null,
+            };
+
+            Customer::updateOrCreate(
+                ['id' => $id],
+                [
+                    'name'         => $name,
+                    'email'        => $email,
+                    'phone'        => $phone,
+                    'gender'       => $gender,
+                    'zip_code'     => $zipCode,
+                    'street'       => $street,
+                    'address'      => $address,
+                    'neighborhood' => $neighborhood,
+                    'created_at'   => $createdAt,
+                    'updated_at'   => $updatedAt,
+                ],
+            );
+        }
+    }
+
+    protected function importSales(string $sql): void
+    {
+        if (! preg_match_all('/INSERT INTO `sales` \(`id`, `order_id`, `cost`, `discount`, `price`, `customer_id`, `customer_name`, `payment_method`, `payment_status`, `created_at`, `updated_at`\) VALUES\s*(.*?);/si', $sql, $matches)) {
+            return;
+        }
+
+        $existingCustomerIds = Customer::pluck('id')->all();
+
+        foreach ($matches[1] as $valuesBlock) {
+            $rows = $this->splitSqlRows($valuesBlock);
 
             foreach ($rows as $row) {
                 $data = $this->parseSqlRow($row);
@@ -106,91 +173,35 @@ class ImportLegacyDataJob implements ShouldQueue
                 }
 
                 $id = (int) $data[0];
-                $name = $this->getUniqueCustomerName($data[1], $id);
-                $email = $this->cleanValue($data[2]);
-                $phone = $this->cleanValue($data[3]);
-                $genderRaw = strtoupper($data[4] ?? '');
-                $zipCode = $this->cleanValue($data[5]);
-                $street = $this->cleanValue($data[6]);
-                $address = $this->cleanValue($data[7]);
-                $neighborhood = $this->cleanValue($data[8]);
+                $orderId = $data[1];
+                $discount = $data[3] !== null && $data[3] !== 'NULL' ? (float) $data[3] : 0.00;
+                $price = (float) $data[4];
+                $customerId = $data[5] !== null && $data[5] !== 'NULL' ? (int) $data[5] : null;
+
+                if ($customerId !== null && ! in_array($customerId, $existingCustomerIds)) {
+                    $customerId = null;
+                }
+
+                $paymentMethod = $data[7];
+                $paymentStatus = $data[8];
                 $createdAt = $this->parseDate($data[9]);
                 $updatedAt = $this->parseDate($data[10]);
 
-                $gender = match (true) {
-                    str_starts_with($genderRaw, 'M') => Gender::Male,
-                    str_starts_with($genderRaw, 'F') => Gender::Female,
-                    default                          => null,
-                };
-
-                Customer::updateOrCreate(
+                Sale::updateOrCreate(
                     ['id' => $id],
                     [
-                        'name'         => $name,
-                        'email'        => $email,
-                        'phone'        => $phone,
-                        'gender'       => $gender,
-                        'zip_code'     => $zipCode,
-                        'street'       => $street,
-                        'address'      => $address,
-                        'neighborhood' => $neighborhood,
-                        'created_at'   => $createdAt,
-                        'updated_at'   => $updatedAt,
+                        'customer_id'     => $customerId,
+                        'payment_method'  => $paymentMethod,
+                        'total_amount'    => $price + $discount,
+                        'discount_amount' => $discount,
+                        'net_amount'      => $price,
+                        'status'          => $paymentStatus === '1' ? SaleStatus::Paid : SaleStatus::Pending,
+                        'created_at'      => $createdAt,
+                        'updated_at'      => $updatedAt,
+                        'legacy_order_id' => $orderId,
                     ],
                 );
             }
-        });
-    }
-
-    protected function importSales(string $sql): void
-    {
-        if (! preg_match_all('/INSERT INTO `sales` \(`id`, `order_id`, `cost`, `discount`, `price`, `customer_id`, `customer_name`, `payment_method`, `payment_status`, `created_at`, `updated_at`\) VALUES\s*(.*?);/si', $sql, $matches)) {
-            return;
-        }
-
-        foreach ($matches[1] as $valuesBlock) {
-            DB::transaction(function () use ($valuesBlock) {
-                $rows = $this->splitSqlRows($valuesBlock);
-
-                foreach ($rows as $row) {
-                    $data = $this->parseSqlRow($row);
-
-                    if (count($data) < 11) {
-                        continue;
-                    }
-
-                    $id = (int) $data[0];
-                    $orderId = $data[1];
-                    // $cost = (float) $data[2]; // total cost of the sale
-                    $discount = $data[3] !== null && $data[3] !== 'NULL' ? (float) $data[3] : 0.00;
-                    $price = (float) $data[4];
-                    $customerId = $data[5] !== null && $data[5] !== 'NULL' ? (int) $data[5] : null;
-
-                    if ($customerId !== null && ! Customer::where('id', $customerId)->exists()) {
-                        $customerId = null;
-                    }
-
-                    $paymentMethod = $data[7];
-                    $paymentStatus = $data[8];
-                    $createdAt = $this->parseDate($data[9]);
-                    $updatedAt = $this->parseDate($data[10]);
-
-                    Sale::updateOrCreate(
-                        ['id' => $id],
-                        [
-                            'customer_id'     => $customerId,
-                            'payment_method'  => $paymentMethod,
-                            'total_amount'    => $price + $discount,
-                            'discount_amount' => $discount,
-                            'net_amount'      => $price,
-                            'status'          => $paymentStatus === '1' ? SaleStatus::Paid : SaleStatus::Pending,
-                            'created_at'      => $createdAt,
-                            'updated_at'      => $updatedAt,
-                            'legacy_order_id' => $orderId,
-                        ],
-                    );
-                }
-            });
         }
     }
 
@@ -200,52 +211,53 @@ class ImportLegacyDataJob implements ShouldQueue
             return;
         }
 
+        $existingProductIds = Product::pluck('id')->all();
+        $saleMap = Sale::whereNotNull('legacy_order_id')->pluck('id', 'legacy_order_id')->all();
+
         foreach ($matches[1] as $valuesBlock) {
-            DB::transaction(function () use ($valuesBlock) {
-                $rows = $this->splitSqlRows($valuesBlock);
+            $rows = $this->splitSqlRows($valuesBlock);
 
-                foreach ($rows as $row) {
-                    $data = $this->parseSqlRow($row);
+            foreach ($rows as $row) {
+                $data = $this->parseSqlRow($row);
 
-                    if (count($data) < 9) {
-                        continue;
-                    }
-
-                    $legacyOrderId = $data[1];
-                    $productId = (int) $data[2];
-
-                    if (! Product::where('id', $productId)->exists()) {
-                        continue;
-                    }
-
-                    $unitCost = (float) $data[5];
-                    $unitPrice = (float) $data[6];
-                    $amount = (int) $data[8];
-
-                    $sale = Sale::where('legacy_order_id', $legacyOrderId)->first();
-
-                    if (! $sale) {
-                        continue;
-                    }
-
-                    SaleItem::updateOrCreate(
-                        [
-                            'sale_id'    => $sale->id,
-                            'product_id' => $productId,
-                        ],
-                        [
-                            'quantity'   => $amount,
-                            'unit_price' => $unitPrice,
-                            'unit_cost'  => $unitCost,
-                            'subtotal'   => $unitPrice * $amount,
-                        ],
-                    );
+                if (count($data) < 9) {
+                    continue;
                 }
-            });
+
+                $legacyOrderId = $data[1];
+                $productId = (int) $data[2];
+
+                if (! in_array($productId, $existingProductIds)) {
+                    continue;
+                }
+
+                $unitCost = (float) $data[5];
+                $unitPrice = (float) $data[6];
+                $amount = (int) $data[8];
+
+                $saleId = $saleMap[$legacyOrderId] ?? null;
+
+                if (! $saleId) {
+                    continue;
+                }
+
+                SaleItem::updateOrCreate(
+                    [
+                        'sale_id'    => $saleId,
+                        'product_id' => $productId,
+                    ],
+                    [
+                        'quantity'   => $amount,
+                        'unit_price' => $unitPrice,
+                        'unit_cost'  => $unitCost,
+                        'subtotal'   => $unitPrice * $amount,
+                    ],
+                );
+            }
         }
     }
 
-    protected function getUniqueCustomerName(string $name, int $id): string
+    protected function getUniqueCustomerName(string $name, int $id, array $existingNames = []): string
     {
         $existingCustomer = Customer::find($id);
 
@@ -256,7 +268,7 @@ class ImportLegacyDataJob implements ShouldQueue
         $originalName = $name;
         $counter = 1;
 
-        while (Customer::where('name', $name)->exists()) {
+        while (in_array($name, $existingNames)) {
             $name = "{$originalName} {$counter}";
             $counter++;
         }
@@ -270,43 +282,44 @@ class ImportLegacyDataJob implements ShouldQueue
             return;
         }
 
-        DB::transaction(function () use ($allMatches) {
-            foreach ($allMatches[1] as $values) {
-                $rows = $this->splitSqlRows($values);
+        $existingCategoryIds = Category::pluck('id')->all();
 
-                foreach ($rows as $row) {
-                    $data = $this->parseSqlRow($row);
+        foreach ($allMatches[1] as $values) {
+            $rows = $this->splitSqlRows($values);
 
-                    if (count($data) < 10) {
-                        continue;
-                    }
+            foreach ($rows as $row) {
+                $data = $this->parseSqlRow($row);
 
-                    $category_id = (int) $data[8];
-
-                    if (! Category::where('id', $category_id)->exists()) {
-                        Category::create([
-                            'id'   => $category_id,
-                            'name' => "Category {$category_id}",
-                        ]);
-                    }
-
-                    Product::updateOrCreate(
-                        ['id' => (int) $data[0]],
-                        [
-                            'category_id'     => $category_id,
-                            'name'            => $data[1],
-                            'brand'           => $data[2],
-                            'weight'          => $data[3],
-                            'upc'             => $this->cleanValue($data[9]),
-                            'stock_quantity'  => (int) $data[6],
-                            'unit_cost'       => (float) $data[4],
-                            'sale_price'      => (float) $data[5],
-                            'expiration_date' => $this->parseExpirationDate($data[7] ?? null),
-                        ],
-                    );
+                if (count($data) < 10) {
+                    continue;
                 }
+
+                $category_id = (int) $data[8];
+
+                if (! in_array($category_id, $existingCategoryIds)) {
+                    Category::create([
+                        'id'   => $category_id,
+                        'name' => "Category {$category_id}",
+                    ]);
+                    $existingCategoryIds[] = $category_id;
+                }
+
+                Product::updateOrCreate(
+                    ['id' => (int) $data[0]],
+                    [
+                        'category_id'     => $category_id,
+                        'name'            => $data[1],
+                        'brand'           => $data[2],
+                        'weight'          => $data[3],
+                        'upc'             => $this->cleanValue($data[9]),
+                        'stock_quantity'  => (int) $data[6],
+                        'unit_cost'       => (float) $data[4],
+                        'sale_price'      => (float) $data[5],
+                        'expiration_date' => $this->parseExpirationDate($data[7] ?? null),
+                    ],
+                );
             }
-        });
+        }
     }
 
     protected function parseExpirationDate(?string $value): ?Carbon

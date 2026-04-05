@@ -155,6 +155,8 @@ class Index extends Component
             return null;
         }
 
+        $this->authorize(PermissionEnum::ViewSale->value, $sale);
+
         if ($sale->invoice_status === 'ready' && $sale->invoice_path && Storage::exists($sale->invoice_path)) {
             return Storage::download($sale->invoice_path, "{$sale->id}.pdf");
         }
@@ -172,6 +174,8 @@ class Index extends Component
         if (! $sale) {
             return null;
         }
+
+        $this->authorize(PermissionEnum::ViewSale->value, $sale);
 
         if ($sale->invoice_status === 'ready' && $sale->invoice_png_path && Storage::exists($sale->invoice_png_path)) {
             return Storage::download($sale->invoice_png_path, "{$sale->id}.png");

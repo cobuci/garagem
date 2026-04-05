@@ -104,6 +104,14 @@ class Index extends Component
         );
     }
 
+    public function updatedShowDrawer(bool $value): void
+    {
+        if (! $value) {
+            $this->form->reset();
+            $this->resetErrorBag();
+        }
+    }
+
     public function render(): View
     {
         return view('livewire.roles.index');

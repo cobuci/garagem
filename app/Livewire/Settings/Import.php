@@ -18,7 +18,7 @@ class Import extends Component
     public function save(): void
     {
         $this->validate([
-            'file' => ['required', 'file', 'max:20480'],
+            'file' => ['required', 'file', 'mimes:csv,txt,sql', 'max:20480'],
         ]);
 
         $path = $this->file->store('temp-imports');

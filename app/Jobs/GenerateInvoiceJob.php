@@ -24,6 +24,14 @@ class GenerateInvoiceJob implements ShouldQueue
     {
         $this->sale->update(['invoice_status' => 'generating']);
 
+        if ($this->sale->invoice_path) {
+            Storage::delete($this->sale->invoice_path);
+        }
+
+        if ($this->sale->invoice_png_path) {
+            Storage::delete($this->sale->invoice_png_path);
+        }
+
         $sale = $this->sale->load(['customer', 'items.product']);
         $settings = Setting::singleton();
 

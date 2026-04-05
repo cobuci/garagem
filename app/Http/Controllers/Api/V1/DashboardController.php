@@ -54,7 +54,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @return array{sales: int, pending: int, receivable: int}
+     * @return array{sales: int, pending: int, receivable: int, goal: int}
      */
     private function monthlyData(): array
     {
@@ -75,6 +75,7 @@ class DashboardController extends Controller
             'sales'      => $paidSales,
             'pending'    => $pendingSales,
             'receivable' => $paidSales + $pendingSales,
+            'goal'       => (int) AccountBalance::singleton()->getRawOriginal('target_balance'),
         ];
     }
 }

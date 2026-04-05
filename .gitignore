@@ -28,3 +28,4 @@ yarn-error.log
 !README.md
 laradumps.yaml
 /.junie
+.DS_Store

@@ -50,7 +50,7 @@ return [
     |
     */
 
-    'expiration' => null,
+    'expiration' => env('SANCTUM_TOKEN_EXPIRATION', 525600), // Default to 1 year if not set, or override via .env
 
     /*
     |--------------------------------------------------------------------------

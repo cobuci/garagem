@@ -48,11 +48,14 @@
                 <livewire:layout.sidebar />
 
                 <!-- Main Content -->
-                <main class="flex-1 lg:ml-64 pt-16 lg:pt-0 min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col overflow-hidden">
-                    <div class="flex-1 p-4 lg:p-8 overflow-hidden flex flex-col">
+                <main class="flex-1 min-w-0 lg:ml-64 pt-16 lg:pt-0 min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col overflow-x-hidden">
+                    <div class="flex-1 p-4 lg:p-8 flex flex-col w-full">
                         {{ $slot }}
                     </div>
                 </main>
+
+                <!-- Changelog Modal -->
+                <livewire:changelog.modal />
             </div>
         @else
             {{ $slot }}

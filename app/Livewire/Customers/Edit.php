@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Customers;
 
+use App\Enums\Permission;
 use App\Livewire\Forms\CustomerForm;
 use App\Models\Customer;
 use Illuminate\View\View;
@@ -27,6 +28,8 @@ class Edit extends Component
 
     public function save(): void
     {
+        $this->authorize(Permission::EditCustomer->value);
+
         $this->form->update();
 
         $this->notification()->success(__('customers.updated'));
@@ -34,6 +37,14 @@ class Edit extends Component
         $this->dispatch('customer:updated');
 
         $this->showDrawer = false;
+    }
+
+    public function updatedShowDrawer(bool $value): void
+    {
+        if (! $value) {
+            $this->form->reset();
+            $this->resetErrorBag();
+        }
     }
 
     public function render(): View

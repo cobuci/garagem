@@ -79,7 +79,7 @@ test('it can generate the report PDF', function () {
     $job->handle(new GetSystemReportData);
 
     Mail::assertSent(SystemReportMail::class);
-    Storage::disk('public')->assertExists('reports/system_report_' . $user->id . '_' . $now->timestamp . '.pdf');
+    Storage::disk('local')->assertMissing('reports/system_report_' . $user->id . '_' . $now->timestamp . '.pdf');
 
     Carbon::setTestNow();
 });

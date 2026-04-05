@@ -43,6 +43,7 @@ class Purchase extends Component
 
         $this->form->reset();
         $this->form->invoiceDate = now()->format('Y-m-d');
+        $this->resetErrorBag();
     }
 
     public Collection $categories;

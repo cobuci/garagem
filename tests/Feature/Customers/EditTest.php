@@ -5,7 +5,6 @@ namespace Tests\Feature\Customers;
 use App\Enums\Gender;
 use App\Livewire\Customers\Edit;
 use App\Models\Customer;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -14,8 +13,7 @@ use function Pest\Laravel\assertDatabaseHas;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
-    $this->actingAs($this->user);
+    $this->actingAsAdmin();
 });
 
 it('can render customer edit component', function () {
