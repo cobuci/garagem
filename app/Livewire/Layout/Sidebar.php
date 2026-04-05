@@ -3,6 +3,7 @@
 namespace App\Livewire\Layout;
 
 use App\Enums\Permission as PermissionEnum;
+use App\Models\Changelog;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +21,19 @@ class Sidebar extends Component
 
         Auth::loginUsingId($userId);
         $this->redirect(request()->header('Referer', route('dashboard')));
+    }
+
+    #[Computed]
+    public function hasUnseenChangelogs(): bool
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        if ($user === null) {
+            return false;
+        }
+
+        return Changelog::query()->unseenBy($user)->exists();
     }
 
     #[Computed]

@@ -4,10 +4,11 @@ return [
     'title'    => 'Administration',
     'subtitle' => 'Manage advanced system settings and tools.',
     'tabs'     => [
-        'users'  => 'Users',
-        'import' => 'Import Legacy',
-        'roles'  => 'Roles & Permissions',
-        'audits' => 'Audit Log',
+        'users'     => 'Users',
+        'import'    => 'Import Legacy',
+        'roles'     => 'Roles & Permissions',
+        'audits'    => 'Audit Log',
+        'changelog' => 'Changelog',
     ],
     'users' => [
         'title'    => 'User Management',
