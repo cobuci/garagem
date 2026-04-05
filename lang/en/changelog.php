@@ -1,14 +1,18 @@
 <?php
 
 return [
-    'title'    => "What's New",
-    'subtitle' => 'Changelog and new features',
-    'step'     => ':current of :total',
-    'previous' => 'Previous',
-    'next'     => 'Next',
-    'finish'   => 'Got it!',
-    'close'    => 'Close',
-    'admin'    => [
+    'title'            => "What's New",
+    'subtitle'         => 'Changelog and new features',
+    'history_title'    => "What's New",
+    'history_subtitle' => 'Track all the improvements and updates we have prepared for you.',
+    'released_on'      => 'Released on :date',
+    'no_changelogs'    => 'No updates published yet.',
+    'step'             => ':current of :total',
+    'previous'         => 'Previous',
+    'next'             => 'Next',
+    'finish'           => 'Got it!',
+    'close'            => 'Close',
+    'admin'            => [
         'title'            => 'Changelog',
         'subtitle'         => 'Manage app changelogs shown to users on login.',
         'new'              => 'New Changelog',

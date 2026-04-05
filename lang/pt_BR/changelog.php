@@ -1,14 +1,18 @@
 <?php
 
 return [
-    'title'    => 'Novidades',
-    'subtitle' => 'Changelog e novas funcionalidades',
-    'step'     => ':current de :total',
-    'previous' => 'Anterior',
-    'next'     => 'Próximo',
-    'finish'   => 'Entendido!',
-    'close'    => 'Fechar',
-    'admin'    => [
+    'title'            => 'Novidades',
+    'subtitle'         => 'Changelog e novas funcionalidades',
+    'history_title'    => 'Histórico de Atualizações',
+    'history_subtitle' => 'Acompanhe todas as melhorias e novidades que preparamos para você.',
+    'released_on'      => 'Lançado em :date',
+    'no_changelogs'    => 'Nenhuma atualização publicada ainda.',
+    'step'             => ':current de :total',
+    'previous'         => 'Anterior',
+    'next'             => 'Próximo',
+    'finish'           => 'Entendido!',
+    'close'            => 'Fechar',
+    'admin'            => [
         'title'            => 'Changelog',
         'subtitle'         => 'Gerencie os changelogs exibidos aos usuários no login.',
         'new'              => 'Novo Changelog',
