@@ -6,7 +6,7 @@
         x-on:click="$dispatch('purchase:open')"
     />
 
-    <x-drawer wire:model.defer="purchaseDrawer" title="{{ __('products.purchase_title') }}" right md>
+    <x-drawer wire:model.live="purchaseDrawer" title="{{ __('products.purchase_title') }}" right md>
         <div class="flex flex-col h-full">
             <div class="flex-1 overflow-y-auto">
                 <div class="grid grid-cols-1 gap-4">
@@ -115,7 +115,7 @@
             </div>
 
             <div class="flex justify-end gap-x-4 pt-6 border-t border-gray-100 dark:border-gray-700 mt-6 shrink-0">
-                <x-button flat label="{{ __('products.cancel') }}" x-on:click="$wire.purchaseDrawer = false" />
+                <x-button flat label="{{ __('products.cancel') }}" wire:click="closeDrawer" />
                 <x-button primary label="{{ __('products.save') }}" wire:click="save" />
             </div>
         </div>

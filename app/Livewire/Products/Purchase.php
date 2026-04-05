@@ -32,7 +32,19 @@ class Purchase extends Component
     {
         $this->authorize(Permission::CreateProductPurchase->value);
 
+        $this->form->reset();
+        $this->form->invoiceDate = now()->format('Y-m-d');
+        $this->resetErrorBag();
+
         $this->purchaseDrawer = true;
+    }
+
+    public function closeDrawer(): void
+    {
+        $this->purchaseDrawer = false;
+        $this->form->reset();
+        $this->form->invoiceDate = now()->format('Y-m-d');
+        $this->resetErrorBag();
     }
 
     public function updatedPurchaseDrawer($value): void
@@ -41,9 +53,7 @@ class Purchase extends Component
             return;
         }
 
-        $this->form->reset();
-        $this->form->invoiceDate = now()->format('Y-m-d');
-        $this->resetErrorBag();
+        $this->closeDrawer();
     }
 
     public Collection $categories;
