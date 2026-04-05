@@ -108,6 +108,24 @@
                     </div>
                 </div>
             @endforeach
+
+            {{-- What's New --}}
+            @if($this->hasUnseenChangelogs)
+                <div>
+                    <div class="space-y-1">
+                        <button
+                            @click="$dispatch('open-changelog')"
+                            class="w-full flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white border-none bg-transparent cursor-pointer"
+                        >
+                            <x-icon name="megaphone" class="mr-3 h-5 w-5 text-indigo-400" />
+                            {{ __('sidebar.whats_new') }}
+                            <span class="ml-auto inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500 text-white">
+                                {{ __('sidebar.new') }}
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            @endif
         </nav>
 
         <div class="hidden lg:block p-4 border-t border-gray-200 dark:border-gray-700">

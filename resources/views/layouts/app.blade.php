@@ -53,6 +53,9 @@
                         {{ $slot }}
                     </div>
                 </main>
+
+                <!-- Changelog Modal -->
+                <livewire:changelog.modal />
             </div>
         @else
             {{ $slot }}
