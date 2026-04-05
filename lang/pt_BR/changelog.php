@@ -1,0 +1,31 @@
+<?php
+
+return [
+    'title'    => 'Novidades',
+    'subtitle' => 'Changelog e novas funcionalidades',
+    'step'     => ':current de :total',
+    'previous' => 'Anterior',
+    'next'     => 'Próximo',
+    'finish'   => 'Entendido!',
+    'close'    => 'Fechar',
+    'admin'    => [
+        'title'            => 'Changelog',
+        'subtitle'         => 'Gerencie os changelogs exibidos aos usuários no login.',
+        'new'              => 'Novo Changelog',
+        'edit'             => 'Editar Changelog',
+        'version'          => 'Versão',
+        'title_field'      => 'Título',
+        'released_at'      => 'Data de Lançamento',
+        'items'            => 'Itens',
+        'add_item'         => 'Adicionar Item',
+        'save'             => 'Salvar',
+        'cancel'           => 'Cancelar',
+        'delete_confirm'   => 'Tem certeza que deseja excluir este changelog?',
+        'deleted'          => 'Changelog excluído com sucesso.',
+        'saved'            => 'Changelog salvo com sucesso.',
+        'empty'            => 'Nenhum changelog ainda. Crie o primeiro.',
+        'item_title'       => 'Título do Item',
+        'item_description' => 'Descrição',
+        'item_image'       => 'Imagem (opcional)',
+    ],
+];

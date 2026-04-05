@@ -4,10 +4,11 @@ return [
     'title'    => 'Administração',
     'subtitle' => 'Gerencie as configurações avançadas e ferramentas do sistema.',
     'tabs'     => [
-        'users'  => 'Usuários',
-        'import' => 'Importar Legado',
-        'roles'  => 'Roles e Permissões',
-        'audits' => 'Log de Auditoria',
+        'users'     => 'Usuários',
+        'import'    => 'Importar Legado',
+        'roles'     => 'Roles e Permissões',
+        'audits'    => 'Log de Auditoria',
+        'changelog' => 'Changelog',
     ],
     'users' => [
         'title'    => 'Gerenciamento de Usuários',
