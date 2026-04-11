@@ -30,15 +30,6 @@ class ChangelogV110Seeder extends Seeder
                 'description' => 'Adicionada uma nova métrica no painel de performance que calcula a média de vendas por dia do mês atual, auxiliando na projeção de fechamento mensal.',
                 'image_path'  => 'changelog/v1.1.0/daily-average.png',
             ],
-            [
-                'title'       => 'Layout Unificado do Dashboard',
-                'description' => 'Reorganizamos os componentes do dashboard para eliminar espaços vazios e garantir que todas as informações importantes estejam visíveis de forma compacta e organizada, especialmente em telas maiores.',
-                'image_path'  => 'changelog/v1.1.0/dashboard-layout.png',
-            ],
-            [
-                'title'       => 'Melhorias na Legenda e Cores',
-                'description' => 'A legenda do gráfico foi atualizada para incluir o Total e as Vendas Pagas separadamente, com ícones padronizados para garantir consistência visual em todo o sistema.',
-            ],
         ];
 
         foreach ($items as $index => $item) {
