@@ -6,6 +6,7 @@ use App\Enums\Permission;
 use App\Models\Changelog;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -22,6 +23,14 @@ class Index extends Component
     public bool $showForm = false;
 
     public ?int $editingId = null;
+
+    public string $selectedSeeder = '';
+
+    /** @var array<string, string> */
+    public const SEEDERS = [
+        'ChangelogV100Seeder' => 'v1.0.0 — Novas Métricas, Abas em Relatórios e Melhorias',
+        'ChangelogV110Seeder' => 'v1.1.0 — Novo Dashboard e Métricas de Vendas',
+    ];
 
     public function mount(): void
     {
@@ -61,6 +70,34 @@ class Index extends Component
         );
 
         unset($this->changelogs);
+    }
+
+    public function runSeeder(): void
+    {
+        $this->authorize(Permission::ManageChangelog->value);
+
+        $seederClass = $this->selectedSeeder;
+
+        if (! array_key_exists($seederClass, self::SEEDERS)) {
+            $this->notification()->error(
+                title: __('changelog.admin.seeder_invalid'),
+            );
+
+            return;
+        }
+
+        Artisan::call('db:seed', [
+            '--class'          => "Database\\Seeders\\{$seederClass}",
+            '--no-interaction' => true,
+        ]);
+
+        $this->selectedSeeder = '';
+
+        unset($this->changelogs);
+
+        $this->notification()->success(
+            title: __('changelog.admin.seeder_success'),
+        );
     }
 
     public function updatedShowForm(bool $value): void

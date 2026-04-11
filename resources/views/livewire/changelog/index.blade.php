@@ -7,6 +7,27 @@
         <x-button primary icon="plus" label="{{ __('changelog.admin.new') }}" wire:click="create" />
     </div>
 
+    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">{{ __('changelog.admin.run_seeder') }}</p>
+        <div class="flex items-center gap-3">
+            <div class="flex-1">
+                <x-native-select wire:model="selectedSeeder" placeholder="{{ __('changelog.admin.seeder_placeholder') }}">
+                    @foreach(\App\Livewire\Changelog\Index::SEEDERS as $class => $label)
+                        <option value="{{ $class }}">{{ $label }}</option>
+                    @endforeach
+                </x-native-select>
+            </div>
+            <x-button
+                secondary
+                icon="play"
+                label="{{ __('changelog.admin.seeder_run') }}"
+                wire:click="runSeeder"
+                wire:confirm="{{ __('changelog.admin.seeder_confirm') }}"
+                :disabled="!$selectedSeeder"
+            />
+        </div>
+    </div>
+
     @if($this->changelogs->isEmpty())
         <div class="flex flex-col items-center justify-center py-16 text-gray-400 dark:text-gray-600">
             <x-icon name="megaphone" class="w-12 h-12 mb-3" />
