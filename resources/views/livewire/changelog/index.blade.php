@@ -9,13 +9,18 @@
 
     <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
         <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-3">{{ __('changelog.admin.run_seeder') }}</p>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3" x-data="{ seeder: '' }">
             <div class="flex-1">
-                <x-native-select wire:model="selectedSeeder" placeholder="{{ __('changelog.admin.seeder_placeholder') }}">
+                <select
+                    wire:model="selectedSeeder"
+                    x-model="seeder"
+                    class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                    <option value="">{{ __('changelog.admin.seeder_placeholder') }}</option>
                     @foreach(\App\Livewire\Changelog\Index::SEEDERS as $class => $label)
                         <option value="{{ $class }}">{{ $label }}</option>
                     @endforeach
-                </x-native-select>
+                </select>
             </div>
             <x-button
                 secondary
@@ -23,7 +28,7 @@
                 label="{{ __('changelog.admin.seeder_run') }}"
                 wire:click="runSeeder"
                 wire:confirm="{{ __('changelog.admin.seeder_confirm') }}"
-                :disabled="!$selectedSeeder"
+                x-bind:disabled="!seeder"
             />
         </div>
     </div>
