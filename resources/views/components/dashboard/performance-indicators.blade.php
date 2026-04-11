@@ -73,8 +73,8 @@
         </div>
         <div class="space-y-3">
             <div class="flex items-center justify-between">
-                <span class="text-xs text-gray-500 font-medium uppercase tracking-tight">{{ __('dashboard.sales') }}</span>
-                <span class="text-xs font-black text-gray-900 dark:text-white uppercase tracking-tighter">R$ {{ number_format($monthlyMetrics['sales'], 2, ',', '.') }}</span>
+                <span class="text-xs text-gray-500 font-medium uppercase tracking-tight">{{ __('dashboard.total') }}</span>
+                <span class="text-xs font-black text-gray-900 dark:text-white uppercase tracking-tighter">R$ {{ number_format($monthlyMetrics['total'], 2, ',', '.') }}</span>
             </div>
             @if($monthlyMetrics['pending_sales'] > 0)
                 <div class="flex items-center justify-between bg-amber-50 dark:bg-amber-900/20 border border-amber-200/60 dark:border-amber-700/40 rounded-lg px-2.5 py-1.5">

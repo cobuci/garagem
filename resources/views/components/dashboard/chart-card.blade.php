@@ -9,7 +9,11 @@
         <div class="flex items-center gap-4">
             <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-indigo-500"></span>
-                <span class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('dashboard.sales') }}</span>
+                <span class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('dashboard.total') }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-violet-400"></span>
+                <span class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('dashboard.paid_sales') }}</span>
             </div>
             <div class="flex items-center gap-2">
                 <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
@@ -28,6 +32,7 @@
             sales: @js($chartData['sales']),
             profit: @js($chartData['profit']),
             pending: @js($chartData['pending']),
+            total: @js($chartData['total']),
             init() {
                 let chart = new ApexCharts(this.$refs.chart, {
                     chart: {
@@ -40,7 +45,11 @@
                     },
                     series: [
                         {
-                            name: '{{ __('dashboard.sales') }}',
+                            name: '{{ __('dashboard.total') }}',
+                            data: this.total
+                        },
+                        {
+                            name: '{{ __('dashboard.paid_sales') }}',
                             data: this.sales
                         },
                         {
@@ -64,11 +73,11 @@
                     dataLabels: { enabled: false },
                     stroke: {
                         curve: 'smooth',
-                        width: [3, 3, 2],
-                        colors: ['#6366f1', '#10b981', '#f59e0b'],
-                        dashArray: [0, 0, 5]
+                        width: [3, 2, 3, 2],
+                        colors: ['#6366f1', '#a78bfa', '#10b981', '#f59e0b'],
+                        dashArray: [0, 5, 0, 5]
                     },
-                    colors: ['#6366f1', '#10b981', '#f59e0b'],
+                    colors: ['#6366f1', '#a78bfa', '#10b981', '#f59e0b'],
                     grid: {
                         borderColor: 'rgba(156, 163, 175, 0.1)',
                         strokeDashArray: 4,

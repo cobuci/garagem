@@ -232,6 +232,7 @@ class Index extends Component
                 'sales'   => [],
                 'profit'  => [],
                 'pending' => [],
+                'total'   => [],
             ];
         }
 
@@ -270,15 +271,20 @@ class Index extends Component
         $salesData = [];
         $profitData = [];
         $pendingData = [];
+        $totalData = [];
 
         for ($i = 5; $i >= 0; $i--) {
             $date = Carbon::now()->subMonthsNoOverflow($i);
             $key = "{$date->year}-{$date->month}";
 
+            $salesValue = round(($salesByMonth->get($key)->total_sales ?? 0) / 100, 2);
+            $pendingValue = round(($pendingByMonth->get($key)->total_pending ?? 0) / 100, 2);
+
             $labels[] = $date->translatedFormat('M');
-            $salesData[] = round(($salesByMonth->get($key)->total_sales ?? 0) / 100, 2);
+            $salesData[] = $salesValue;
             $profitData[] = round(($profitByMonth->get($key)->total_profit ?? 0) / 100, 2);
-            $pendingData[] = round(($pendingByMonth->get($key)->total_pending ?? 0) / 100, 2);
+            $pendingData[] = $pendingValue;
+            $totalData[] = $salesValue + $pendingValue;
         }
 
         return [
@@ -286,6 +292,7 @@ class Index extends Component
             'sales'   => $salesData,
             'profit'  => $profitData,
             'pending' => $pendingData,
+            'total'   => $totalData,
         ];
     }
 

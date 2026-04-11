@@ -63,4 +63,6 @@ return [
     'profit_paid'     => 'Paid Profit',
     'profit_pending'  => 'Pending Profit',
     'avg_daily_sales' => 'Avg. Daily Sales',
+    'total'           => 'Total',
+    'paid_sales'      => 'Paid Sales',
 ];

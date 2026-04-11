@@ -63,4 +63,6 @@ return [
     'profit_paid'     => 'Lucro Pago',
     'profit_pending'  => 'Lucro Pendente',
     'avg_daily_sales' => 'Média de Vendas Diária',
+    'total'           => 'Total',
+    'paid_sales'      => 'Vendas Pagas',
 ];
