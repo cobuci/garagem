@@ -57,6 +57,9 @@ return [
         'precipitation'   => 'Rain',
         'no_location'     => 'Location not defined',
     ],
-    'add_sale' => 'New Sale',
-    'not_paid' => 'Not paid',
+    'add_sale'       => 'New Sale',
+    'not_paid'       => 'Not paid',
+    'paid'           => 'Paid',
+    'profit_paid'    => 'Paid Profit',
+    'profit_pending' => 'Pending Profit',
 ];

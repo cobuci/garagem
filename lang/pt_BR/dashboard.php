@@ -57,6 +57,9 @@ return [
         'precipitation'   => 'Chuva',
         'no_location'     => 'Localização não definida',
     ],
-    'add_sale' => 'Nova Venda',
-    'not_paid' => 'Não pago',
+    'add_sale'       => 'Nova Venda',
+    'not_paid'       => 'Não pago',
+    'paid'           => 'Pago',
+    'profit_paid'    => 'Lucro Pago',
+    'profit_pending' => 'Lucro Pendente',
 ];
