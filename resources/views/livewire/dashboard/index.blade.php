@@ -14,9 +14,10 @@
             <x-dashboard.stats-card
                 :title="__('dashboard.sales_today')"
                 :value="$this->dailyMetrics['sales']"
+                :total="$this->dailyMetrics['total']"
                 :trend="$this->dailyMetrics['percent']"
                 :profit="$this->dailyMetrics['profit']"
-                :previous-profit="$this->dailyMetrics['previous_profit']"
+                :total-profit="$this->dailyMetrics['total_profit']"
                 :pending-sales="$this->dailyMetrics['pending_sales']"
                 :pending-profit="$this->dailyMetrics['pending_profit']"
                 icon="shopping-cart"
@@ -26,9 +27,10 @@
             <x-dashboard.stats-card
                 :title="__('dashboard.sales_month')"
                 :value="$this->monthlyMetrics['sales']"
+                :total="$this->monthlyMetrics['total']"
                 :trend="$this->monthlyMetrics['percent']"
                 :profit="$this->monthlyMetrics['profit']"
-                :previous-profit="$this->monthlyMetrics['previous_profit']"
+                :total-profit="$this->monthlyMetrics['total_profit']"
                 :pending-sales="$this->monthlyMetrics['pending_sales']"
                 :pending-profit="$this->monthlyMetrics['pending_profit']"
                 icon="calendar-days"
