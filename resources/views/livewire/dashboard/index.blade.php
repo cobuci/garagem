@@ -49,32 +49,20 @@
     @endcan
 
     @can(Permission::ViewFinancialTransaction->value)
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            <div class="lg:col-span-2">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 flex flex-col gap-8">
                 <x-dashboard.chart-card :chart-data="$this->chartData"/>
-            </div>
-
-            <div class="space-y-6">
-                <x-dashboard.performance-summary :chart-data="$this->chartData"/>
-            </div>
-        </div>
-    @endcan
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        @can(Permission::ViewFinancialTransaction->value)
-            <div class="lg:col-span-2">
                 <x-dashboard.recent-activities :activities="$this->recentActivities"/>
             </div>
-        @endcan
 
-        @can(Permission::ViewFinancialTransaction->value)
-            <div>
+            <div class="flex flex-col gap-8">
+                <x-dashboard.performance-summary :chart-data="$this->chartData" :monthly-metrics="$this->monthlyMetrics"/>
                 <x-dashboard.performance-indicators
                     :daily-metrics="$this->dailyMetrics"
                     :monthly-metrics="$this->monthlyMetrics"
                     :chart-data="$this->chartData"
                 />
             </div>
-        @endcan
-    </div>
+        </div>
+    @endcan
 </div>
