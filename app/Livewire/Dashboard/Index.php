@@ -154,6 +154,7 @@ class Index extends Component
                 'previous_pending_profit' => 0,
                 'bar_paid_percentage'     => 0,
                 'bar_pending_percentage'  => 0,
+                'daily_average'           => 0,
             ];
         }
 
@@ -218,6 +219,7 @@ class Index extends Component
             'previous_pending_profit' => $pendingProfitLastMonth / 100,
             'bar_paid_percentage'     => ($salesMonth / $barMax) * 100,
             'bar_pending_percentage'  => ($totalCurrent / $barMax) * 100,
+            'daily_average'           => ($totalCurrent / 100) / max(now()->day, 1),
         ];
     }
 
