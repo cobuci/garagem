@@ -30,6 +30,11 @@ class ChangelogV110Seeder extends Seeder
                 'description' => 'Adicionada uma nova métrica no painel de performance que calcula a média de vendas por dia do mês atual, auxiliando na projeção de fechamento mensal.',
                 'image_path'  => 'changelog/v1.1.0/daily-average.png',
             ],
+            [
+                'title'       => 'Novos Cards de Resumo (Hoje, Ontem e Mês)',
+                'description' => 'Os cards de performance foram atualizados para mostrar o Total de Vendas de forma mais clara, incluindo um resumo detalhado do que já foi pago e o que ainda está pendente.',
+                'image_path'  => 'changelog/v1.1.0/performance-cards.png',
+            ],
         ];
 
         foreach ($items as $index => $item) {
