@@ -1,4 +1,4 @@
-@props(['chartData'])
+@props(['chartData', 'monthlyMetrics'])
 
 <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col justify-center">
     <div class="text-center mb-8">
@@ -9,7 +9,17 @@
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">{{ __('dashboard.summary_text') }}</p>
     </div>
 
-    <div class="space-y-6">
+    <div class="space-y-4">
+        <div class="p-5 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm group hover:border-amber-100 dark:hover:border-amber-900 transition-colors">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ __('dashboard.avg_daily_sales') }}</span>
+                <div class="p-2 bg-amber-50 dark:bg-amber-900/30 rounded-lg group-hover:scale-110 transition-transform">
+                    <x-icon name="calendar" class="w-4 h-4 text-amber-500" />
+                </div>
+            </div>
+            <p class="text-xl font-black text-gray-900 dark:text-white tracking-tight">R$ {{ number_format($monthlyMetrics['daily_average'] ?? 0, 2, ',', '.') }}</p>
+        </div>
+
         <div class="p-5 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm group hover:border-indigo-100 dark:hover:border-indigo-900 transition-colors">
             <div class="flex items-center justify-between mb-3">
                 <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{{ __('dashboard.avg_monthly_sales') }}</span>

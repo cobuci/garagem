@@ -14,9 +14,10 @@
             <x-dashboard.stats-card
                 :title="__('dashboard.sales_today')"
                 :value="$this->dailyMetrics['sales']"
+                :total="$this->dailyMetrics['total']"
                 :trend="$this->dailyMetrics['percent']"
                 :profit="$this->dailyMetrics['profit']"
-                :previous-profit="$this->dailyMetrics['previous_profit']"
+                :total-profit="$this->dailyMetrics['total_profit']"
                 :pending-sales="$this->dailyMetrics['pending_sales']"
                 :pending-profit="$this->dailyMetrics['pending_profit']"
                 icon="shopping-cart"
@@ -26,9 +27,10 @@
             <x-dashboard.stats-card
                 :title="__('dashboard.sales_month')"
                 :value="$this->monthlyMetrics['sales']"
+                :total="$this->monthlyMetrics['total']"
                 :trend="$this->monthlyMetrics['percent']"
                 :profit="$this->monthlyMetrics['profit']"
-                :previous-profit="$this->monthlyMetrics['previous_profit']"
+                :total-profit="$this->monthlyMetrics['total_profit']"
                 :pending-sales="$this->monthlyMetrics['pending_sales']"
                 :pending-profit="$this->monthlyMetrics['pending_profit']"
                 icon="calendar-days"
@@ -47,32 +49,20 @@
     @endcan
 
     @can(Permission::ViewFinancialTransaction->value)
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            <div class="lg:col-span-2">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 flex flex-col gap-8">
                 <x-dashboard.chart-card :chart-data="$this->chartData"/>
-            </div>
-
-            <div class="space-y-6">
-                <x-dashboard.performance-summary :chart-data="$this->chartData"/>
-            </div>
-        </div>
-    @endcan
-
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        @can(Permission::ViewFinancialTransaction->value)
-            <div class="lg:col-span-2">
                 <x-dashboard.recent-activities :activities="$this->recentActivities"/>
             </div>
-        @endcan
 
-        @can(Permission::ViewFinancialTransaction->value)
-            <div>
+            <div class="flex flex-col gap-8">
+                <x-dashboard.performance-summary :chart-data="$this->chartData" :monthly-metrics="$this->monthlyMetrics"/>
                 <x-dashboard.performance-indicators
                     :daily-metrics="$this->dailyMetrics"
                     :monthly-metrics="$this->monthlyMetrics"
                     :chart-data="$this->chartData"
                 />
             </div>
-        @endcan
-    </div>
+        </div>
+    @endcan
 </div>
