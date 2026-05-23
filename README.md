@@ -1,6 +1,6 @@
 # Garagem
 
-Management system for auto parts and repair shops. Covers sales, inventory, customers, purchases, reports, and financials.
+Management system. Covers sales, inventory, customers, purchases, reports, and financials.
 
 ## Stack
 
