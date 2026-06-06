@@ -33,7 +33,7 @@ class SalesByHourAndDay extends Component
     {
         [$startDate, $endDate] = $this->getPeriodConfig();
 
-        $data = Sale::query()
+        $rows = Sale::query()
             ->selectRaw('
                 DAYOFWEEK(created_at) as dow,
                 HOUR(created_at) as hour,
@@ -44,33 +44,39 @@ class SalesByHourAndDay extends Component
             ->where('created_at', '<=', $endDate)
             ->where('status', '!=', SaleStatus::Cancelled)
             ->groupBy('dow', 'hour')
+            ->toBase()
             ->get();
 
-        $series = [];
-        $days = [1, 2, 3, 4, 5, 6, 7]; // 1=Sun, 7=Sat
+        $byDayAndHour = [];
 
-        // Initialize 24 hours
-        for ($h = 0; $h < 24; $h++) {
-            $hourLabel = str_pad($h, 2, '0', STR_PAD_LEFT) . 'h';
+        foreach ($rows as $row) {
+            $byDayAndHour[(int) $row->dow][(int) $row->hour] = [
+                'revenue'     => (float) $row->revenue,
+                'sales_count' => (int) $row->sales_count,
+            ];
+        }
+
+        $series = [];
+
+        for ($hour = 0; $hour < 24; $hour++) {
             $hourData = [];
 
-            foreach ($days as $d) {
-                $match = $data->where('dow', $d)->where('hour', $h)->first();
+            foreach (range(1, 7) as $day) {
                 $hourData[] = [
-                    'x'     => $this->getDayLabel($d),
-                    'y'     => $match ? round($match->revenue / 100, 2) : 0,
-                    'sales' => $match ? (int) $match->sales_count : 0,
+                    'x'     => $this->getDayLabel($day),
+                    'y'     => round(($byDayAndHour[$day][$hour]['revenue'] ?? 0) / 100, 2),
+                    'sales' => $byDayAndHour[$day][$hour]['sales_count'] ?? 0,
                 ];
             }
 
             $series[] = [
-                'name' => $hourLabel,
+                'name' => sprintf('%02dh', $hour),
                 'data' => $hourData,
             ];
         }
 
         $this->chartDataArray = [
-            'series' => array_reverse($series), // Reverse to show 00h at bottom or top depending on preference
+            'series' => array_reverse($series),
         ];
     }
 
