@@ -4,7 +4,7 @@ Management platform for sales, inventory, customers, purchases, reports, and fin
 
 | | |
 |---|---|
-| **Backend** | PHP 8.4, Laravel 12, Livewire 4 |
+| **Backend** | PHP 8.4, Laravel 13, Livewire 4 |
 | **Frontend** | Tailwind CSS 4, Vite |
 | **Data** | MySQL 8+ |
 | **Queues** | Redis, Laravel Horizon |
