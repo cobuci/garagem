@@ -119,9 +119,13 @@
                     <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ __('orders.actions') }}</th>
                 </tr>
                 </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700" x-data="{ selectedId: null }">
                 @forelse ($this->orders as $order)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                    <x-table.row
+                        wire:key="order-{{ $order->id }}"
+                        @click="selectedId = {{ $order->id }}"
+                        x-bind:data-selected="selectedId === {{ $order->id }}"
+                    >
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div
                                 class="text-sm text-gray-900 dark:text-white">{{ $order->created_at->format('d/m/Y H:i') }}</div>
@@ -148,7 +152,7 @@
                                     {{ $statusLabels[$order->status->value] ?? $order->status->value }}
                                 </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium" @click.stop>
                             <div class="flex justify-end gap-2">
                                 <button wire:click="showDetails({{ $order->id }})"
                                         class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
@@ -156,7 +160,7 @@
                                 </button>
                             </div>
                         </td>
-                    </tr>
+                    </x-table.row>
                 @empty
                     <tr>
                         <td colspan="4" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">

@@ -28,6 +28,28 @@
     display: none !important;
 }
 
+@layer components {
+    .table-row--interactive {
+        @apply cursor-pointer transition-colors;
+    }
+
+    .table-row--interactive:not([data-selected='true']):hover {
+        @apply bg-gray-100 dark:bg-gray-700/50;
+    }
+
+    .table-row--danger:not([data-selected='true']) {
+        @apply bg-red-50 dark:bg-red-900/20;
+    }
+
+    .table-row--danger:not([data-selected='true']):hover {
+        @apply bg-red-100 dark:bg-red-900/30;
+    }
+
+    .table-row[data-selected='true'] {
+        @apply bg-primary-100 shadow-[inset_3px_0_0_0_var(--color-primary-500)] ring-1 ring-inset ring-primary-300 dark:bg-primary-900/40 dark:shadow-[inset_3px_0_0_0_var(--color-primary-400)] dark:ring-primary-600/50;
+    }
+}
+
 @layer base {
     * {
         scrollbar-width: thin;

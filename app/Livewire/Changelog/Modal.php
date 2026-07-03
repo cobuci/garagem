@@ -36,24 +36,23 @@ class Modal extends Component
         $this->changelogIds = $unseenChangelogs->pluck('id')->all();
 
         $this->allItems = $unseenChangelogs
-            ->flatMap(fn (Changelog $changelog) => $changelog->items->map(fn (ChangelogItem $item) => [
-                'id'                => $item->id,
-                'changelog_id'      => $item->changelog_id,
-                'title'             => $item->title,
-                'description'       => $item->description,
-                'image_path'        => $item->image_path,
-                'sort_order'        => $item->sort_order,
-                'changelog_version' => $changelog->version,
-                'changelog_title'   => $changelog->title,
-            ]))
+            ->flatMap(fn (Changelog $changelog) => $changelog->items->map(
+                fn (ChangelogItem $item) => [
+                    'id'                => $item->id,
+                    'changelog_id'      => $item->changelog_id,
+                    'title'             => $item->title,
+                    'description'       => $item->description,
+                    'image_path'        => $item->image_path,
+                    'sort_order'        => $item->sort_order,
+                    'changelog_version' => $changelog->version,
+                    'changelog_title'   => $changelog->title,
+                ],
+            )->all())
             ->values()
             ->all();
 
         $this->totalSteps = count($this->allItems);
-
-        if ($this->totalSteps > 0) {
-            $this->isOpen = true;
-        }
+        $this->isOpen = $this->totalSteps > 0;
     }
 
     public function next(): void

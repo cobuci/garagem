@@ -65,7 +65,7 @@ test('can filter sales by status', function () {
 });
 
 test('can show sale details', function () {
-    $sale = Sale::factory()->create();
+    $sale = Sale::factory()->create(['status' => SaleStatus::Pending]);
 
     Livewire::actingAs($this->user)
         ->test(Index::class)

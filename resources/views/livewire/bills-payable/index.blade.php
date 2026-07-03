@@ -53,9 +53,13 @@
                         <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-700 whitespace-nowrap"></th>
                     </tr>
                 </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700" x-data="{ selectedId: null }">
                     @forelse ($this->bills as $bill)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                        <x-table.row
+                            wire:key="bill-{{ $bill->id }}"
+                            @click="selectedId = {{ $bill->id }}"
+                            x-bind:data-selected="selectedId === {{ $bill->id }}"
+                        >
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div @class([
                                     'text-sm',
@@ -94,7 +98,7 @@
                                     </span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 text-right whitespace-nowrap">
+                            <td class="px-6 py-4 text-right whitespace-nowrap" @click.stop>
                                 <div class="flex justify-end gap-2">
                                     @can(\App\Enums\Permission::DeleteProductPurchase->value)
                                         <x-button
@@ -118,7 +122,7 @@
                                     @endif
                                 </div>
                             </td>
-                        </tr>
+                        </x-table.row>
                     @empty
                         <tr>
                             <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">

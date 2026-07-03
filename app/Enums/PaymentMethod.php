@@ -19,10 +19,10 @@ enum PaymentMethod: string
     {
         return match (strtolower(trim($value))) {
             'money', 'cash', 'dinheiro' => self::Money,
-            'credit_card', 'credito' => self::CreditCard,
-            'debit_card', 'debito' => self::DebitCard,
-            'pix'   => self::Pix,
-            default => self::Others,
+            'credit_card', 'credito'    => self::CreditCard,
+            'debit_card', 'debito'      => self::DebitCard,
+            'pix'                       => self::Pix,
+            default                     => self::Others,
         };
     }
 }
