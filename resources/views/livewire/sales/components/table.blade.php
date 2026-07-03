@@ -21,9 +21,13 @@
                 <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-700 whitespace-nowrap"></th>
             </tr>
             </thead>
-            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700" x-data="{ selectedId: null }">
             @forelse ($sales as $sale)
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                <x-table.row
+                    wire:key="sale-{{ $sale->id }}"
+                    @click="selectedId = {{ $sale->id }}"
+                    x-bind:data-selected="selectedId === {{ $sale->id }}"
+                >
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                         {{ $sale->customer->name ?? __('sales.customer_placeholder') }}
                     </td>
@@ -39,7 +43,7 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                         {{ $sale->created_at->format('d/m/Y') }}
                     </td>
-                    <td class="px-6 py-4 text-right flex justify-end gap-2 text-nowrap">
+                    <td class="px-6 py-4 text-right flex justify-end gap-2 text-nowrap" @click.stop>
                         @if($sale->status === SaleStatus::Pending)
                             @can(\App\Enums\Permission::EditSale->value)
                                 <x-button
@@ -60,7 +64,7 @@
                             wire:click="showDetails({{ $sale->id }})"
                         />
                     </td>
-                </tr>
+                </x-table.row>
             @empty
                 <tr>
                     <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">

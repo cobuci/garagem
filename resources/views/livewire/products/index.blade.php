@@ -120,9 +120,14 @@
                     <th class="w-10 px-6 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-100 dark:border-gray-700 whitespace-nowrap"></th>
                 </tr>
                 </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700" x-data="{ selectedId: null }">
                 @forelse ($this->products as $product)
-                    <tr class="transition {{ $product->stock_quantity <= 0 ? 'bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30' : 'hover:bg-gray-50 dark:hover:bg-gray-700' }}">
+                    <x-table.row
+                        wire:key="product-{{ $product->id }}"
+                        @click="selectedId = {{ $product->id }}"
+                        x-bind:data-selected="selectedId === {{ $product->id }}"
+                        :variant="$product->stock_quantity <= 0 ? 'danger' : 'default'"
+                    >
                         <td class="px-6 py-4">
                             <div class="text-sm text-gray-900 dark:text-white">{{ $product->id }}</div>
                         </td>
@@ -154,7 +159,7 @@
                                     {{ $product->stock_quantity }}
                                 </span>
                         </td>
-                        <td class="px-6 py-4 text-right flex justify-end gap-2">
+                        <td class="px-6 py-4 text-right flex justify-end gap-2" @click.stop>
                             @can(\App\Enums\Permission::EditProduct->value)
                                 <x-button
                                     xs
@@ -174,7 +179,7 @@
                                 />
                             @endcan
                         </td>
-                    </tr>
+                    </x-table.row>
                 @empty
                     <tr>
                         <td colspan="8" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">

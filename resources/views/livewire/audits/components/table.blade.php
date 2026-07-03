@@ -13,9 +13,13 @@
                     <th class="px-6 py-3 border-b border-gray-100 dark:border-gray-700"></th>
                 </tr>
             </thead>
-            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700" x-data="{ selectedId: null }">
                 @forelse ($audits as $audit)
-                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+                    <x-table.row
+                        wire:key="audit-{{ $audit->id }}"
+                        @click="selectedId = {{ $audit->id }}"
+                        x-bind:data-selected="selectedId === {{ $audit->id }}"
+                    >
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                             <span title="{{ $audit->created_at->format('d/m/Y H:i:s') }}">
                                 {{ $audit->created_at->format('d/m/Y H:i') }}
@@ -45,7 +49,7 @@
                                 <span class="text-xs text-gray-400">—</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 text-right whitespace-nowrap">
+                        <td class="px-6 py-4 text-right whitespace-nowrap" @click.stop>
                             <x-button
                                 xs
                                 flat
@@ -54,7 +58,7 @@
                                 wire:click="showDetails({{ $audit->id }})"
                             />
                         </td>
-                    </tr>
+                    </x-table.row>
                 @empty
                     <tr>
                         <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
