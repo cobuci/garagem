@@ -92,19 +92,19 @@
                 @if($selectedSale)
                     <div class="flex flex-col sm:flex-row gap-4">
                         @if($selectedSale->invoice_status === 'generating')
-                            <x-button secondary outline spinner="downloadInvoice" icon="arrow-path" label="{{ __('sales.generating_invoice') }}" class="w-full sm:w-auto" />
+                            <x-button secondary outline spinner="downloadInvoicePng" icon="arrow-path" label="{{ __('sales.generating_invoice') }}" class="w-full sm:w-auto" />
                         @elseif($selectedSale->invoice_status === 'failed')
                             <x-button negative outline
                                       icon="exclamation-triangle"
                                       label="{{ __('sales.invoice_failed_retry') }}"
-                                      wire:click="downloadInvoice({{ $selectedSale->id }})"
+                                      wire:click="downloadInvoicePng({{ $selectedSale->id }})"
                                       class="w-full sm:w-auto" />
                         @else
                             <div class="relative inline-flex w-full sm:w-auto" x-data="{ open: false }">
                                 <x-button secondary outline
                                           icon="arrow-down-tray"
                                           label="{{ $selectedSale->invoice_status === 'ready' ? __('sales.download_invoice_ready') : __('sales.download_invoice') }}"
-                                          wire:click="downloadInvoice({{ $selectedSale->id }})"
+                                          wire:click="downloadInvoicePng({{ $selectedSale->id }})"
                                           class="w-full sm:w-auto rounded-r-none border-r-0" />
                                 <button
                                     @click="open = !open"

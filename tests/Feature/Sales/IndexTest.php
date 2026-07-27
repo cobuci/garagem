@@ -409,6 +409,19 @@ test('can download invoice png when it is ready', function () {
         ->assertFileDownloaded("{$sale->id}.png");
 });
 
+test('invoice download button defaults to png', function () {
+    $sale = Sale::factory()->create([
+        'invoice_status'   => 'ready',
+        'invoice_path'     => 'invoices/ready.pdf',
+        'invoice_png_path' => 'invoices/ready.png',
+    ]);
+
+    Livewire::actingAs($this->user)
+        ->test(Index::class)
+        ->call('showDetails', $sale->id)
+        ->assertSeeHtml('wire:click="downloadInvoicePng(' . $sale->id . ')"');
+});
+
 test('dispatches invoice job when png requested but invoice not yet generated', function () {
     Queue::fake();
     $sale = Sale::factory()->create();

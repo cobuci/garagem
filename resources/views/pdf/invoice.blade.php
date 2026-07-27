@@ -78,6 +78,14 @@
             padding: 16px;
             border-bottom: 1px solid #f3f4f6;
         }
+        .product-name {
+            font-weight: 500;
+        }
+        .product-meta {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
         .text-right {
             text-align: right;
         }
@@ -157,7 +165,14 @@
         <tbody>
             @foreach($sale->items as $item)
                 <tr>
-                    <td>{{ $item->product->name }}</td>
+                    <td>
+                        <div class="product-name">{{ $item->product->name }}</div>
+                        @if($item->product->brand || $item->product->weight)
+                            <div class="product-meta">
+                                {{ collect([$item->product->brand, $item->product->weight])->filter()->implode(' · ') }}
+                            </div>
+                        @endif
+                    </td>
                     <td class="text-center">{{ $item->quantity }}</td>
                     <td class="text-right">R$ {{ number_format($item->unit_price, 2, ',', '.') }}</td>
                     <td class="text-right" style="font-weight: 600;">R$ {{ number_format($item->subtotal, 2, ',', '.') }}</td>
