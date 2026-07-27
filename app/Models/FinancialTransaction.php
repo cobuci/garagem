@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Casts\MoneyCast;
 use App\Enums\TransactionType;
 use Carbon\Carbon;
 use Database\Factories\FinancialTransactionFactory;
@@ -39,7 +38,7 @@ class FinancialTransaction extends Model implements AuditableContract
     {
         return [
             'type'             => TransactionType::class,
-            'amount'           => MoneyCast::class,
+            'amount'           => 'integer',
             'transaction_date' => 'datetime',
         ];
     }
