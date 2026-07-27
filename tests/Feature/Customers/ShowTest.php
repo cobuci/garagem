@@ -3,8 +3,11 @@
 namespace Tests\Feature\Customers;
 
 use App\Enums\SaleStatus;
+use App\Enums\TransactionType;
 use App\Livewire\Customers\Show;
+use App\Models\AccountBalance;
 use App\Models\Customer;
+use App\Models\FinancialTransaction;
 use App\Models\Sale;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -277,14 +280,18 @@ it('cannot cancel an already cancelled sale from customer page', function () {
 
 it('can mark all pending sales as paid', function () {
     $customer = Customer::factory()->create();
-    $pendingSales = Sale::factory()->count(3)->create([
+    Sale::factory()->count(3)->create([
         'customer_id' => $customer->id,
         'status'      => SaleStatus::Pending,
+        'net_amount'  => 50.00,
     ]);
-    $paidSale = Sale::factory()->create([
+    Sale::factory()->create([
         'customer_id' => $customer->id,
         'status'      => SaleStatus::Paid,
+        'net_amount'  => 25.00,
     ]);
+
+    expect(AccountBalance::singleton()->current_balance)->toEqual(25.0);
 
     Livewire::test(Show::class, ['customer' => $customer])
         ->call('confirmMarkAllAsPaid')
@@ -294,7 +301,9 @@ it('can mark all pending sales as paid', function () {
         ->assertSet('showMarkAllAsPaidModal', false);
 
     expect($customer->sales()->where('status', SaleStatus::Pending)->count())->toBe(0)
-        ->and($customer->sales()->where('status', SaleStatus::Paid)->count())->toBe(4);
+        ->and($customer->sales()->where('status', SaleStatus::Paid)->count())->toBe(4)
+        ->and(AccountBalance::singleton()->current_balance)->toEqual(175.0)
+        ->and(FinancialTransaction::query()->where('type', TransactionType::Sale)->count())->toBe(4);
 });
 
 it('cannot mark all as paid without confirming checkbox', function () {
