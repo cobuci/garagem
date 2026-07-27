@@ -9,6 +9,7 @@ use App\Models\Customer;
 use App\Models\Sale;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
@@ -153,9 +154,13 @@ class Show extends Component
             return;
         }
 
-        $this->customer->sales()
-            ->where('status', SaleStatus::Pending)
-            ->update(['status' => SaleStatus::Paid]);
+        DB::transaction(function (): void {
+            $this->customer->sales()
+                ->where('status', SaleStatus::Pending)
+                ->lockForUpdate()
+                ->get()
+                ->each(fn (Sale $sale) => $sale->update(['status' => SaleStatus::Paid]));
+        });
 
         $this->showMarkAllAsPaidModal = false;
         $this->confirmedMarkAllAsPaid = false;
