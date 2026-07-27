@@ -89,11 +89,25 @@ it('marks changelog as seen and closes modal on dismiss', function () {
     Livewire::test(Modal::class)
         ->assertSet('isOpen', true)
         ->call('dismiss')
-        ->assertSet('isOpen', false);
+        ->assertSet('isOpen', false)
+        ->assertOk();
 
     expect(
         $this->user->seenChangelogs()->where('changelogs.id', $changelog->id)->exists(),
     )->toBeTrue();
+});
+
+it('renders overflow lock on the persistent wrapper so close can unlock scroll', function () {
+    $changelog = Changelog::factory()->create();
+    $changelog->items()->create(['title' => 'Feature A', 'description' => 'Desc A', 'sort_order' => 0]);
+
+    Livewire::test(Modal::class)
+        ->assertSet('isOpen', true)
+        ->assertSeeHtml('x-effect')
+        ->assertSeeHtml('overflow-hidden')
+        ->call('dismiss')
+        ->assertSet('isOpen', false)
+        ->assertSeeHtml('x-effect');
 });
 
 it('marks as seen when finishing the last step via next', function () {
