@@ -58,7 +58,9 @@ test('it can load top products for the last 30 days for authorized user', functi
         ->assertSet('period', 'last_30_days')
         ->assertSet('chartDataArray.labels', ['Product B', 'Product A'])
         ->assertSet('chartDataArray.quantity', [10, 5])
-        ->assertSet('chartDataArray.revenue', [500.0, 500.0]);
+        ->assertSet('chartDataArray.revenue', [500.0, 500.0])
+        ->assertSet('chartDataArray.cost', [250.0, 250.0])
+        ->assertSet('chartDataArray.profit', [250.0, 250.0]);
 });
 
 test('it filters top products by period for authorized user', function () {

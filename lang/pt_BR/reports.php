@@ -37,6 +37,8 @@ return [
     'sales_heatmap_overview'       => 'Volume de vendas por hora e dia da semana',
     'quantity'                     => 'Quantidade',
     'units'                        => 'unidades',
+    'cost'                         => 'Custo',
+    'total'                        => 'Total',
 
     'churn_risk' => [
         'title'          => 'Clientes em Risco de Churn',
