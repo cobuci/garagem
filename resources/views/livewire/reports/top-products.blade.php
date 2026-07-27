@@ -34,7 +34,28 @@
             labels: @entangle('chartDataArray.labels'),
             quantity: @entangle('chartDataArray.quantity'),
             revenue: @entangle('chartDataArray.revenue'),
+            cost: @entangle('chartDataArray.cost'),
+            profit: @entangle('chartDataArray.profit'),
             chart: null,
+            formatMoney(value) {
+                return 'R$ ' + (value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            },
+            tooltipValue(dataPointIndex, quantity) {
+                return '{{ __('reports.quantity') }}: ' + quantity + ' {{ __('reports.units') }}<br>' +
+                    '{{ __('reports.total') }}: ' + this.formatMoney(this.revenue[dataPointIndex]) + '<br>' +
+                    '{{ __('reports.cost') }}: ' + this.formatMoney(this.cost[dataPointIndex]) + '<br>' +
+                    '{{ __('reports.profit') }}: ' + this.formatMoney(this.profit[dataPointIndex]);
+            },
+            tooltipOptions() {
+                return {
+                    theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+                    marker: { show: false },
+                    y: {
+                        title: { formatter: () => '' },
+                        formatter: (val, { dataPointIndex }) => this.tooltipValue(dataPointIndex, val)
+                    }
+                };
+            },
             init() {
                 this.$nextTick(() => {
                     this.initChart();
@@ -42,6 +63,8 @@
 
                 this.$watch('quantity', () => this.updateChart());
                 this.$watch('revenue', () => this.updateChart());
+                this.$watch('cost', () => this.updateChart());
+                this.$watch('profit', () => this.updateChart());
                 this.$watch('labels', () => this.updateChart());
             },
             updateChart() {
@@ -52,14 +75,7 @@
                             name: '{{ __('reports.quantity') }}',
                             data: this.quantity
                         }],
-                        tooltip: {
-                            y: {
-                                formatter: (val, { seriesIndex, dataPointIndex, w }) => {
-                                    let rev = this.revenue[dataPointIndex] || 0;
-                                    return val + ' {{ __('reports.units') }} (R$ ' + rev.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ')';
-                                }
-                            }
-                        }
+                        tooltip: this.tooltipOptions()
                     });
                 }
             },
@@ -136,15 +152,7 @@
                             }
                         }
                     },
-                    tooltip: {
-                        theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
-                        y: {
-                            formatter: (val, { seriesIndex, dataPointIndex, w }) => {
-                                let rev = this.revenue[dataPointIndex];
-                                return val + ' {{ __('reports.units') }} (R$ ' + rev.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) + ')';
-                            }
-                        }
-                    },
+                    tooltip: this.tooltipOptions(),
                     legend: { show: false }
                 });
                 this.chart.render();

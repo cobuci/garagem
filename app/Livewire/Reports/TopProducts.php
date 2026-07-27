@@ -39,7 +39,9 @@ class TopProducts extends Component
             ->selectRaw('
                 products.name as product_name,
                 SUM(sale_items.quantity) as total_quantity,
-                SUM(sale_items.subtotal) as total_revenue
+                SUM(sale_items.subtotal) as total_revenue,
+                SUM(sale_items.unit_cost * sale_items.quantity) as total_cost,
+                SUM(sale_items.subtotal - (sale_items.unit_cost * sale_items.quantity)) as total_profit
             ')
             ->where('sales.created_at', '>=', $startDate)
             ->where('sales.created_at', '<=', $endDate)
@@ -53,6 +55,8 @@ class TopProducts extends Component
             'labels'   => $products->pluck('product_name')->toArray(),
             'quantity' => $products->pluck('total_quantity')->map(fn ($val) => (int) $val)->toArray(),
             'revenue'  => $products->pluck('total_revenue')->map(fn ($val) => round($val / 100, 2))->toArray(),
+            'cost'     => $products->pluck('total_cost')->map(fn ($val) => round($val / 100, 2))->toArray(),
+            'profit'   => $products->pluck('total_profit')->map(fn ($val) => round($val / 100, 2))->toArray(),
         ];
     }
 
