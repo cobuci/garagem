@@ -89,6 +89,13 @@ class Sidebar extends Component
                         'active'     => request()->routeIs('products.*'),
                         'permission' => PermissionEnum::ViewProduct->value,
                     ],
+                    [
+                        'label'      => __('sidebar.categories'),
+                        'icon'       => 'squares-2x2',
+                        'route'      => 'categories.index',
+                        'active'     => request()->routeIs('categories.*'),
+                        'permission' => PermissionEnum::ViewCategory->value,
+                    ],
                 ],
             ],
             [

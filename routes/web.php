@@ -2,6 +2,7 @@
 
 use App\Livewire\Admin\Index as AdminIndex;
 use App\Livewire\BillsPayable\Index as BillsPayableIndex;
+use App\Livewire\Categories\Index as CategoriesIndex;
 use App\Livewire\Changelog\History as ChangelogHistory;
 use App\Livewire\Customers\Index as CustomersIndex;
 use App\Livewire\Customers\Show as CustomersShow;
@@ -24,6 +25,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/customers', CustomersIndex::class)->name('customers.index');
     Route::get('/customers/{customer}', CustomersShow::class)->name('customers.show');
     Route::get('/products', ProductsIndex::class)->name('products.index');
+    Route::get('/categories', CategoriesIndex::class)->name('categories.index');
     Route::get('/sales', SalesIndex::class)->name('sales.index');
     Route::get('/sales/create', SalesCreate::class)->name('sales.create');
     Route::get('/orders', OrdersIndex::class)->name('orders.index');
