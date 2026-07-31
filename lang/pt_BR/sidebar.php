@@ -16,6 +16,7 @@ return [
     'reports'            => 'Relatórios',
     'inventory'          => 'Estoque',
     'products'           => 'Produtos',
+    'categories'         => 'Categorias',
     'bills_payable'      => 'Contas a Pagar',
     'recent_activities'  => 'Atividades Recentes',
     'settings'           => 'Configurações',

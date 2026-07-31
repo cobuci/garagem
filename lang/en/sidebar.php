@@ -16,6 +16,7 @@ return [
     'reports'            => 'Reports',
     'inventory'          => 'Inventory',
     'products'           => 'Products',
+    'categories'         => 'Categories',
     'bills_payable'      => 'Bills Payable',
     'recent_activities'  => 'Recent Activities',
     'settings'           => 'Settings',
