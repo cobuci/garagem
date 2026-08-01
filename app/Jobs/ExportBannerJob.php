@@ -35,6 +35,7 @@ class ExportBannerJob implements ShouldQueue
         $html = view('banners.render', [
             'banner'        => $this->banner,
             'backgroundSrc' => $this->backgroundSrc(),
+            'logoSrc'       => $this->logoSrc(),
         ])->render();
 
         Storage::makeDirectory("banners/{$this->banner->id}");
@@ -73,6 +74,17 @@ class ExportBannerJob implements ShouldQueue
         }
 
         return 'data:image/png;base64,' . base64_encode(Storage::get($this->banner->background_path));
+    }
+
+    private function logoSrc(): ?string
+    {
+        $path = public_path(Banner::LOGO_PATH);
+
+        if (! file_exists($path)) {
+            return null;
+        }
+
+        return 'data:image/png;base64,' . base64_encode(file_get_contents($path));
     }
 
     private function browsershot(string $html, int $width, int $height): Browsershot

@@ -12,31 +12,97 @@ return [
     ],
 
     'sections' => [
+        'presets'    => 'Start from a template',
+        'background' => 'AI Background',
+        'logo'       => 'Logo',
         'content'    => 'Content',
         'items'      => 'Items and Prices',
-        'background' => 'AI Background',
         'export'     => 'Export',
         'preview'    => 'Preview',
     ],
 
+    'hints' => [
+        'workflow'   => 'Pick a template, generate the background and adjust the texts.',
+        'presets'    => 'Apply a ready-made template, then customize freely.',
+        'background' => 'Pick a theme and, if you like, adjust mood and intensity.',
+    ],
+
+    'presets' => [
+        'barbecue' => 'Skewers',
+        'drinks'   => 'Cold drinks',
+        'snacks'   => 'Snacks',
+    ],
+
+    'themes' => [
+        'barbecue' => [
+            'label'       => 'Barbecue',
+            'description' => 'Embers, smoke and skewer vibes',
+        ],
+        'cold_drinks' => [
+            'label'       => 'Cold drinks',
+            'description' => 'Chilled bottles and blue tones',
+        ],
+        'snacks' => [
+            'label'       => 'Snacks',
+            'description' => 'Warm golden appetizer tones',
+        ],
+        'daily_promo' => [
+            'label'       => 'Daily promo',
+            'description' => 'Dark, clean and elegant backdrop',
+        ],
+        'happy_hour' => [
+            'label'       => 'Happy hour',
+            'description' => 'Bokeh lights and festive mood',
+        ],
+        'brand_minimal' => [
+            'label'       => 'Minimal',
+            'description' => 'Blue gradient with brand identity',
+        ],
+    ],
+
+    'moods' => [
+        'dark'  => 'Dark',
+        'light' => 'Light',
+        'night' => 'Night',
+    ],
+
+    'intensities' => [
+        'soft' => 'Soft',
+        'bold' => 'Bold',
+    ],
+
+    'logo_positions' => [
+        'top'    => 'Top',
+        'bottom' => 'Bottom',
+    ],
+
+    'logo_sizes' => [
+        'small'  => 'Small',
+        'medium' => 'Medium',
+        'large'  => 'Large',
+    ],
+
     'fields' => [
-        'name'                          => 'Name',
-        'name_placeholder'              => 'e.g. August Promo',
-        'format'                        => 'Format',
-        'created_by'                    => 'Created by',
-        'updated_at'                    => 'Updated',
-        'title'                         => 'Title',
-        'subtitle'                      => 'Subtitle',
-        'footer'                        => 'Footer',
-        'background_color'              => 'Background',
-        'accent_color'                  => 'Accent',
-        'text_color'                    => 'Text',
-        'item_name'                     => 'Item',
-        'item_note'                     => 'Note',
-        'item_price'                    => 'Price',
-        'background_prompt'             => 'Describe the desired background',
-        'background_prompt_placeholder' => 'e.g. dark garage workshop background, blue tones, modern style',
-        'resolution'                    => 'Resolution',
+        'name'             => 'Name',
+        'name_placeholder' => 'e.g. August Promo',
+        'format'           => 'Format',
+        'created_by'       => 'Created by',
+        'updated_at'       => 'Updated',
+        'title'            => 'Title',
+        'subtitle'         => 'Subtitle',
+        'footer'           => 'Footer',
+        'background_color' => 'Background',
+        'accent_color'     => 'Accent',
+        'text_color'       => 'Text',
+        'show_logo'        => 'Show logo on banner',
+        'logo_position'    => 'Logo position',
+        'logo_size'        => 'Logo size',
+        'mood'             => 'Mood',
+        'intensity'        => 'Intensity',
+        'item_name'        => 'Item',
+        'item_note'        => 'Note',
+        'item_price'       => 'Price',
+        'resolution'       => 'Resolution',
     ],
 
     'actions' => [
@@ -60,6 +126,7 @@ return [
         'deleted'               => 'Banner deleted.',
         'delete_title'          => 'Delete banner?',
         'delete_description'    => 'This action cannot be undone.',
+        'theme_required'        => 'Pick a theme to generate the background.',
         'background_generating' => 'Generating AI background, please wait...',
         'background_failed'     => 'Failed to generate background. Try again.',
         'export_generating'     => 'Exporting in high quality, please wait...',

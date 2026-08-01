@@ -2,7 +2,10 @@
 
 namespace App\Livewire\Banners;
 
+use App\Enums\BannerIntensity;
 use App\Enums\BannerJobStatus;
+use App\Enums\BannerMood;
+use App\Enums\BannerTheme;
 use App\Enums\Permission;
 use App\Jobs\ExportBannerJob;
 use App\Jobs\GenerateBannerBackgroundJob;
@@ -10,6 +13,7 @@ use App\Models\Banner;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Livewire\Component;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -24,7 +28,11 @@ class Studio extends Component
 
     public array $design = [];
 
-    public string $backgroundPrompt = '';
+    public ?string $backgroundTheme = null;
+
+    public ?string $backgroundMood = null;
+
+    public ?string $backgroundIntensity = null;
 
     public int $exportScale = 2;
 
@@ -33,8 +41,10 @@ class Studio extends Component
         $this->authorize(Permission::ViewBanner->value);
 
         $this->banner = $banner;
-        $this->design = $banner->design;
-        $this->backgroundPrompt = (string) $banner->background_prompt;
+        $this->design = array_merge(Banner::defaultDesign(), $banner->design);
+        $this->backgroundTheme = $banner->background_theme?->value;
+        $this->backgroundMood = $banner->background_mood?->value;
+        $this->backgroundIntensity = $banner->background_intensity?->value;
     }
 
     protected function rules(): array
@@ -46,6 +56,9 @@ class Studio extends Component
             'design.background_color' => ['required', 'string', 'max:9'],
             'design.accent_color'     => ['required', 'string', 'max:9'],
             'design.text_color'       => ['required', 'string', 'max:9'],
+            'design.show_logo'        => ['boolean'],
+            'design.logo_position'    => ['required', Rule::in(['top', 'bottom'])],
+            'design.logo_size'        => ['required', Rule::in(['small', 'medium', 'large'])],
             'design.items'            => ['array', 'max:14'],
             'design.items.*.name'     => ['nullable', 'string', 'max:60'],
             'design.items.*.note'     => ['nullable', 'string', 'max:30'],
@@ -66,6 +79,17 @@ class Studio extends Component
         );
     }
 
+    public function applyPreset(string $preset): void
+    {
+        $this->authorize(Permission::EditBanner->value);
+
+        $presets = Banner::presets();
+
+        abort_unless(array_key_exists($preset, $presets), 404);
+
+        $this->design = array_merge($this->design, $presets[$preset]);
+    }
+
     public function addItem(): void
     {
         $this->design['items'][] = ['name' => '', 'note' => '', 'price' => ''];
@@ -77,16 +101,27 @@ class Studio extends Component
         $this->design['items'] = array_values($this->design['items']);
     }
 
+    public function selectTheme(string $theme): void
+    {
+        $this->backgroundTheme = $theme;
+    }
+
     public function generateBackground(): void
     {
         $this->authorize(Permission::EditBanner->value);
 
-        $this->validate(['backgroundPrompt' => ['required', 'string', 'max:500']]);
+        $this->validate([
+            'backgroundTheme'     => ['required', Rule::enum(BannerTheme::class)],
+            'backgroundMood'      => ['nullable', Rule::enum(BannerMood::class)],
+            'backgroundIntensity' => ['nullable', Rule::enum(BannerIntensity::class)],
+        ]);
 
         $this->banner->update([
-            'design'            => $this->design,
-            'background_prompt' => $this->backgroundPrompt,
-            'background_status' => BannerJobStatus::Generating,
+            'design'               => $this->design,
+            'background_theme'     => $this->backgroundTheme,
+            'background_mood'      => $this->backgroundMood,
+            'background_intensity' => $this->backgroundIntensity,
+            'background_status'    => BannerJobStatus::Generating,
         ]);
 
         GenerateBannerBackgroundJob::dispatch($this->banner);

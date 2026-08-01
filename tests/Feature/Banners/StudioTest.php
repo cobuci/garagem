@@ -2,6 +2,8 @@
 
 use App\Enums\BannerFormat;
 use App\Enums\BannerJobStatus;
+use App\Enums\BannerMood;
+use App\Enums\BannerTheme;
 use App\Enums\Permission;
 use App\Jobs\ExportBannerJob;
 use App\Jobs\GenerateBannerBackgroundJob;
@@ -39,7 +41,9 @@ it('can render the studio page', function () {
     Livewire::test(Studio::class, ['banner' => $this->banner])
         ->assertSuccessful()
         ->assertSee('Banner Studio')
-        ->assertSee(__('banners.sections.preview'));
+        ->assertSee(__('banners.sections.preview'))
+        ->assertSee(__('banners.sections.presets'))
+        ->assertSee(__('banners.themes.barbecue.label'));
 });
 
 it('can save design changes', function () {
@@ -53,6 +57,28 @@ it('can save design changes', function () {
         ->and($this->banner->fresh()->design['subtitle'])->toBe('Só hoje');
 });
 
+it('can save logo preferences', function () {
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->set('design.show_logo', false)
+        ->set('design.logo_position', 'bottom')
+        ->set('design.logo_size', 'large')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $design = $this->banner->fresh()->design;
+
+    expect($design['show_logo'])->toBeFalse()
+        ->and($design['logo_position'])->toBe('bottom')
+        ->and($design['logo_size'])->toBe('large');
+});
+
+it('applies a campaign preset', function () {
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->call('applyPreset', 'barbecue')
+        ->assertSet('design.title', 'ESPETINHOS')
+        ->assertCount('design.items', 5);
+});
+
 it('can add and remove items', function () {
     Livewire::test(Studio::class, ['banner' => $this->banner])
         ->call('addItem')
@@ -61,11 +87,12 @@ it('can add and remove items', function () {
         ->assertCount('design.items', 1);
 });
 
-it('dispatches background generation job', function () {
+it('dispatches background generation job with theme', function () {
     Queue::fake();
 
     Livewire::test(Studio::class, ['banner' => $this->banner])
-        ->set('backgroundPrompt', 'fundo azul moderno de oficina')
+        ->call('selectTheme', BannerTheme::Barbecue->value)
+        ->set('backgroundMood', BannerMood::Night->value)
         ->call('generateBackground')
         ->assertHasNoErrors();
 
@@ -73,16 +100,16 @@ it('dispatches background generation job', function () {
 
     expect($this->banner->fresh())
         ->background_status->toBe(BannerJobStatus::Generating)
-        ->background_prompt->toBe('fundo azul moderno de oficina');
+        ->background_theme->toBe(BannerTheme::Barbecue)
+        ->background_mood->toBe(BannerMood::Night);
 });
 
-it('requires a prompt to generate background', function () {
+it('requires a theme to generate background', function () {
     Queue::fake();
 
     Livewire::test(Studio::class, ['banner' => $this->banner])
-        ->set('backgroundPrompt', '')
         ->call('generateBackground')
-        ->assertHasErrors(['backgroundPrompt' => 'required']);
+        ->assertHasErrors(['backgroundTheme' => 'required']);
 
     Queue::assertNothingPushed();
 });

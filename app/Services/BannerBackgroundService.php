@@ -11,7 +11,11 @@ class BannerBackgroundService
 {
     public function generate(Banner $banner): string
     {
-        $image = Image::of($this->prompt($banner))
+        $prompt = $this->prompt($banner);
+
+        $banner->update(['background_prompt' => $prompt]);
+
+        $image = Image::of($prompt)
             ->size($banner->format->aiSize())
             ->quality('low')
             ->timeout(120)
@@ -32,11 +36,13 @@ class BannerBackgroundService
 
     private function prompt(Banner $banner): string
     {
-        return implode(' ', [
-            'Crie uma imagem de fundo para um banner promocional.',
+        return collect([
+            'Crie uma imagem de fundo para um banner promocional de uma loja de conveniência.',
+            $banner->background_theme?->prompt(),
+            $banner->background_mood?->prompt(),
+            $banner->background_intensity?->prompt(),
             'A imagem deve ser apenas um fundo decorativo, sem nenhum texto, letra, número ou logotipo.',
             'Deixe a área central mais limpa e com bom contraste para receber texto por cima.',
-            'Estilo desejado: ' . $banner->background_prompt,
-        ]);
+        ])->filter()->implode(' ');
     }
 }

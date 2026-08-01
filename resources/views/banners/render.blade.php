@@ -15,6 +15,7 @@
         'format'        => $banner->format,
         'design'        => $banner->design,
         'backgroundSrc' => $backgroundSrc,
+        'logoSrc'       => $logoSrc,
     ])
 </body>
 </html>

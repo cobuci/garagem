@@ -1,5 +1,9 @@
+@use(App\Enums\BannerIntensity)
 @use(App\Enums\BannerJobStatus)
+@use(App\Enums\BannerMood)
+@use(App\Enums\BannerTheme)
 @use(App\Enums\Permission)
+@use(App\Models\Banner)
 
 @php
     $isWorking = $banner->background_status === BannerJobStatus::Generating
@@ -17,7 +21,7 @@
         <div>
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $banner->name }}</h1>
             <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ $banner->format->label() }}
+                {{ $banner->format->label() }} — {{ __('banners.hints.workflow') }}
             </p>
         </div>
         <div class="flex items-center gap-2">
@@ -31,6 +35,124 @@
 
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
         <div class="space-y-6">
+            <x-card :title="__('banners.sections.presets')">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">{{ __('banners.hints.presets') }}</p>
+                <div class="flex flex-wrap gap-2">
+                    @foreach (array_keys(Banner::presets()) as $presetKey)
+                        <x-button
+                            flat
+                            primary
+                            :label="__('banners.presets.' . $presetKey)"
+                            wire:click="applyPreset('{{ $presetKey }}')"
+                        />
+                    @endforeach
+                </div>
+            </x-card>
+
+            <x-card :title="__('banners.sections.background')">
+                <div class="space-y-4">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('banners.hints.background') }}</p>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        @foreach (BannerTheme::cases() as $theme)
+                            <button
+                                type="button"
+                                wire:click="selectTheme('{{ $theme->value }}')"
+                                class="rounded-lg border p-3 text-left transition
+                                    {{ $backgroundTheme === $theme->value
+                                        ? 'border-primary-500 ring-2 ring-primary-500/40 bg-primary-50 dark:bg-primary-900/20'
+                                        : 'border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700' }}"
+                            >
+                                <span class="block text-sm font-semibold text-gray-900 dark:text-white">{{ $theme->label() }}</span>
+                                <span class="block mt-1 text-xs text-gray-500 dark:text-gray-400">{{ $theme->description() }}</span>
+                            </button>
+                        @endforeach
+                    </div>
+                    @error('backgroundTheme')
+                        <p class="text-sm text-red-600 dark:text-red-400">{{ __('banners.messages.theme_required') }}</p>
+                    @enderror
+
+                    <div>
+                        <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('banners.fields.mood') }}</span>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach (BannerMood::cases() as $mood)
+                                <button
+                                    type="button"
+                                    wire:click="$set('backgroundMood', {{ $backgroundMood === $mood->value ? 'null' : "'{$mood->value}'" }})"
+                                    class="rounded-full px-4 py-1.5 text-sm font-medium border transition
+                                        {{ $backgroundMood === $mood->value
+                                            ? 'border-primary-500 bg-primary-500 text-white'
+                                            : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-primary-400' }}"
+                                >
+                                    {{ $mood->label() }}
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('banners.fields.intensity') }}</span>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach (BannerIntensity::cases() as $intensity)
+                                <button
+                                    type="button"
+                                    wire:click="$set('backgroundIntensity', {{ $backgroundIntensity === $intensity->value ? 'null' : "'{$intensity->value}'" }})"
+                                    class="rounded-full px-4 py-1.5 text-sm font-medium border transition
+                                        {{ $backgroundIntensity === $intensity->value
+                                            ? 'border-primary-500 bg-primary-500 text-white'
+                                            : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-primary-400' }}"
+                                >
+                                    {{ $intensity->label() }}
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <x-button
+                            primary
+                            icon="sparkles"
+                            :label="__('banners.actions.generate_background')"
+                            wire:click="generateBackground"
+                            :disabled="$banner->background_status === BannerJobStatus::Generating"
+                        />
+
+                        @if ($banner->background_path)
+                            <x-button flat negative :label="__('banners.actions.remove_background')" wire:click="removeBackground" />
+                        @endif
+                    </div>
+
+                    @if ($banner->background_status === BannerJobStatus::Generating)
+                        <p class="text-sm text-primary-600 dark:text-primary-400 animate-pulse">{{ __('banners.messages.background_generating') }}</p>
+                    @endif
+
+                    @if ($banner->background_status === BannerJobStatus::Failed)
+                        <p class="text-sm text-red-600 dark:text-red-400">{{ __('banners.messages.background_failed') }}</p>
+                    @endif
+                </div>
+            </x-card>
+
+            <x-card :title="__('banners.sections.logo')">
+                <div class="space-y-4">
+                    <x-toggle wire:model.live="design.show_logo" :label="__('banners.fields.show_logo')" />
+
+                    @if ($design['show_logo'])
+                        <div class="grid grid-cols-2 gap-4">
+                            <x-native-select wire:model.live="design.logo_position" :label="__('banners.fields.logo_position')">
+                                <option value="top">{{ __('banners.logo_positions.top') }}</option>
+                                <option value="bottom">{{ __('banners.logo_positions.bottom') }}</option>
+                            </x-native-select>
+
+                            <x-native-select wire:model.live="design.logo_size" :label="__('banners.fields.logo_size')">
+                                <option value="small">{{ __('banners.logo_sizes.small') }}</option>
+                                <option value="medium">{{ __('banners.logo_sizes.medium') }}</option>
+                                <option value="large">{{ __('banners.logo_sizes.large') }}</option>
+                            </x-native-select>
+                        </div>
+                    @endif
+                </div>
+            </x-card>
+
             <x-card :title="__('banners.sections.content')">
                 <div class="space-y-4">
                     <x-input wire:model.live.debounce.400ms="design.title" :label="__('banners.fields.title')" />
@@ -72,39 +194,6 @@
                     @endforeach
 
                     <x-button flat primary icon="plus" :label="__('banners.actions.add_item')" wire:click="addItem" />
-                </div>
-            </x-card>
-
-            <x-card :title="__('banners.sections.background')">
-                <div class="space-y-4">
-                    <x-textarea
-                        wire:model="backgroundPrompt"
-                        :label="__('banners.fields.background_prompt')"
-                        :placeholder="__('banners.fields.background_prompt_placeholder')"
-                        rows="3"
-                    />
-
-                    <div class="flex items-center gap-2">
-                        <x-button
-                            primary
-                            icon="sparkles"
-                            :label="__('banners.actions.generate_background')"
-                            wire:click="generateBackground"
-                            :disabled="$banner->background_status === BannerJobStatus::Generating"
-                        />
-
-                        @if ($banner->background_path)
-                            <x-button flat negative :label="__('banners.actions.remove_background')" wire:click="removeBackground" />
-                        @endif
-                    </div>
-
-                    @if ($banner->background_status === BannerJobStatus::Generating)
-                        <p class="text-sm text-primary-600 dark:text-primary-400 animate-pulse">{{ __('banners.messages.background_generating') }}</p>
-                    @endif
-
-                    @if ($banner->background_status === BannerJobStatus::Failed)
-                        <p class="text-sm text-red-600 dark:text-red-400">{{ __('banners.messages.background_failed') }}</p>
-                    @endif
                 </div>
             </x-card>
 
@@ -156,6 +245,7 @@
                             'format'        => $banner->format,
                             'design'        => $design,
                             'backgroundSrc' => $backgroundSrc,
+                            'logoSrc'       => asset(Banner::LOGO_PATH),
                         ])
                     </div>
                 </div>

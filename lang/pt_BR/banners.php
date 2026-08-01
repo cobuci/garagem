@@ -12,31 +12,97 @@ return [
     ],
 
     'sections' => [
+        'presets'    => 'Comece com um modelo',
+        'background' => 'Fundo com IA',
+        'logo'       => 'Logo',
         'content'    => 'Conteúdo',
         'items'      => 'Itens e Preços',
-        'background' => 'Fundo com IA',
         'export'     => 'Exportar',
         'preview'    => 'Pré-visualização',
     ],
 
+    'hints' => [
+        'workflow'   => 'Escolha um modelo, gere o fundo e ajuste os textos.',
+        'presets'    => 'Aplique um modelo pronto e depois personalize à vontade.',
+        'background' => 'Escolha um tema e, se quiser, ajuste o clima e a intensidade.',
+    ],
+
+    'presets' => [
+        'barbecue' => 'Espetinhos',
+        'drinks'   => 'Bebidas geladas',
+        'snacks'   => 'Petiscos',
+    ],
+
+    'themes' => [
+        'barbecue' => [
+            'label'       => 'Churrasco',
+            'description' => 'Brasas, fumaça e clima de espetinho',
+        ],
+        'cold_drinks' => [
+            'label'       => 'Bebidas geladas',
+            'description' => 'Garrafas geladas e tons azuis',
+        ],
+        'snacks' => [
+            'label'       => 'Petiscos',
+            'description' => 'Porções em tons quentes e dourados',
+        ],
+        'daily_promo' => [
+            'label'       => 'Promo do dia',
+            'description' => 'Fundo escuro, limpo e elegante',
+        ],
+        'happy_hour' => [
+            'label'       => 'Happy hour',
+            'description' => 'Luzes desfocadas e clima festivo',
+        ],
+        'brand_minimal' => [
+            'label'       => 'Minimalista',
+            'description' => 'Gradiente azul com a cara da marca',
+        ],
+    ],
+
+    'moods' => [
+        'dark'  => 'Escuro',
+        'light' => 'Claro',
+        'night' => 'Noturno',
+    ],
+
+    'intensities' => [
+        'soft' => 'Suave',
+        'bold' => 'Marcante',
+    ],
+
+    'logo_positions' => [
+        'top'    => 'Topo',
+        'bottom' => 'Rodapé',
+    ],
+
+    'logo_sizes' => [
+        'small'  => 'Pequeno',
+        'medium' => 'Médio',
+        'large'  => 'Grande',
+    ],
+
     'fields' => [
-        'name'                          => 'Nome',
-        'name_placeholder'              => 'Ex: Promoção de Agosto',
-        'format'                        => 'Formato',
-        'created_by'                    => 'Criado por',
-        'updated_at'                    => 'Atualizado',
-        'title'                         => 'Título',
-        'subtitle'                      => 'Subtítulo',
-        'footer'                        => 'Rodapé',
-        'background_color'              => 'Fundo',
-        'accent_color'                  => 'Destaque',
-        'text_color'                    => 'Texto',
-        'item_name'                     => 'Item',
-        'item_note'                     => 'Nota',
-        'item_price'                    => 'Preço',
-        'background_prompt'             => 'Descreva o fundo desejado',
-        'background_prompt_placeholder' => 'Ex: fundo escuro com detalhes de oficina mecânica, tons de azul, estilo moderno',
-        'resolution'                    => 'Resolução',
+        'name'             => 'Nome',
+        'name_placeholder' => 'Ex: Promoção de Agosto',
+        'format'           => 'Formato',
+        'created_by'       => 'Criado por',
+        'updated_at'       => 'Atualizado',
+        'title'            => 'Título',
+        'subtitle'         => 'Subtítulo',
+        'footer'           => 'Rodapé',
+        'background_color' => 'Fundo',
+        'accent_color'     => 'Destaque',
+        'text_color'       => 'Texto',
+        'show_logo'        => 'Mostrar logo no banner',
+        'logo_position'    => 'Posição do logo',
+        'logo_size'        => 'Tamanho do logo',
+        'mood'             => 'Clima',
+        'intensity'        => 'Intensidade',
+        'item_name'        => 'Item',
+        'item_note'        => 'Nota',
+        'item_price'       => 'Preço',
+        'resolution'       => 'Resolução',
     ],
 
     'actions' => [
@@ -60,6 +126,7 @@ return [
         'deleted'               => 'Banner excluído.',
         'delete_title'          => 'Excluir banner?',
         'delete_description'    => 'Essa ação não pode ser desfeita.',
+        'theme_required'        => 'Escolha um tema para gerar o fundo.',
         'background_generating' => 'Gerando fundo com IA, aguarde...',
         'background_failed'     => 'Falha ao gerar o fundo. Tente novamente.',
         'export_generating'     => 'Exportando em alta qualidade, aguarde...',
