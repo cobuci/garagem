@@ -68,6 +68,7 @@ class Banner extends Model
             'items'            => [
                 ['name' => 'Produto', 'note' => '', 'price' => 'R$ 0,00'],
             ],
+            'texts' => [],
         ];
     }
 

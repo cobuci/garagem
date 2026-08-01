@@ -86,4 +86,35 @@
             >{{ $design['footer'] }}</div>
         @endif
     </div>
+
+    @foreach ($design['texts'] ?? [] as $index => $text)
+        <div
+            @if ($editable)
+                wire:key="canvas-text-{{ $index }}"
+                x-data
+                x-on:pointerdown.prevent="
+                    const el = $el;
+                    const canvas = el.offsetParent.getBoundingClientRect();
+                    const rect = el.getBoundingClientRect();
+                    const offsetX = $event.clientX - rect.left;
+                    const offsetY = $event.clientY - rect.top;
+                    const move = (e) => {
+                        const x = Math.min(100, Math.max(0, (e.clientX - offsetX - canvas.left) * 100 / canvas.width));
+                        const y = Math.min(100, Math.max(0, (e.clientY - offsetY - canvas.top) * 100 / canvas.height));
+                        el.style.left = Math.round(x * 10) / 10 + '%';
+                        el.style.top = Math.round(y * 10) / 10 + '%';
+                    };
+                    const stop = () => {
+                        window.removeEventListener('pointermove', move);
+                        window.removeEventListener('pointerup', stop);
+                        $wire.set('design.texts.{{ $index }}.x', parseFloat(el.style.left), false);
+                        $wire.set('design.texts.{{ $index }}.y', parseFloat(el.style.top));
+                    };
+                    window.addEventListener('pointermove', move);
+                    window.addEventListener('pointerup', stop);
+                "
+            @endif
+            style="position: absolute; left: {{ $text['x'] }}%; top: {{ $text['y'] }}%; font-family: {{ App\Enums\BannerFont::fromDesign($text, 'font')->family() }}; font-size: {{ $text['size'] }}px; font-weight: 700; color: {{ $text['color'] }}; white-space: nowrap; line-height: 1.2;{{ $editable ? ' cursor: move; touch-action: none; user-select: none;' : '' }}"
+        >{{ $text['content'] }}</div>
+    @endforeach
 </div>

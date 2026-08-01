@@ -114,6 +114,48 @@ it('rejects an unknown font', function () {
         ->assertHasErrors(['design.title_font']);
 });
 
+it('can add a custom text with color, font and free position', function () {
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->assertSee(__('banners.sections.texts'))
+        ->call('addText')
+        ->assertCount('design.texts', 1)
+        ->set('design.texts.0.content', 'Válido até domingo')
+        ->set('design.texts.0.color', '#ff0000')
+        ->set('design.texts.0.font', BannerFont::BebasNeue->value)
+        ->set('design.texts.0.x', 12.5)
+        ->set('design.texts.0.y', 80)
+        ->assertSee('Válido até domingo')
+        ->assertSee("font-family: 'Bebas Neue', sans-serif")
+        ->assertSee('left: 12.5%')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $text = $this->banner->fresh()->design['texts'][0];
+
+    expect($text['content'])->toBe('Válido até domingo')
+        ->and($text['color'])->toBe('#ff0000')
+        ->and($text['font'])->toBe('bebas_neue')
+        ->and($text['x'])->toBe(12.5)
+        ->and($text['y'])->toBe(80);
+});
+
+it('can remove a custom text', function () {
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->call('addText')
+        ->call('addText')
+        ->assertCount('design.texts', 2)
+        ->call('removeText', 0)
+        ->assertCount('design.texts', 1);
+});
+
+it('keeps custom texts inside the canvas bounds', function () {
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->call('addText')
+        ->set('design.texts.0.x', 150)
+        ->call('save')
+        ->assertHasErrors(['design.texts.0.x']);
+});
+
 it('can save logo preferences', function () {
     Livewire::test(Studio::class, ['banner' => $this->banner])
         ->set('design.show_logo', false)

@@ -59,4 +59,21 @@ enum BannerFont: string
     {
         return self::tryFrom($design[$key] ?? '') ?? self::InstrumentSans;
     }
+
+    /**
+     * @return array<int, self>
+     */
+    public static function usedIn(array $design): array
+    {
+        $fonts = [
+            self::fromDesign($design, 'title_font'),
+            self::fromDesign($design, 'text_font'),
+        ];
+
+        foreach ($design['texts'] ?? [] as $text) {
+            $fonts[] = self::fromDesign($text, 'font');
+        }
+
+        return $fonts;
+    }
 }

@@ -69,6 +69,13 @@ class Studio extends Component
             'design.items.*.name'     => ['nullable', 'string', 'max:60'],
             'design.items.*.note'     => ['nullable', 'string', 'max:30'],
             'design.items.*.price'    => ['nullable', 'string', 'max:20'],
+            'design.texts'            => ['array', 'max:10'],
+            'design.texts.*.content'  => ['required', 'string', 'max:120'],
+            'design.texts.*.color'    => ['required', 'string', 'max:9'],
+            'design.texts.*.font'     => ['required', Rule::enum(BannerFont::class)],
+            'design.texts.*.size'     => ['required', 'integer', 'between:12,200'],
+            'design.texts.*.x'        => ['required', 'numeric', 'between:0,100'],
+            'design.texts.*.y'        => ['required', 'numeric', 'between:0,100'],
         ];
     }
 
@@ -116,6 +123,24 @@ class Studio extends Component
     {
         unset($this->design['items'][$index]);
         $this->design['items'] = array_values($this->design['items']);
+    }
+
+    public function addText(): void
+    {
+        $this->design['texts'][] = [
+            'content' => 'Seu texto',
+            'color'   => $this->design['accent_color'],
+            'font'    => BannerFont::InstrumentSans->value,
+            'size'    => 40,
+            'x'       => 50,
+            'y'       => 50,
+        ];
+    }
+
+    public function removeText(int $index): void
+    {
+        unset($this->design['texts'][$index]);
+        $this->design['texts'] = array_values($this->design['texts']);
     }
 
     public function sortItems(int|string $index, int $position): void

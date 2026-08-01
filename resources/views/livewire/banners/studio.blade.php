@@ -366,6 +366,35 @@
                 </div>
             </x-banner.section>
 
+            <x-banner.section name="texts" :title="__('banners.sections.texts')" :hint="__('banners.hints.texts')">
+                <div class="space-y-3">
+                    @foreach ($design['texts'] ?? [] as $index => $text)
+                        <div class="space-y-3 rounded-lg border border-gray-200 dark:border-gray-700 p-3" wire:key="text-{{ $index }}">
+                            <div class="flex items-end gap-2">
+                                <div class="flex-1 min-w-0">
+                                    <x-input wire:model.live.debounce.400ms="design.texts.{{ $index }}.content" :label="__('banners.fields.text_content')" />
+                                </div>
+                                <x-button flat negative icon="trash" wire:click="removeText({{ $index }})" />
+                            </div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <x-native-select wire:model.live="design.texts.{{ $index }}.font" :label="__('banners.fields.font')">
+                                    @foreach (BannerFont::cases() as $font)
+                                        <option value="{{ $font->value }}" style="font-family: {{ $font->family() }}">{{ $font->label() }}</option>
+                                    @endforeach
+                                </x-native-select>
+                                <x-input type="number" min="12" max="200" wire:model.live.debounce.400ms="design.texts.{{ $index }}.size" :label="__('banners.fields.size')" />
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('banners.fields.color') }}</label>
+                                    <input type="color" wire:model.live="design.texts.{{ $index }}.color" class="h-10 w-full cursor-pointer rounded-lg border border-gray-300 dark:border-gray-600 bg-transparent">
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+
+                    <x-button flat primary icon="plus" :label="__('banners.actions.add_text')" wire:click="addText" />
+                </div>
+            </x-banner.section>
+
             <x-banner.section name="export" :title="__('banners.sections.export')">
                 <div class="space-y-4">
                     <div class="flex items-end gap-2">
