@@ -6,6 +6,8 @@ return [
     'customers_category' => 'Customers',
     'inventory'          => 'Inventory',
     'finance'            => 'Finance',
+    'marketing'          => 'Marketing',
+    'banners'            => 'Banners',
     'reports_category'   => 'Reports',
     'sales'              => 'Sales',
     'dashboard'          => 'Dashboard',
