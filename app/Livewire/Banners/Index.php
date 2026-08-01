@@ -25,6 +25,12 @@ class Index extends Component
 
     public bool $showDrawer = false;
 
+    public bool $showDeleteModal = false;
+
+    public ?int $deletingBannerId = null;
+
+    public string $deletingBannerName = '';
+
     public string $name = '';
 
     public string $format = BannerFormat::Stories->value;
@@ -71,14 +77,29 @@ class Index extends Component
         $this->redirectRoute('banners.studio', $banner, navigate: true);
     }
 
-    public function delete(int $bannerId): void
+    public function confirmDelete(int $bannerId): void
     {
         $this->authorize(Permission::DeleteBanner->value);
 
         $banner = Banner::query()->findOrFail($bannerId);
 
+        $this->deletingBannerId = $banner->id;
+        $this->deletingBannerName = $banner->name;
+        $this->showDeleteModal = true;
+    }
+
+    public function delete(): void
+    {
+        $this->authorize(Permission::DeleteBanner->value);
+
+        $banner = Banner::query()->findOrFail($this->deletingBannerId);
+
         Storage::deleteDirectory("banners/{$banner->id}");
         $banner->delete();
+
+        $this->showDeleteModal = false;
+        $this->deletingBannerId = null;
+        $this->deletingBannerName = '';
 
         $this->notification()->success(
             title: __('banners.messages.success'),
