@@ -21,6 +21,16 @@
 
         <title>{{ $title ?? config('app.name') }}</title>
 
+        @php
+            $favicon = \App\Models\Banner::logoUrl();
+        @endphp
+        @if ($favicon)
+            <link rel="icon" href="{{ $favicon }}" type="image/png">
+            <link rel="apple-touch-icon" href="{{ $favicon }}">
+        @else
+            <link rel="icon" href="/favicon.ico" sizes="any">
+        @endif
+
         <script>
             function applyDarkMode() {
                 if (localStorage.getItem('darkMode') === 'true' ||
