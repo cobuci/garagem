@@ -1,3 +1,4 @@
+@use(App\Enums\BannerFont)
 @use(App\Enums\BannerIntensity)
 @use(App\Enums\BannerJobStatus)
 @use(App\Enums\BannerMood)
@@ -30,6 +31,7 @@
         window.addEventListener('beforeunload', warn)
     "
 >
+    <link href="{{ BannerFont::stylesheetUrl(...BannerFont::cases()) }}" rel="stylesheet">
     <style>
         .banner-editable { transition: outline-color 0.15s; outline: 2px dashed transparent; outline-offset: 6px; }
         .banner-editable:hover { outline-color: rgba(56, 182, 248, 0.7); cursor: text; }
@@ -291,6 +293,20 @@
                     <x-input wire:model.live.debounce.400ms="design.title" :label="__('banners.fields.title')" />
                     <x-input wire:model.live.debounce.400ms="design.subtitle" :label="__('banners.fields.subtitle')" />
                     <x-input wire:model.live.debounce.400ms="design.footer" :label="__('banners.fields.footer')" />
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <x-native-select wire:model.live="design.title_font" :label="__('banners.fields.title_font')">
+                            @foreach (BannerFont::cases() as $font)
+                                <option value="{{ $font->value }}" style="font-family: {{ $font->family() }}">{{ $font->label() }}</option>
+                            @endforeach
+                        </x-native-select>
+
+                        <x-native-select wire:model.live="design.text_font" :label="__('banners.fields.text_font')">
+                            @foreach (BannerFont::cases() as $font)
+                                <option value="{{ $font->value }}" style="font-family: {{ $font->family() }}">{{ $font->label() }}</option>
+                            @endforeach
+                        </x-native-select>
+                    </div>
 
                     <div>
                         <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('banners.fields.brand_colors') }}</span>

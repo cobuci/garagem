@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Banners;
 
+use App\Enums\BannerFont;
 use App\Enums\BannerIntensity;
 use App\Enums\BannerJobStatus;
 use App\Enums\BannerMood;
@@ -55,6 +56,8 @@ class Studio extends Component
             'design.title'            => ['required', 'string', 'max:80'],
             'design.subtitle'         => ['nullable', 'string', 'max:120'],
             'design.footer'           => ['nullable', 'string', 'max:120'],
+            'design.title_font'       => ['required', Rule::enum(BannerFont::class)],
+            'design.text_font'        => ['required', Rule::enum(BannerFont::class)],
             'design.background_color' => ['required', 'string', 'max:9'],
             'design.accent_color'     => ['required', 'string', 'max:9'],
             'design.text_color'       => ['required', 'string', 'max:9'],

@@ -144,6 +144,8 @@ return [
         'title'            => 'Título',
         'subtitle'         => 'Subtítulo',
         'footer'           => 'Rodapé',
+        'title_font'       => 'Fonte do título',
+        'text_font'        => 'Fonte do texto',
         'background_color' => 'Fundo',
         'accent_color'     => 'Destaque',
         'text_color'       => 'Texto',

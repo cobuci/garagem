@@ -144,6 +144,8 @@ return [
         'title'            => 'Title',
         'subtitle'         => 'Subtitle',
         'footer'           => 'Footer',
+        'title_font'       => 'Title font',
+        'text_font'        => 'Text font',
         'background_color' => 'Background',
         'accent_color'     => 'Accent',
         'text_color'       => 'Text',

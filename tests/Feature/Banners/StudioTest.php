@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\BannerFont;
 use App\Enums\BannerFormat;
 use App\Enums\BannerJobStatus;
 use App\Enums\BannerMood;
@@ -87,6 +88,30 @@ it('can save design changes', function () {
 
     expect($this->banner->fresh()->design['title'])->toBe('OFERTAS')
         ->and($this->banner->fresh()->design['subtitle'])->toBe('Só hoje');
+});
+
+it('can use different fonts for the title and the text', function () {
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->assertSee(__('banners.fields.title_font'))
+        ->assertSee(__('banners.fields.text_font'))
+        ->set('design.title_font', BannerFont::Anton->value)
+        ->set('design.text_font', BannerFont::Oswald->value)
+        ->assertSee("font-family: 'Anton', sans-serif")
+        ->assertSee("font-family: 'Oswald', sans-serif")
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $design = $this->banner->fresh()->design;
+
+    expect($design['title_font'])->toBe('anton')
+        ->and($design['text_font'])->toBe('oswald');
+});
+
+it('rejects an unknown font', function () {
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->set('design.title_font', 'comic_sans')
+        ->call('save')
+        ->assertHasErrors(['design.title_font']);
 });
 
 it('can save logo preferences', function () {

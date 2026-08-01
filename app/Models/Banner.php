@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\BannerFont;
 use App\Enums\BannerFormat;
 use App\Enums\BannerIntensity;
 use App\Enums\BannerJobStatus;
@@ -55,6 +56,8 @@ class Banner extends Model
             'title'            => 'PROMOÇÕES',
             'subtitle'         => 'Confira nossos preços',
             'footer'           => '',
+            'title_font'       => BannerFont::InstrumentSans->value,
+            'text_font'        => BannerFont::InstrumentSans->value,
             'background_color' => '#0f172a',
             'accent_color'     => '#38bdf8',
             'text_color'       => '#ffffff',

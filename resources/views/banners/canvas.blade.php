@@ -2,6 +2,8 @@
     $editable = $editable ?? false;
     $width = $format->width();
     $height = $format->height();
+    $titleFont = App\Enums\BannerFont::fromDesign($design, 'title_font');
+    $textFont = App\Enums\BannerFont::fromDesign($design, 'text_font');
     $items = collect($design['items'] ?? []);
     $items = $editable ? $items : $items->filter(fn ($item) => filled($item['name'] ?? null));
     $showLogo = ($design['show_logo'] ?? false) && filled($logoSrc ?? null);
@@ -18,7 +20,7 @@
     };
     $editableAttrs = 'contenteditable="true" spellcheck="false" class="banner-editable"';
 @endphp
-<div style="position: relative; width: {{ $width }}px; height: {{ $height }}px; background-color: {{ $design['background_color'] }}; overflow: hidden; font-family: 'Instrument Sans', ui-sans-serif, sans-serif; color: {{ $design['text_color'] }};">
+<div style="position: relative; width: {{ $width }}px; height: {{ $height }}px; background-color: {{ $design['background_color'] }}; overflow: hidden; font-family: {{ $textFont->family() }}; color: {{ $design['text_color'] }};">
     @if ($backgroundSrc)
         <img src="{{ $backgroundSrc }}" alt="" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
     @endif
@@ -33,12 +35,12 @@
         <div style="text-align: center;">
             <div
                 @if ($editable) {!! $editableAttrs !!} x-on:keydown.enter.prevent="$event.target.blur()" x-on:blur="$wire.set('design.title', $event.target.innerText.trim())" @endif
-                style="font-size: 76px; font-weight: 800; letter-spacing: 2px; line-height: 1.1;"
+                style="font-family: {{ $titleFont->family() }}; font-size: 76px; font-weight: 800; letter-spacing: 2px; line-height: 1.1;"
             >{{ $design['title'] }}</div>
             @if ($editable || filled($design['subtitle']))
                 <div
                     @if ($editable) {!! $editableAttrs !!} x-on:keydown.enter.prevent="$event.target.blur()" x-on:blur="$wire.set('design.subtitle', $event.target.innerText.trim())" @endif
-                    style="margin-top: 20px; font-size: 36px; font-weight: 700; color: {{ $design['accent_color'] }}; min-height: 40px;"
+                    style="font-family: {{ $titleFont->family() }}; margin-top: 20px; font-size: 36px; font-weight: 700; color: {{ $design['accent_color'] }}; min-height: 40px;"
                 >{{ $design['subtitle'] }}</div>
             @endif
         </div>
