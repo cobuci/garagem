@@ -132,6 +132,18 @@ class Sidebar extends Component
                 ],
             ],
             [
+                'title' => __('sidebar.marketing'),
+                'items' => [
+                    [
+                        'label'      => __('sidebar.banners'),
+                        'icon'       => 'photo',
+                        'route'      => 'banners.index',
+                        'active'     => request()->routeIs('banners.*'),
+                        'permission' => PermissionEnum::ViewBanner->value,
+                    ],
+                ],
+            ],
+            [
                 'title' => __('sidebar.reports_category'),
                 'items' => [
                     [

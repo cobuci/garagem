@@ -6,6 +6,8 @@ return [
     'customers_category' => 'Clientes',
     'inventory'          => 'Estoque',
     'finance'            => 'Financeiro',
+    'marketing'          => 'Marketing',
+    'banners'            => 'Banners',
     'reports_category'   => 'Relatórios',
     'sales'              => 'Vendas',
     'dashboard'          => 'Dashboard',
