@@ -87,7 +87,6 @@ class ExportBannerJob implements ShouldQueue
             ->setNodeBinary(config('services.browsershot.node_binary'))
             ->setNpmBinary(config('services.browsershot.npm_binary'))
             ->setNodeModulePath(base_path('node_modules'))
-            ->windowSize($width, $height)
-            ->waitUntilNetworkIdle();
+            ->windowSize($width, $height);
     }
 }
