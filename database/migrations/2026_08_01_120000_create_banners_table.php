@@ -15,11 +15,15 @@ return new class extends Migration
             $table->string('format')->default('stories');
             $table->json('design');
             $table->text('background_prompt')->nullable();
+            $table->string('background_theme')->nullable();
+            $table->string('background_mood')->nullable();
+            $table->string('background_intensity')->nullable();
             $table->string('background_path')->nullable();
             $table->string('background_status')->default('none');
             $table->string('export_status')->default('none');
             $table->string('export_png_path')->nullable();
             $table->string('export_pdf_path')->nullable();
+            $table->json('export_design')->nullable();
             $table->timestamps();
         });
     }
