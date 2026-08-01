@@ -3,34 +3,29 @@
 namespace App\Services;
 
 use App\Models\Banner;
-use Gemini\Data\GenerationConfig;
-use Gemini\Data\ImageConfig;
-use Gemini\Enums\ResponseModality;
-use Gemini\Laravel\Facades\Gemini;
-use Illuminate\Support\Facades\Storage;
+use Laravel\Ai\Enums\Lab;
+use Laravel\Ai\Image;
 use RuntimeException;
 
 class BannerBackgroundService
 {
     public function generate(Banner $banner): string
     {
-        $generationConfig = new GenerationConfig(
-            responseMimeType: null,
-            responseModalities: [ResponseModality::IMAGE, ResponseModality::TEXT],
-            imageConfig: new ImageConfig(aspectRatio: $banner->format->aspectRatio()),
+        $image = Image::of($this->prompt($banner))
+            ->size($banner->format->aspectRatio())
+            ->quality('low')
+            ->timeout(120)
+            ->generate(
+                provider: Lab::Gemini,
+                model: config('ai.providers.gemini.models.image.default'),
+            );
+
+        $path = $image->storeAs(
+            "banners/{$banner->id}",
+            'background-' . now()->timestamp . '.png',
         );
 
-        $response = Gemini::generativeModel(model: config('gemini.banner_image_model'))
-            ->withGenerationConfig($generationConfig)
-            ->generateContent($this->prompt($banner));
-
-        $image = collect($response->parts())
-            ->first(fn ($part) => $part->inlineData !== null);
-
-        throw_if($image === null, new RuntimeException('Gemini não retornou uma imagem.'));
-
-        $path = "banners/{$banner->id}/background-" . now()->timestamp . '.png';
-        Storage::put($path, base64_decode($image->inlineData->data));
+        throw_if($path === false, new RuntimeException('Falha ao salvar a imagem gerada.'));
 
         return $path;
     }
