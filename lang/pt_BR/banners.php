@@ -193,6 +193,7 @@ return [
         'deleted'               => 'Banner excluído.',
         'delete_title'          => 'Excluir banner?',
         'delete_description'    => 'Essa ação não pode ser desfeita.',
+        'confirm_delete'        => 'Tem certeza que deseja excluir este banner? Essa ação não pode ser desfeita.',
         'theme_required'        => 'Escolha um tema para gerar o fundo.',
         'background_generating' => 'Gerando fundo com IA, aguarde...',
         'background_failed'     => 'Falha ao gerar o fundo. Tente novamente.',

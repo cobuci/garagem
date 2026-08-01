@@ -71,19 +71,6 @@ class Index extends Component
         $this->redirectRoute('banners.studio', $banner, navigate: true);
     }
 
-    public function confirmDelete(int $bannerId): void
-    {
-        $this->authorize(Permission::DeleteBanner->value);
-
-        $this->dialog()->confirm([
-            'title'       => __('banners.messages.delete_title'),
-            'description' => __('banners.messages.delete_description'),
-            'acceptLabel' => __('banners.actions.delete'),
-            'method'      => 'delete',
-            'params'      => $bannerId,
-        ]);
-    }
-
     public function delete(int $bannerId): void
     {
         $this->authorize(Permission::DeleteBanner->value);

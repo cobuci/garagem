@@ -58,7 +58,13 @@
                             <x-button flat primary icon="paint-brush" :href="route('banners.studio', $banner)" wire:navigate />
 
                             @can(Permission::DeleteBanner->value)
-                                <x-button flat negative icon="trash" wire:click="confirmDelete({{ $banner->id }})" />
+                                <x-button
+                                    flat
+                                    negative
+                                    icon="trash"
+                                    wire:confirm="{{ __('banners.messages.confirm_delete') }}"
+                                    wire:click="delete({{ $banner->id }})"
+                                />
                             @endcan
                         </td>
                     </tr>

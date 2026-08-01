@@ -77,6 +77,7 @@ it('can delete a banner', function () {
     ]);
 
     Livewire::test(Index::class)
+        ->assertSeeHtml('wire:confirm')
         ->call('delete', $banner->id)
         ->assertHasNoErrors();
 
