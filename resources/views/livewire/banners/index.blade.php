@@ -58,7 +58,12 @@
                             <x-button flat primary icon="paint-brush" :href="route('banners.studio', $banner)" wire:navigate />
 
                             @can(Permission::DeleteBanner->value)
-                                <x-button flat negative icon="trash" wire:click="confirmDelete({{ $banner->id }})" />
+                                <x-button
+                                    flat
+                                    negative
+                                    icon="trash"
+                                    wire:click="confirmDelete({{ $banner->id }})"
+                                />
                             @endcan
                         </td>
                     </tr>
@@ -72,6 +77,25 @@
             </tbody>
         </table>
     </div>
+
+    <x-modal-card wire:model="showDeleteModal" :title="__('banners.messages.delete_title')" max-width="md">
+        <div class="space-y-4">
+            <div class="flex items-center gap-3 rounded-lg bg-red-50 p-4 dark:bg-red-900/20">
+                <x-icon name="exclamation-triangle" class="h-6 w-6 shrink-0 text-red-600 dark:text-red-400" />
+                <p class="text-sm font-medium text-red-700 dark:text-red-300">
+                    {{ __('banners.messages.confirm_delete', ['banner' => $deletingBannerName]) }}
+                </p>
+            </div>
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+                {{ __('banners.messages.delete_description') }}
+            </p>
+        </div>
+
+        <x-slot name="footer" class="flex justify-end gap-x-4">
+            <x-button flat :label="__('banners.actions.cancel')" wire:click="$set('showDeleteModal', false)" />
+            <x-button negative :label="__('banners.actions.delete')" wire:click="delete" spinner="delete" />
+        </x-slot>
+    </x-modal-card>
 
     <x-drawer wire:model="showDrawer" :title="__('banners.actions.create')">
         <div class="flex h-full flex-col">

@@ -77,8 +77,13 @@ it('can delete a banner', function () {
     ]);
 
     Livewire::test(Index::class)
-        ->call('delete', $banner->id)
-        ->assertHasNoErrors();
+        ->call('confirmDelete', $banner->id)
+        ->assertSet('showDeleteModal', true)
+        ->assertSet('deletingBannerName', 'Para Excluir')
+        ->assertSee(__('banners.messages.confirm_delete', ['banner' => 'Para Excluir']))
+        ->call('delete')
+        ->assertHasNoErrors()
+        ->assertSet('showDeleteModal', false);
 
     assertDatabaseMissing('banners', ['id' => $banner->id]);
 });

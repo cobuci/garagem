@@ -193,6 +193,7 @@ return [
         'deleted'               => 'Banner deleted.',
         'delete_title'          => 'Delete banner?',
         'delete_description'    => 'This action cannot be undone.',
+        'confirm_delete'        => 'Are you sure you want to delete the banner ":banner"?',
         'theme_required'        => 'Pick a theme to generate the background.',
         'background_generating' => 'Generating AI background, please wait...',
         'background_failed'     => 'Failed to generate background. Try again.',

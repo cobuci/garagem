@@ -25,6 +25,12 @@ class Index extends Component
 
     public bool $showDrawer = false;
 
+    public bool $showDeleteModal = false;
+
+    public ?int $deletingBannerId = null;
+
+    public string $deletingBannerName = '';
+
     public string $name = '';
 
     public string $format = BannerFormat::Stories->value;
@@ -75,23 +81,25 @@ class Index extends Component
     {
         $this->authorize(Permission::DeleteBanner->value);
 
-        $this->dialog()->confirm([
-            'title'       => __('banners.messages.delete_title'),
-            'description' => __('banners.messages.delete_description'),
-            'acceptLabel' => __('banners.actions.delete'),
-            'method'      => 'delete',
-            'params'      => $bannerId,
-        ]);
+        $banner = Banner::query()->findOrFail($bannerId);
+
+        $this->deletingBannerId = $banner->id;
+        $this->deletingBannerName = $banner->name;
+        $this->showDeleteModal = true;
     }
 
-    public function delete(int $bannerId): void
+    public function delete(): void
     {
         $this->authorize(Permission::DeleteBanner->value);
 
-        $banner = Banner::query()->findOrFail($bannerId);
+        $banner = Banner::query()->findOrFail($this->deletingBannerId);
 
         Storage::deleteDirectory("banners/{$banner->id}");
         $banner->delete();
+
+        $this->showDeleteModal = false;
+        $this->deletingBannerId = null;
+        $this->deletingBannerName = '';
 
         $this->notification()->success(
             title: __('banners.messages.success'),
