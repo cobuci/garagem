@@ -58,6 +58,7 @@ class Studio extends Component
             'design.text_color'       => ['required', 'string', 'max:9'],
             'design.show_logo'        => ['boolean'],
             'design.logo_position'    => ['required', Rule::in(['top', 'bottom'])],
+            'design.logo_align'       => ['required', Rule::in(['left', 'center', 'right'])],
             'design.logo_size'        => ['required', Rule::in(['small', 'medium', 'large'])],
             'design.items'            => ['array', 'max:14'],
             'design.items.*.name'     => ['nullable', 'string', 'max:60'],
@@ -88,6 +89,17 @@ class Studio extends Component
         abort_unless(array_key_exists($preset, $presets), 404);
 
         $this->design = array_merge($this->design, $presets[$preset]);
+    }
+
+    public function applyPalette(string $palette): void
+    {
+        $this->authorize(Permission::EditBanner->value);
+
+        $palettes = Banner::brandPalettes();
+
+        abort_unless(array_key_exists($palette, $palettes), 404);
+
+        $this->design = array_merge($this->design, $palettes[$palette]);
     }
 
     public function addItem(): void

@@ -12,31 +12,64 @@
     $backgroundSrc = $banner->background_path
         ? route('banners.background', $banner) . '?v=' . $banner->updated_at?->timestamp
         : null;
-
-    $previewScale = 420 / $banner->format->width();
 @endphp
 
-<div @if ($isWorking) wire:poll.2s="refreshStatus" @endif>
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $banner->name }}</h1>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {{ $banner->format->label() }} — {{ __('banners.hints.workflow') }}
+<div class="pb-24 lg:pb-0" @if ($isWorking) wire:poll.2s="refreshStatus" @endif>
+    <style>
+        .banner-editable { transition: outline-color 0.15s; outline: 2px dashed transparent; outline-offset: 6px; }
+        .banner-editable:hover { outline-color: rgba(56, 182, 248, 0.7); cursor: text; }
+        .banner-editable:focus { outline-color: rgba(56, 182, 248, 1); }
+    </style>
+
+    <div class="flex items-center justify-between gap-3 mb-6">
+        <div class="min-w-0">
+            <h1 class="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white truncate">{{ $banner->name }}</h1>
+            <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400 truncate">
+                {{ $banner->format->label() }}
             </p>
         </div>
-        <div class="flex items-center gap-2">
-            <x-button flat icon="arrow-left" :label="__('banners.actions.back')" :href="route('banners.index')" wire:navigate />
+        <div class="flex items-center gap-2 shrink-0">
+            <x-button flat icon="arrow-left" :label="__('banners.actions.back')" :href="route('banners.index')" wire:navigate class="!hidden sm:!inline-flex" />
+            <x-button flat icon="arrow-left" :href="route('banners.index')" wire:navigate class="sm:!hidden" />
 
             @can(Permission::EditBanner->value)
-                <x-button primary icon="check" :label="__('banners.actions.save')" wire:click="save" />
+                <x-button primary icon="check" :label="__('banners.actions.save')" wire:click="save" class="!hidden lg:!inline-flex" />
             @endcan
         </div>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-        <div class="space-y-6">
-            <x-card :title="__('banners.sections.presets')">
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-3">{{ __('banners.hints.presets') }}</p>
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
+        <div class="lg:col-span-2 lg:order-last">
+            <div class="lg:sticky lg:top-8">
+                <div class="flex items-baseline justify-between mb-3">
+                    <h2 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        {{ __('banners.sections.preview') }}
+                    </h2>
+                    <span class="text-xs text-gray-400 dark:text-gray-500">{{ __('banners.hints.tap_to_edit') }}</span>
+                </div>
+
+                <div
+                    class="w-full max-w-[480px] mx-auto rounded-xl shadow-lg ring-1 ring-black/10 overflow-hidden"
+                    x-data="{ scale: 0 }"
+                    x-init="const fit = () => { scale = $el.clientWidth / {{ $banner->format->width() }} }; fit(); window.addEventListener('resize', fit)"
+                >
+                    <div x-bind:style="`height: ${Math.round({{ $banner->format->height() }} * scale)}px`" style="overflow: hidden;">
+                        <div x-bind:style="`transform: scale(${scale}); transform-origin: top left;`" style="width: {{ $banner->format->width() }}px;">
+                            @include('banners.canvas', [
+                                'format'        => $banner->format,
+                                'design'        => $design,
+                                'backgroundSrc' => $backgroundSrc,
+                                'logoSrc'       => asset(Banner::LOGO_PATH),
+                                'editable'      => auth()->user()?->can(Permission::EditBanner->value) ?? false,
+                            ])
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-3 space-y-4">
+            <x-banner.section :title="__('banners.sections.presets')" :hint="__('banners.hints.presets')" :open="true">
                 <div class="flex flex-wrap gap-2">
                     @foreach (array_keys(Banner::presets()) as $presetKey)
                         <x-button
@@ -47,12 +80,10 @@
                         />
                     @endforeach
                 </div>
-            </x-card>
+            </x-banner.section>
 
-            <x-card :title="__('banners.sections.background')">
+            <x-banner.section :title="__('banners.sections.background')" :hint="__('banners.hints.background')" :open="true">
                 <div class="space-y-4">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('banners.hints.background') }}</p>
-
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         @foreach (BannerTheme::cases() as $theme)
                             <button
@@ -108,7 +139,7 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-2">
                         <x-button
                             primary
                             icon="sparkles"
@@ -130,14 +161,14 @@
                         <p class="text-sm text-red-600 dark:text-red-400">{{ __('banners.messages.background_failed') }}</p>
                     @endif
                 </div>
-            </x-card>
+            </x-banner.section>
 
-            <x-card :title="__('banners.sections.logo')">
+            <x-banner.section :title="__('banners.sections.logo')">
                 <div class="space-y-4">
                     <x-toggle wire:model.live="design.show_logo" :label="__('banners.fields.show_logo')" />
 
                     @if ($design['show_logo'])
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <x-native-select wire:model.live="design.logo_position" :label="__('banners.fields.logo_position')">
                                 <option value="top">{{ __('banners.logo_positions.top') }}</option>
                                 <option value="bottom">{{ __('banners.logo_positions.bottom') }}</option>
@@ -149,15 +180,53 @@
                                 <option value="large">{{ __('banners.logo_sizes.large') }}</option>
                             </x-native-select>
                         </div>
+
+                        <div>
+                            <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('banners.fields.logo_align') }}</span>
+                            <div class="inline-flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+                                @foreach (['left', 'center', 'right'] as $align)
+                                    <button
+                                        type="button"
+                                        wire:click="$set('design.logo_align', '{{ $align }}')"
+                                        class="px-4 py-2 text-sm font-medium transition
+                                            {{ ($design['logo_align'] ?? 'center') === $align
+                                                ? 'bg-primary-500 text-white'
+                                                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700' }}"
+                                    >
+                                        {{ __('banners.logo_aligns.' . $align) }}
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
                     @endif
                 </div>
-            </x-card>
+            </x-banner.section>
 
-            <x-card :title="__('banners.sections.content')">
+            <x-banner.section :title="__('banners.sections.content')" :hint="__('banners.hints.content')">
                 <div class="space-y-4">
                     <x-input wire:model.live.debounce.400ms="design.title" :label="__('banners.fields.title')" />
                     <x-input wire:model.live.debounce.400ms="design.subtitle" :label="__('banners.fields.subtitle')" />
                     <x-input wire:model.live.debounce.400ms="design.footer" :label="__('banners.fields.footer')" />
+
+                    <div>
+                        <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('banners.fields.brand_colors') }}</span>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach (Banner::brandPalettes() as $paletteKey => $palette)
+                                <button
+                                    type="button"
+                                    wire:click="applyPalette('{{ $paletteKey }}')"
+                                    class="flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:border-primary-400 transition"
+                                >
+                                    <span class="flex -space-x-1">
+                                        <span class="w-4 h-4 rounded-full ring-1 ring-black/10" style="background: {{ $palette['background_color'] }}"></span>
+                                        <span class="w-4 h-4 rounded-full ring-1 ring-black/10" style="background: {{ $palette['accent_color'] }}"></span>
+                                        <span class="w-4 h-4 rounded-full ring-1 ring-black/10" style="background: {{ $palette['text_color'] }}"></span>
+                                    </span>
+                                    {{ __('banners.palettes.' . $paletteKey) }}
+                                </button>
+                            @endforeach
+                        </div>
+                    </div>
 
                     <div class="grid grid-cols-3 gap-4">
                         <div>
@@ -174,19 +243,19 @@
                         </div>
                     </div>
                 </div>
-            </x-card>
+            </x-banner.section>
 
-            <x-card :title="__('banners.sections.items')">
+            <x-banner.section :title="__('banners.sections.items')" :hint="__('banners.hints.items')">
                 <div class="space-y-3">
                     @foreach ($design['items'] as $index => $item)
                         <div class="flex items-end gap-2" wire:key="item-{{ $index }}">
-                            <div class="flex-1">
+                            <div class="flex-1 min-w-0">
                                 <x-input wire:model.live.debounce.400ms="design.items.{{ $index }}.name" :label="$index === 0 ? __('banners.fields.item_name') : null" />
                             </div>
-                            <div class="w-24">
+                            <div class="w-20 sm:w-24">
                                 <x-input wire:model.live.debounce.400ms="design.items.{{ $index }}.note" :label="$index === 0 ? __('banners.fields.item_note') : null" />
                             </div>
-                            <div class="w-32">
+                            <div class="w-28 sm:w-32">
                                 <x-input wire:model.live.debounce.400ms="design.items.{{ $index }}.price" :label="$index === 0 ? __('banners.fields.item_price') : null" />
                             </div>
                             <x-button flat negative icon="trash" wire:click="removeItem({{ $index }})" />
@@ -195,9 +264,9 @@
 
                     <x-button flat primary icon="plus" :label="__('banners.actions.add_item')" wire:click="addItem" />
                 </div>
-            </x-card>
+            </x-banner.section>
 
-            <x-card :title="__('banners.sections.export')">
+            <x-banner.section :title="__('banners.sections.export')">
                 <div class="space-y-4">
                     <x-native-select wire:model="exportScale" :label="__('banners.fields.resolution')">
                         @foreach ([1, 2, 3] as $scale)
@@ -230,26 +299,13 @@
                         <p class="text-sm text-red-600 dark:text-red-400">{{ __('banners.messages.export_failed') }}</p>
                     @endif
                 </div>
-            </x-card>
-        </div>
-
-        <div>
-            <div class="xl:sticky xl:top-8">
-                <h2 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-                    {{ __('banners.sections.preview') }}
-                </h2>
-                <div class="inline-block rounded-xl shadow-lg ring-1 ring-black/10 overflow-hidden"
-                     style="width: 420px; height: {{ (int) round($banner->format->height() * $previewScale) }}px;">
-                    <div style="transform: scale({{ $previewScale }}); transform-origin: top left;">
-                        @include('banners.canvas', [
-                            'format'        => $banner->format,
-                            'design'        => $design,
-                            'backgroundSrc' => $backgroundSrc,
-                            'logoSrc'       => asset(Banner::LOGO_PATH),
-                        ])
-                    </div>
-                </div>
-            </div>
+            </x-banner.section>
         </div>
     </div>
+
+    @can(Permission::EditBanner->value)
+        <div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-800/95 backdrop-blur border-t border-gray-200 dark:border-gray-700 p-3">
+            <x-button primary icon="check" :label="__('banners.actions.save')" wire:click="save" class="w-full" />
+        </div>
+    @endcan
 </div>

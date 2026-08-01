@@ -60,9 +60,26 @@ class Banner extends Model
             'text_color'       => '#ffffff',
             'show_logo'        => true,
             'logo_position'    => 'top',
+            'logo_align'       => 'center',
             'logo_size'        => 'medium',
             'items'            => [
                 ['name' => 'Produto', 'note' => '', 'price' => 'R$ 0,00'],
+            ],
+        ];
+    }
+
+    public static function brandPalettes(): array
+    {
+        return [
+            'brand_dark' => [
+                'background_color' => '#0b1526',
+                'accent_color'     => '#38b6f8',
+                'text_color'       => '#ffffff',
+            ],
+            'brand_light' => [
+                'background_color' => '#f8fafc',
+                'accent_color'     => '#2da7ef',
+                'text_color'       => '#0f172a',
             ],
         ];
     }

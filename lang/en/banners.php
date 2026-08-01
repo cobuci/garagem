@@ -22,9 +22,12 @@ return [
     ],
 
     'hints' => [
-        'workflow'   => 'Pick a template, generate the background and adjust the texts.',
-        'presets'    => 'Apply a ready-made template, then customize freely.',
-        'background' => 'Pick a theme and, if you like, adjust mood and intensity.',
+        'workflow'    => 'Pick a template, generate the background and adjust the texts.',
+        'presets'     => 'Apply a ready-made template, then customize freely.',
+        'background'  => 'Pick a theme and, if you like, adjust mood and intensity.',
+        'content'     => 'You can also tap the banner text directly to edit it.',
+        'items'       => 'Items without a name are hidden on the final banner.',
+        'tap_to_edit' => 'Tap text to edit',
     ],
 
     'presets' => [
@@ -76,6 +79,17 @@ return [
         'bottom' => 'Bottom',
     ],
 
+    'logo_aligns' => [
+        'left'   => 'Left',
+        'center' => 'Center',
+        'right'  => 'Right',
+    ],
+
+    'palettes' => [
+        'brand_dark'  => 'Brand (dark)',
+        'brand_light' => 'Brand (light)',
+    ],
+
     'logo_sizes' => [
         'small'  => 'Small',
         'medium' => 'Medium',
@@ -96,7 +110,9 @@ return [
         'text_color'       => 'Text',
         'show_logo'        => 'Show logo on banner',
         'logo_position'    => 'Logo position',
+        'logo_align'       => 'Logo alignment',
         'logo_size'        => 'Logo size',
+        'brand_colors'     => 'Brand colors',
         'mood'             => 'Mood',
         'intensity'        => 'Intensity',
         'item_name'        => 'Item',

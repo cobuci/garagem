@@ -22,9 +22,12 @@ return [
     ],
 
     'hints' => [
-        'workflow'   => 'Escolha um modelo, gere o fundo e ajuste os textos.',
-        'presets'    => 'Aplique um modelo pronto e depois personalize à vontade.',
-        'background' => 'Escolha um tema e, se quiser, ajuste o clima e a intensidade.',
+        'workflow'    => 'Escolha um modelo, gere o fundo e ajuste os textos.',
+        'presets'     => 'Aplique um modelo pronto e depois personalize à vontade.',
+        'background'  => 'Escolha um tema e, se quiser, ajuste o clima e a intensidade.',
+        'content'     => 'Você também pode tocar direto no texto do banner para editar.',
+        'items'       => 'Itens sem nome não aparecem no banner final.',
+        'tap_to_edit' => 'Toque no texto para editar',
     ],
 
     'presets' => [
@@ -76,6 +79,17 @@ return [
         'bottom' => 'Rodapé',
     ],
 
+    'logo_aligns' => [
+        'left'   => 'Esquerda',
+        'center' => 'Centro',
+        'right'  => 'Direita',
+    ],
+
+    'palettes' => [
+        'brand_dark'  => 'Marca (escuro)',
+        'brand_light' => 'Marca (claro)',
+    ],
+
     'logo_sizes' => [
         'small'  => 'Pequeno',
         'medium' => 'Médio',
@@ -96,7 +110,9 @@ return [
         'text_color'       => 'Texto',
         'show_logo'        => 'Mostrar logo no banner',
         'logo_position'    => 'Posição do logo',
+        'logo_align'       => 'Alinhamento do logo',
         'logo_size'        => 'Tamanho do logo',
+        'brand_colors'     => 'Cores da marca',
         'mood'             => 'Clima',
         'intensity'        => 'Intensidade',
         'item_name'        => 'Item',

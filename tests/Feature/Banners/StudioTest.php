@@ -61,6 +61,7 @@ it('can save logo preferences', function () {
     Livewire::test(Studio::class, ['banner' => $this->banner])
         ->set('design.show_logo', false)
         ->set('design.logo_position', 'bottom')
+        ->set('design.logo_align', 'right')
         ->set('design.logo_size', 'large')
         ->call('save')
         ->assertHasNoErrors();
@@ -69,7 +70,23 @@ it('can save logo preferences', function () {
 
     expect($design['show_logo'])->toBeFalse()
         ->and($design['logo_position'])->toBe('bottom')
+        ->and($design['logo_align'])->toBe('right')
         ->and($design['logo_size'])->toBe('large');
+});
+
+it('rejects an invalid logo alignment', function () {
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->set('design.logo_align', 'diagonal')
+        ->call('save')
+        ->assertHasErrors(['design.logo_align']);
+});
+
+it('applies a brand color palette', function () {
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->call('applyPalette', 'brand_light')
+        ->assertSet('design.background_color', '#f8fafc')
+        ->assertSet('design.accent_color', '#2da7ef')
+        ->assertSet('design.text_color', '#0f172a');
 });
 
 it('applies a campaign preset', function () {
