@@ -83,7 +83,7 @@ class ExportBannerJob implements ShouldQueue
 
     private function browsershot(string $html, int $width, int $height): Browsershot
     {
-        return Browsershot::html($html)
+        $browsershot = Browsershot::html($html)
             ->setNodeBinary(config('services.browsershot.node_binary'))
             ->setNpmBinary(config('services.browsershot.npm_binary'))
             ->setNodeModulePath(base_path('node_modules'))
@@ -91,5 +91,11 @@ class ExportBannerJob implements ShouldQueue
             ->noSandbox()
             ->timeout(120)
             ->setDelay(2000);
+
+        if ($chromePath = config('services.browsershot.chrome_path')) {
+            $browsershot->setChromePath($chromePath);
+        }
+
+        return $browsershot;
     }
 }

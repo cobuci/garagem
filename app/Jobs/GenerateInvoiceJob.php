@@ -56,6 +56,10 @@ class GenerateInvoiceJob implements ShouldQueue
             ->windowSize(900, 1200)
             ->setScreenshotType('png');
 
+        if ($chromePath = config('services.browsershot.chrome_path')) {
+            $browsershot->setChromePath($chromePath);
+        }
+
         $browsershot->save($pngAbsPath);
 
         $this->sale->update([
