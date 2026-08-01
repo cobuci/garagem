@@ -46,6 +46,8 @@ it('can render the studio page', function () {
         ->assertSee(__('banners.sections.presets'))
         ->assertSee(__('banners.themes.barbecue.label'))
         ->assertSeeHtml('sticky top-16 lg:top-0')
+        ->assertSeeHtml('x-on:scroll.window')
+        ->assertSeeHtml('placeholder="Ex: 5 uni"')
         ->assertSeeHtml('banner-preview-frame')
         ->assertSeeHtml('aspect-ratio:')
         ->assertSeeHtml('ResizeObserver')
@@ -64,6 +66,15 @@ it('marks the studio dirty when the design changes and clears after save', funct
         ->assertHasNoErrors()
         ->assertSet('isDirty', false)
         ->assertDontSee(__('banners.actions.save_changes'));
+});
+
+it('shows the mobile save bar only when there are unsaved changes', function () {
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->assertDontSeeHtml('fixed bottom-0')
+        ->set('design.title', 'OFERTAS')
+        ->assertSeeHtml('fixed bottom-0')
+        ->call('save')
+        ->assertDontSeeHtml('fixed bottom-0');
 });
 
 it('marks the studio dirty when applying a preset', function () {

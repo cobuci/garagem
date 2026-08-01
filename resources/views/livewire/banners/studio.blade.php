@@ -41,7 +41,15 @@
         .banner-editable:focus { outline-color: rgba(56, 182, 248, 1); }
     </style>
 
-    <div class="sticky top-16 lg:top-0 z-30 flex items-center justify-between gap-3 mb-6 -mx-4 lg:-mx-8 px-4 lg:px-8 py-3 bg-gray-50/95 dark:bg-gray-900/95 backdrop-blur">
+    <div
+        class="sticky top-16 lg:top-0 z-30 flex items-center justify-between gap-3 mb-6 -mx-4 lg:-mx-8 px-4 lg:px-8 py-3 backdrop-blur transition-[background-color,box-shadow] duration-200"
+        x-data="{ stuck: false }"
+        x-init="stuck = $el.getBoundingClientRect().top <= (window.innerWidth >= 1024 ? 1 : 65)"
+        x-on:scroll.window="stuck = $el.getBoundingClientRect().top <= (window.innerWidth >= 1024 ? 1 : 65)"
+        :class="stuck
+            ? 'bg-white/95 dark:bg-gray-800/95 shadow-md shadow-black/5 dark:shadow-black/30 border-b border-gray-200/80 dark:border-gray-700/60'
+            : 'bg-gray-50/95 dark:bg-gray-900/95 border-b border-transparent'"
+    >
         <div class="min-w-0">
             <div class="flex items-center gap-2 min-w-0">
                 <h1 class="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white truncate">{{ $banner->name }}</h1>
@@ -366,7 +374,7 @@
                                 <x-input wire:model.live.debounce.400ms="design.items.{{ $index }}.name" :label="$index === 0 ? __('banners.fields.item_name') : null" />
                             </div>
                             <div class="w-20 sm:w-24">
-                                <x-input wire:model.live.debounce.400ms="design.items.{{ $index }}.note" :label="$index === 0 ? __('banners.fields.item_note') : null" />
+                                <x-input wire:model.live.debounce.400ms="design.items.{{ $index }}.note" :label="$index === 0 ? __('banners.fields.item_note') : null" :placeholder="__('banners.fields.item_note_placeholder')" />
                             </div>
                             <div class="w-28 sm:w-32">
                                 <x-money-input prefix="R$" wire:model.live.debounce.400ms="design.items.{{ $index }}.price" :label="$index === 0 ? __('banners.fields.item_price') : null" />
@@ -460,17 +468,19 @@
     </div>
 
     @can(Permission::EditBanner->value)
-        <div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-800/95 backdrop-blur border-t border-gray-200 dark:border-gray-700 p-3 space-y-2">
-            <p class="text-center text-xs font-medium text-amber-700 dark:text-amber-300 {{ $isDirty ? '' : 'hidden' }}">
-                {{ __('banners.messages.unsaved_changes') }} — {{ __('banners.messages.save_to_keep') }}
-            </p>
-            <x-button
-                :color="$isDirty ? 'warning' : 'primary'"
-                icon="check"
-                :label="$isDirty ? __('banners.actions.save_changes') : __('banners.actions.save')"
-                wire:click="save"
-                class="w-full"
-            />
-        </div>
+        @if ($isDirty)
+            <div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-800/95 backdrop-blur border-t border-gray-200 dark:border-gray-700 p-3 space-y-2">
+                <p class="text-center text-xs font-medium text-amber-700 dark:text-amber-300">
+                    {{ __('banners.messages.unsaved_changes') }} — {{ __('banners.messages.save_to_keep') }}
+                </p>
+                <x-button
+                    warning
+                    icon="check"
+                    :label="__('banners.actions.save_changes')"
+                    wire:click="save"
+                    class="w-full"
+                />
+            </div>
+        @endif
     @endcan
 </div>
