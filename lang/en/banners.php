@@ -62,6 +62,30 @@ return [
             'label'       => 'Minimal',
             'description' => 'Blue gradient with brand identity',
         ],
+        'fathers_day' => [
+            'label'       => "Father's Day",
+            'description' => 'Blue and gold, warm and caring',
+        ],
+        'mothers_day' => [
+            'label'       => "Mother's Day",
+            'description' => 'Soft flowers and pastel tones',
+        ],
+        'christmas' => [
+            'label'       => 'Christmas',
+            'description' => 'Golden lights and festive mood',
+        ],
+        'easter' => [
+            'label'       => 'Easter',
+            'description' => 'Soft pastels and spring vibes',
+        ],
+        'new_year' => [
+            'label'       => 'New Year',
+            'description' => 'Blurred fireworks and gold glow',
+        ],
+        'valentines' => [
+            'label'       => "Valentine's Day",
+            'description' => 'Romantic pink and red tones',
+        ],
     ],
 
     'moods' => [

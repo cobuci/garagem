@@ -74,6 +74,22 @@ it('can save logo preferences', function () {
         ->and($design['logo_size'])->toBe('large');
 });
 
+it('updates logo alignment live on the design', function () {
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->set('design.logo_align', 'left')
+        ->assertSet('design.logo_align', 'left')
+        ->set('design.logo_align', 'right')
+        ->assertSet('design.logo_align', 'right')
+        ->assertSeeHtml('justify-content: flex-end');
+});
+
+it('lists seasonal themes in the studio', function () {
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->assertSee(__('banners.themes.fathers_day.label'))
+        ->assertSee(__('banners.themes.christmas.label'))
+        ->assertSee(__('banners.themes.easter.label'));
+});
+
 it('rejects an invalid logo alignment', function () {
     Livewire::test(Studio::class, ['banner' => $this->banner])
         ->set('design.logo_align', 'diagonal')

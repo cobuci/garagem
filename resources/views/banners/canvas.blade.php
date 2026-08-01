@@ -11,7 +11,11 @@
         default => 200,
     };
     $logoPosition = $design['logo_position'] ?? 'top';
-    $logoAlign = $design['logo_align'] ?? 'center';
+    $logoAlign = match ($design['logo_align'] ?? 'center') {
+        'left' => 'flex-start',
+        'right' => 'flex-end',
+        default => 'center',
+    };
     $editableAttrs = 'contenteditable="true" spellcheck="false" class="banner-editable"';
 @endphp
 <div style="position: relative; width: {{ $width }}px; height: {{ $height }}px; background-color: {{ $design['background_color'] }}; overflow: hidden; font-family: 'Instrument Sans', ui-sans-serif, sans-serif; color: {{ $design['text_color'] }};">
@@ -21,8 +25,8 @@
 
     <div style="position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; padding: 72px 84px; box-sizing: border-box;">
         @if ($showLogo && $logoPosition === 'top')
-            <div style="text-align: {{ $logoAlign }}; margin-bottom: 32px;">
-                <img src="{{ $logoSrc }}" alt="" style="width: {{ $logoWidth }}px; height: auto;">
+            <div style="display: flex; justify-content: {{ $logoAlign }}; margin-bottom: 32px;">
+                <img src="{{ $logoSrc }}" alt="" style="width: {{ $logoWidth }}px; height: auto; display: block;">
             </div>
         @endif
 
@@ -68,8 +72,8 @@
         </div>
 
         @if ($showLogo && $logoPosition === 'bottom')
-            <div style="text-align: {{ $logoAlign }}; margin-top: 40px;">
-                <img src="{{ $logoSrc }}" alt="" style="width: {{ $logoWidth }}px; height: auto;">
+            <div style="display: flex; justify-content: {{ $logoAlign }}; margin-top: 40px;">
+                <img src="{{ $logoSrc }}" alt="" style="width: {{ $logoWidth }}px; height: auto; display: block;">
             </div>
         @endif
 

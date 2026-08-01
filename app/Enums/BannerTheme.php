@@ -10,6 +10,12 @@ enum BannerTheme: string
     case DailyPromo = 'daily_promo';
     case HappyHour = 'happy_hour';
     case BrandMinimal = 'brand_minimal';
+    case FathersDay = 'fathers_day';
+    case MothersDay = 'mothers_day';
+    case Christmas = 'christmas';
+    case Easter = 'easter';
+    case NewYear = 'new_year';
+    case Valentines = 'valentines';
 
     public function label(): string
     {
@@ -30,6 +36,12 @@ enum BannerTheme: string
             self::DailyPromo   => 'Fundo escuro e elegante com gradiente suave, formas geométricas sutis e brilho discreto, visual limpo de promoção.',
             self::HappyHour    => 'Fundo de happy hour com luzes bokeh desfocadas, clima festivo noturno, tons âmbar e azuis, atmosfera de comemoração.',
             self::BrandMinimal => 'Fundo minimalista com gradiente entre azul céu e azul escuro, textura sutil, sem objetos, visual moderno e limpo.',
+            self::FathersDay   => 'Fundo temático de Dia dos Pais, tons azuis e dourados suaves, textura elegante e acolhedora, detalhes sutis de gravata ou bigode desfocados nas bordas, clima carinhoso e celebrativo.',
+            self::MothersDay   => 'Fundo temático de Dia das Mães, flores desfocadas e delicadas nas bordas, tons rosa, pêssego e creme, luz suave e aconchegante, clima afetivo.',
+            self::Christmas    => 'Fundo natalino com luzes bokeh douradas e vermelhas, neve suave desfocada, tons verdes e vermelhos discretos, clima aconchegante de Natal, área central limpa.',
+            self::Easter       => 'Fundo de Páscoa com tons pastel (lilás, amarelo claro e verde menta), ovos e flores desfocados nas bordas, luz clara e alegre, clima primaveril.',
+            self::NewYear      => 'Fundo de Ano Novo com fogos de artifício desfocados e bokeh dourado, tons pretos, dourados e azul-noite, clima festivo e sofisticado.',
+            self::Valentines   => 'Fundo de Dia dos Namorados com tons vermelho e rosa suaves, corações desfocados nas bordas, luz romântica e calorosa, clima carinhoso.',
         };
     }
 }

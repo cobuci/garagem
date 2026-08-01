@@ -62,6 +62,30 @@ return [
             'label'       => 'Minimalista',
             'description' => 'Gradiente azul com a cara da marca',
         ],
+        'fathers_day' => [
+            'label'       => 'Dia dos Pais',
+            'description' => 'Tons azuis e dourados, clima carinhoso',
+        ],
+        'mothers_day' => [
+            'label'       => 'Dia das Mães',
+            'description' => 'Flores suaves e tons pastel',
+        ],
+        'christmas' => [
+            'label'       => 'Natal',
+            'description' => 'Luzes douradas e clima natalino',
+        ],
+        'easter' => [
+            'label'       => 'Páscoa',
+            'description' => 'Pastéis claros e clima primaveril',
+        ],
+        'new_year' => [
+            'label'       => 'Ano Novo',
+            'description' => 'Fogos desfocados e brilho dourado',
+        ],
+        'valentines' => [
+            'label'       => 'Dia dos Namorados',
+            'description' => 'Rosa e vermelho românticos',
+        ],
     ],
 
     'moods' => [
