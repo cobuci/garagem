@@ -3,6 +3,7 @@
 namespace App\Livewire\Banners;
 
 use App\Enums\BannerFont;
+use App\Enums\BannerFormat;
 use App\Enums\BannerIntensity;
 use App\Enums\BannerJobStatus;
 use App\Enums\BannerMood;
@@ -29,6 +30,8 @@ class Studio extends Component
 
     public array $design = [];
 
+    public string $format = '';
+
     public bool $isDirty = false;
 
     public ?string $backgroundTheme = null;
@@ -45,6 +48,7 @@ class Studio extends Component
 
         $this->banner = $banner;
         $this->design = array_merge(Banner::defaultDesign(), $banner->design);
+        $this->format = $banner->format->value;
         $this->backgroundTheme = $banner->background_theme?->value;
         $this->backgroundMood = $banner->background_mood?->value;
         $this->backgroundIntensity = $banner->background_intensity?->value;
@@ -161,6 +165,15 @@ class Studio extends Component
         $this->design['items'] = $items;
     }
 
+    public function updatedFormat(): void
+    {
+        $this->authorize(Permission::EditBanner->value);
+
+        $this->validate(['format' => ['required', Rule::enum(BannerFormat::class)]]);
+
+        $this->banner->update(['format' => $this->format]);
+    }
+
     public function selectTheme(string $theme): void
     {
         $this->backgroundTheme = $theme;
@@ -209,7 +222,7 @@ class Studio extends Component
 
         $this->banner->update([
             'design'        => $this->design,
-            'export_design' => $this->design,
+            'export_design' => [...$this->design, 'format' => $this->format],
             'export_status' => BannerJobStatus::Generating,
         ]);
 

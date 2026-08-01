@@ -18,7 +18,7 @@
     $canvasHeight = $banner->format->height();
 
     $exportIsOutdated = $banner->export_status === BannerJobStatus::Ready
-        && $banner->export_design != $design;
+        && $banner->export_design != [...$design, 'format' => $banner->format->value];
 @endphp
 
 <div
@@ -89,17 +89,25 @@
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
         <div class="lg:col-span-2 lg:order-last min-w-0">
             <div class="lg:sticky lg:top-8 min-w-0">
-                <div class="flex items-baseline justify-between mb-3">
+                <div class="flex items-center justify-between gap-3 mb-3">
                     <h2 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         {{ __('banners.sections.preview') }}
                     </h2>
-                    <span
-                        class="text-xs text-gray-400 dark:text-gray-500 cursor-help border-b border-dashed border-gray-300 dark:border-gray-600"
-                        title="{{ __('banners.hints.tap_to_edit') }}"
-                    >{{ __('banners.hints.tap_to_edit') }}</span>
+                    @can(Permission::EditBanner->value)
+                        <select
+                            wire:model.live="format"
+                            aria-label="{{ __('banners.fields.format') }}"
+                            class="rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs text-gray-700 dark:text-gray-300 py-1.5 pl-2 pr-8 focus:ring-primary-500 focus:border-primary-500"
+                        >
+                            @foreach (App\Enums\BannerFormat::cases() as $formatOption)
+                                <option value="{{ $formatOption->value }}">{{ $formatOption->label() }} ({{ $formatOption->width() }} × {{ $formatOption->height() }})</option>
+                            @endforeach
+                        </select>
+                    @endcan
                 </div>
 
                 <div
+                    wire:key="preview-frame-{{ $banner->format->value }}"
                     class="banner-preview-frame relative w-full max-w-[480px] mx-auto min-w-0 rounded-xl shadow-lg ring-1 ring-black/10 overflow-hidden bg-gray-100 dark:bg-gray-900"
                     style="aspect-ratio: {{ $canvasWidth }} / {{ $canvasHeight }};"
                     x-data="{
@@ -136,6 +144,8 @@
                         ])
                     </div>
                 </div>
+
+                <p class="mt-2 text-center text-xs text-gray-400 dark:text-gray-500">{{ __('banners.hints.tap_to_edit') }}</p>
             </div>
         </div>
 

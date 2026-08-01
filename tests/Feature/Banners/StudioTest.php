@@ -272,6 +272,40 @@ it('dispatches export job', function () {
         ->design->title->toBe('OFERTAS');
 });
 
+it('can change the banner format', function () {
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->assertSet('format', BannerFormat::Stories->value)
+        ->set('format', BannerFormat::Square->value)
+        ->assertHasNoErrors()
+        ->assertSeeHtml('aspect-ratio: 1080 / 1080');
+
+    expect($this->banner->fresh()->format)->toBe(BannerFormat::Square);
+});
+
+it('rejects an invalid banner format', function () {
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->set('format', 'billboard')
+        ->assertHasErrors(['format']);
+
+    expect($this->banner->fresh()->format)->toBe(BannerFormat::Stories);
+});
+
+it('marks the export as outdated when the format changes', function () {
+    Queue::fake();
+
+    $component = Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->call('export')
+        ->assertHasNoErrors();
+
+    $this->banner->fresh()->update(['export_status' => BannerJobStatus::Ready]);
+
+    $component
+        ->call('refreshStatus')
+        ->assertDontSee(__('banners.messages.export_outdated'))
+        ->set('format', BannerFormat::Post->value)
+        ->assertSee(__('banners.messages.export_outdated'));
+});
+
 it('warns when the exported files are from an older design', function () {
     Queue::fake();
 
