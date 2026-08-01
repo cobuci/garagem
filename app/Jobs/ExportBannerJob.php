@@ -88,6 +88,8 @@ class ExportBannerJob implements ShouldQueue
             ->setNpmBinary(config('services.browsershot.npm_binary'))
             ->setNodeModulePath(base_path('node_modules'))
             ->windowSize($width, $height)
-            ->waitUntilNetworkIdle();
+            ->noSandbox()
+            ->timeout(120)
+            ->setDelay(2000);
     }
 }
