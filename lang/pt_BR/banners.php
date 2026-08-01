@@ -22,12 +22,13 @@ return [
     ],
 
     'hints' => [
-        'workflow'    => 'Escolha um modelo, gere o fundo e ajuste os textos.',
-        'presets'     => 'Aplique um modelo pronto e depois personalize à vontade.',
-        'background'  => 'Escolha um tema e, se quiser, ajuste o clima e a intensidade.',
-        'content'     => 'Você também pode tocar direto no texto do banner para editar.',
-        'items'       => 'Itens sem nome não aparecem no banner final.',
-        'tap_to_edit' => 'Toque no texto para editar',
+        'workflow'        => 'Escolha um modelo, gere o fundo e ajuste os textos.',
+        'presets'         => 'Aplique um modelo pronto e depois personalize à vontade.',
+        'background'      => 'Escolha um tema e, se quiser, ajuste o clima e a intensidade.',
+        'content'         => 'Você também pode tocar direto no texto do banner para editar.',
+        'items'           => 'Itens sem nome não aparecem no banner final.',
+        'tap_to_edit'     => 'Toque no texto para editar',
+        'drag_to_reorder' => 'Arraste para reordenar',
     ],
 
     'presets' => [

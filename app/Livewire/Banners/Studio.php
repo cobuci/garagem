@@ -113,6 +113,24 @@ class Studio extends Component
         $this->design['items'] = array_values($this->design['items']);
     }
 
+    public function sortItems(int|string $index, int $position): void
+    {
+        $this->authorize(Permission::EditBanner->value);
+
+        $items = array_values($this->design['items']);
+        $moved = $items[(int) $index] ?? null;
+
+        if ($moved === null) {
+            return;
+        }
+
+        unset($items[(int) $index]);
+        $items = array_values($items);
+        array_splice($items, $position, 0, [$moved]);
+
+        $this->design['items'] = $items;
+    }
+
     public function selectTheme(string $theme): void
     {
         $this->backgroundTheme = $theme;

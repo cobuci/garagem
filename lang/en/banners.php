@@ -22,12 +22,13 @@ return [
     ],
 
     'hints' => [
-        'workflow'    => 'Pick a template, generate the background and adjust the texts.',
-        'presets'     => 'Apply a ready-made template, then customize freely.',
-        'background'  => 'Pick a theme and, if you like, adjust mood and intensity.',
-        'content'     => 'You can also tap the banner text directly to edit it.',
-        'items'       => 'Items without a name are hidden on the final banner.',
-        'tap_to_edit' => 'Tap text to edit',
+        'workflow'        => 'Pick a template, generate the background and adjust the texts.',
+        'presets'         => 'Apply a ready-made template, then customize freely.',
+        'background'      => 'Pick a theme and, if you like, adjust mood and intensity.',
+        'content'         => 'You can also tap the banner text directly to edit it.',
+        'items'           => 'Items without a name are hidden on the final banner.',
+        'tap_to_edit'     => 'Tap text to edit',
+        'drag_to_reorder' => 'Drag to reorder',
     ],
 
     'presets' => [

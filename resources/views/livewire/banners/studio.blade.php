@@ -68,8 +68,8 @@
             </div>
         </div>
 
-        <div class="lg:col-span-3 space-y-4">
-            <x-banner.section :title="__('banners.sections.presets')" :hint="__('banners.hints.presets')" :open="true">
+        <div class="lg:col-span-3 space-y-4" x-data="{ active: 'presets' }">
+            <x-banner.section name="presets" :title="__('banners.sections.presets')" :hint="__('banners.hints.presets')">
                 <div class="flex flex-wrap gap-2">
                     @foreach (array_keys(Banner::presets()) as $presetKey)
                         <x-button
@@ -82,7 +82,7 @@
                 </div>
             </x-banner.section>
 
-            <x-banner.section :title="__('banners.sections.background')" :hint="__('banners.hints.background')" :open="true">
+            <x-banner.section name="background" :title="__('banners.sections.background')" :hint="__('banners.hints.background')">
                 <div class="space-y-4">
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         @foreach (BannerTheme::cases() as $theme)
@@ -163,7 +163,7 @@
                 </div>
             </x-banner.section>
 
-            <x-banner.section :title="__('banners.sections.logo')">
+            <x-banner.section name="logo" :title="__('banners.sections.logo')">
                 <div class="space-y-4">
                     <x-toggle wire:model.live="design.show_logo" :label="__('banners.fields.show_logo')" />
 
@@ -202,7 +202,7 @@
                 </div>
             </x-banner.section>
 
-            <x-banner.section :title="__('banners.sections.content')" :hint="__('banners.hints.content')">
+            <x-banner.section name="content" :title="__('banners.sections.content')" :hint="__('banners.hints.content')">
                 <div class="space-y-4">
                     <x-input wire:model.live.debounce.400ms="design.title" :label="__('banners.fields.title')" />
                     <x-input wire:model.live.debounce.400ms="design.subtitle" :label="__('banners.fields.subtitle')" />
@@ -245,7 +245,7 @@
                 </div>
             </x-banner.section>
 
-            <x-banner.section :title="__('banners.sections.items')" :hint="__('banners.hints.items')">
+            <x-banner.section name="items" :title="__('banners.sections.items')" :hint="__('banners.hints.items')">
                 <div class="space-y-3">
                     @foreach ($design['items'] as $index => $item)
                         <div class="flex items-end gap-2" wire:key="item-{{ $index }}">
@@ -266,7 +266,7 @@
                 </div>
             </x-banner.section>
 
-            <x-banner.section :title="__('banners.sections.export')">
+            <x-banner.section name="export" :title="__('banners.sections.export')">
                 <div class="space-y-4">
                     <x-native-select wire:model="exportScale" :label="__('banners.fields.resolution')">
                         @foreach ([1, 2, 3] as $scale)

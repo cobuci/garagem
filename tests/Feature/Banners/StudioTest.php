@@ -96,6 +96,14 @@ it('applies a campaign preset', function () {
         ->assertCount('design.items', 5);
 });
 
+it('reorders items by drag position', function () {
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->call('applyPreset', 'barbecue')
+        ->call('sortItems', 4, 0)
+        ->assertSet('design.items.0.name', 'Medalhão')
+        ->assertSet('design.items.1.name', 'Bovino');
+});
+
 it('can add and remove items', function () {
     Livewire::test(Studio::class, ['banner' => $this->banner])
         ->call('addItem')

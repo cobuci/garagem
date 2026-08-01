@@ -39,9 +39,15 @@
             @endif
         </div>
 
-        <div style="display: flex; flex-direction: column; justify-content: center; gap: 30px; flex: 1; margin-top: 48px;">
+        <div @if ($editable) wire:sort="sortItems" @endif style="display: flex; flex-direction: column; justify-content: center; gap: 30px; flex: 1; margin-top: 48px;">
             @foreach ($items as $index => $item)
-                <div style="display: flex; align-items: baseline; gap: 16px; font-size: 36px;">
+                <div
+                    @if ($editable) wire:sort:item="{{ $index }}" wire:key="canvas-item-{{ $index }}" @endif
+                    style="display: flex; align-items: baseline; gap: 16px; font-size: 36px;"
+                >
+                    @if ($editable)
+                        <span wire:sort:handle title="{{ __('banners.hints.drag_to_reorder') }}" style="cursor: grab; opacity: 0.35; font-size: 30px; user-select: none; line-height: 1;">⠿</span>
+                    @endif
                     <span
                         @if ($editable) {!! $editableAttrs !!} x-on:keydown.enter.prevent="$event.target.blur()" x-on:blur="$wire.set('design.items.{{ $index }}.name', $event.target.innerText.trim())" @endif
                         style="font-weight: 600; min-width: 60px;"
