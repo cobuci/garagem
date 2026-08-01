@@ -27,6 +27,7 @@ use Illuminate\Support\Carbon;
  * @property BannerJobStatus  $export_status
  * @property ?string          $export_png_path
  * @property ?string          $export_pdf_path
+ * @property ?array           $export_design
  * @property ?Carbon          $created_at
  * @property ?Carbon          $updated_at
  * @property User             $user
@@ -47,6 +48,7 @@ class Banner extends Model
             'background_intensity' => BannerIntensity::class,
             'background_status'    => BannerJobStatus::class,
             'export_status'        => BannerJobStatus::class,
+            'export_design'        => 'array',
         ];
     }
 

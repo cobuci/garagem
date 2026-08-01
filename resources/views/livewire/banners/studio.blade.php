@@ -16,6 +16,9 @@
 
     $canvasWidth = $banner->format->width();
     $canvasHeight = $banner->format->height();
+
+    $exportIsOutdated = $banner->export_status === BannerJobStatus::Ready
+        && $banner->export_design != $design;
 @endphp
 
 <div
@@ -426,6 +429,13 @@
                             <x-button flat positive icon="document" :label="__('banners.actions.download_pdf')" wire:click="downloadPdf" />
                         @endif
                     </div>
+
+                    @if ($exportIsOutdated)
+                        <p class="flex items-start gap-1.5 text-sm text-amber-600 dark:text-amber-400">
+                            <x-icon name="exclamation-triangle" class="w-4 h-4 mt-0.5 shrink-0" />
+                            {{ __('banners.messages.export_outdated') }}
+                        </p>
+                    @endif
 
                     @if ($banner->export_status === BannerJobStatus::Generating)
                         <p class="text-sm text-primary-600 dark:text-primary-400 animate-pulse">{{ __('banners.messages.export_generating') }}</p>

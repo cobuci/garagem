@@ -196,6 +196,7 @@ return [
         'background_failed'     => 'Falha ao gerar o fundo. Tente novamente.',
         'export_generating'     => 'Exportando em alta qualidade, aguarde...',
         'export_failed'         => 'Falha ao exportar. Tente novamente.',
+        'export_outdated'       => 'Os arquivos disponíveis são de uma versão anterior do banner. Exporte novamente para baixar a versão atual.',
         'unsaved_changes'       => 'Alterações não salvas',
         'save_to_keep'          => 'Salve para não perder as mudanças',
         'discard_unsaved'       => 'Há alterações não salvas. Deseja sair mesmo assim?',

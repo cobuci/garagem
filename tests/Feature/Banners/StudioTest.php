@@ -271,3 +271,27 @@ it('dispatches export job', function () {
         ->export_status->toBe(BannerJobStatus::Generating)
         ->design->title->toBe('OFERTAS');
 });
+
+it('warns when the exported files are from an older design', function () {
+    Queue::fake();
+
+    $component = Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->call('export')
+        ->assertHasNoErrors();
+
+    $this->banner->fresh()->update(['export_status' => BannerJobStatus::Ready]);
+
+    $component
+        ->call('refreshStatus')
+        ->assertDontSee(__('banners.messages.export_outdated'))
+        ->set('design.title', 'NOVO TÍTULO')
+        ->assertSee(__('banners.messages.export_outdated'))
+        ->call('export')
+        ->assertHasNoErrors();
+
+    $this->banner->fresh()->update(['export_status' => BannerJobStatus::Ready]);
+
+    $component
+        ->call('refreshStatus')
+        ->assertDontSee(__('banners.messages.export_outdated'));
+});

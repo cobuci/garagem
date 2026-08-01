@@ -209,6 +209,7 @@ class Studio extends Component
 
         $this->banner->update([
             'design'        => $this->design,
+            'export_design' => $this->design,
             'export_status' => BannerJobStatus::Generating,
         ]);
 

@@ -196,6 +196,7 @@ return [
         'background_failed'     => 'Failed to generate background. Try again.',
         'export_generating'     => 'Exporting in high quality, please wait...',
         'export_failed'         => 'Failed to export. Try again.',
+        'export_outdated'       => 'The available files are from an older version of this banner. Export again to download the current version.',
         'unsaved_changes'       => 'Unsaved changes',
         'save_to_keep'          => 'Save to keep your changes',
         'discard_unsaved'       => 'You have unsaved changes. Leave anyway?',
