@@ -43,7 +43,39 @@ it('can render the studio page', function () {
         ->assertSee('Banner Studio')
         ->assertSee(__('banners.sections.preview'))
         ->assertSee(__('banners.sections.presets'))
-        ->assertSee(__('banners.themes.barbecue.label'));
+        ->assertSee(__('banners.themes.barbecue.label'))
+        ->assertSeeHtml('banner-preview-frame')
+        ->assertSeeHtml('aspect-ratio:')
+        ->assertSeeHtml('ResizeObserver')
+        ->assertSee(__('banners.hints.mood'))
+        ->assertSee(__('banners.hints.intensity'));
+});
+
+it('marks the studio dirty when the design changes and clears after save', function () {
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->assertSet('isDirty', false)
+        ->assertDontSee(__('banners.actions.save_changes'))
+        ->set('design.title', 'OFERTAS')
+        ->assertSet('isDirty', true)
+        ->assertSee(__('banners.actions.save_changes'))
+        ->call('save')
+        ->assertHasNoErrors()
+        ->assertSet('isDirty', false)
+        ->assertDontSee(__('banners.actions.save_changes'));
+});
+
+it('marks the studio dirty when applying a preset', function () {
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->call('applyPreset', 'barbecue')
+        ->assertSet('isDirty', true)
+        ->assertSee(__('banners.actions.save_changes'));
+});
+
+it('renders tip markup for mood and intensity', function () {
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->assertSee(__('banners.hints.mood'))
+        ->assertSee(__('banners.hints.intensity'))
+        ->assertSeeHtml('title="' . e(__('banners.mood_tips.dark')) . '"');
 });
 
 it('can save design changes', function () {
@@ -159,11 +191,15 @@ it('dispatches export job', function () {
     Queue::fake();
 
     Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->set('design.title', 'OFERTAS')
         ->set('exportScale', 3)
         ->call('export')
-        ->assertHasNoErrors();
+        ->assertHasNoErrors()
+        ->assertSet('isDirty', false);
 
     Queue::assertPushed(ExportBannerJob::class, fn (ExportBannerJob $job) => $job->scale === 3);
 
-    expect($this->banner->fresh()->export_status)->toBe(BannerJobStatus::Generating);
+    expect($this->banner->fresh())
+        ->export_status->toBe(BannerJobStatus::Generating)
+        ->design->title->toBe('OFERTAS');
 });

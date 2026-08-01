@@ -28,6 +28,8 @@ class Studio extends Component
 
     public array $design = [];
 
+    public bool $isDirty = false;
+
     public ?string $backgroundTheme = null;
 
     public ?string $backgroundMood = null;
@@ -208,6 +210,8 @@ class Studio extends Component
 
     public function render(): View
     {
+        $this->isDirty = $this->design != array_merge(Banner::defaultDesign(), $this->banner->design);
+
         return view('livewire.banners.studio');
     }
 }

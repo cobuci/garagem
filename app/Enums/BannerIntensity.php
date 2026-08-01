@@ -12,6 +12,11 @@ enum BannerIntensity: string
         return __("banners.intensities.{$this->value}");
     }
 
+    public function tip(): string
+    {
+        return __("banners.intensity_tips.{$this->value}");
+    }
+
     public function prompt(): string
     {
         return match ($this) {

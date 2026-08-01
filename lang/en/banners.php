@@ -29,6 +29,20 @@ return [
         'items'           => 'Items without a name are hidden on the final banner.',
         'tap_to_edit'     => 'Tap text to edit',
         'drag_to_reorder' => 'Drag to reorder',
+        'mood'            => 'Sets the overall lighting of the AI-generated background.',
+        'intensity'       => 'Controls how strongly background elements stand out.',
+        'resolution'      => 'Multiplies the exported file size. 2x and 3x look sharper.',
+    ],
+
+    'mood_tips' => [
+        'dark'  => 'Dark, sophisticated look — great for night promotions.',
+        'light' => 'Bright and airy lighting — good for snacks and daily deals.',
+        'night' => 'Night ambience with light accents — fits happy hour.',
+    ],
+
+    'intensity_tips' => [
+        'soft' => 'Subtle, blurred elements — keeps focus on the text.',
+        'bold' => 'Vivid colors and strong accents — more visual impact.',
     ],
 
     'presets' => [
@@ -150,6 +164,7 @@ return [
         'label'               => 'Actions',
         'create'              => 'New Banner',
         'save'                => 'Save',
+        'save_changes'        => 'Save changes',
         'cancel'              => 'Cancel',
         'delete'              => 'Delete',
         'back'                => 'Back',
@@ -172,5 +187,8 @@ return [
         'background_failed'     => 'Failed to generate background. Try again.',
         'export_generating'     => 'Exporting in high quality, please wait...',
         'export_failed'         => 'Failed to export. Try again.',
+        'unsaved_changes'       => 'Unsaved changes',
+        'save_to_keep'          => 'Save to keep your changes',
+        'discard_unsaved'       => 'You have unsaved changes. Leave anyway?',
     ],
 ];

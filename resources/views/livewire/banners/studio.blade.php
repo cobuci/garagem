@@ -12,9 +12,24 @@
     $backgroundSrc = $banner->background_path
         ? route('banners.background', $banner) . '?v=' . $banner->updated_at?->timestamp
         : null;
+
+    $canvasWidth = $banner->format->width();
+    $canvasHeight = $banner->format->height();
 @endphp
 
-<div class="pb-24 lg:pb-0" @if ($isWorking) wire:poll.2s="refreshStatus" @endif>
+<div
+    class="pb-24 lg:pb-0"
+    @if ($isWorking) wire:poll.2s="refreshStatus" @endif
+    x-data
+    x-init="
+        const warn = (event) => {
+            if (! $wire.isDirty) return
+            event.preventDefault()
+            event.returnValue = ''
+        }
+        window.addEventListener('beforeunload', warn)
+    "
+>
     <style>
         .banner-editable { transition: outline-color 0.15s; outline: 2px dashed transparent; outline-offset: 6px; }
         .banner-editable:hover { outline-color: rgba(56, 182, 248, 0.7); cursor: text; }
@@ -23,46 +38,97 @@
 
     <div class="flex items-center justify-between gap-3 mb-6">
         <div class="min-w-0">
-            <h1 class="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white truncate">{{ $banner->name }}</h1>
+            <div class="flex items-center gap-2 min-w-0">
+                <h1 class="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white truncate">{{ $banner->name }}</h1>
+                <span class="inline-flex items-center gap-1.5 shrink-0 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800 dark:bg-amber-500/15 dark:text-amber-300 {{ $isDirty ? '' : 'hidden' }}">
+                    <span class="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                    {{ __('banners.messages.unsaved_changes') }}
+                </span>
+            </div>
             <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400 truncate">
                 {{ $banner->format->label() }}
+                <span class="text-amber-600 dark:text-amber-400 {{ $isDirty ? '' : 'hidden' }}">· {{ __('banners.messages.save_to_keep') }}</span>
             </p>
         </div>
         <div class="flex items-center gap-2 shrink-0">
-            <x-button flat icon="arrow-left" :label="__('banners.actions.back')" :href="route('banners.index')" wire:navigate class="!hidden sm:!inline-flex" />
-            <x-button flat icon="arrow-left" :href="route('banners.index')" wire:navigate class="sm:!hidden" />
+            <x-button
+                flat
+                icon="arrow-left"
+                :label="__('banners.actions.back')"
+                :href="route('banners.index')"
+                wire:navigate
+                class="!hidden sm:!inline-flex"
+                x-on:click="if ($wire.isDirty && ! confirm({{ \Illuminate\Support\Js::from(__('banners.messages.discard_unsaved')) }})) $event.preventDefault()"
+            />
+            <x-button
+                flat
+                icon="arrow-left"
+                :href="route('banners.index')"
+                wire:navigate
+                class="sm:!hidden"
+                x-on:click="if ($wire.isDirty && ! confirm({{ \Illuminate\Support\Js::from(__('banners.messages.discard_unsaved')) }})) $event.preventDefault()"
+            />
 
             @can(Permission::EditBanner->value)
-                <x-button primary icon="check" :label="__('banners.actions.save')" wire:click="save" class="!hidden lg:!inline-flex" />
+                <x-button
+                    :color="$isDirty ? 'warning' : 'primary'"
+                    icon="check"
+                    :label="$isDirty ? __('banners.actions.save_changes') : __('banners.actions.save')"
+                    wire:click="save"
+                    class="!hidden lg:!inline-flex"
+                />
             @endcan
         </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
-        <div class="lg:col-span-2 lg:order-last">
-            <div class="lg:sticky lg:top-8">
+        <div class="lg:col-span-2 lg:order-last min-w-0">
+            <div class="lg:sticky lg:top-8 min-w-0">
                 <div class="flex items-baseline justify-between mb-3">
                     <h2 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         {{ __('banners.sections.preview') }}
                     </h2>
-                    <span class="text-xs text-gray-400 dark:text-gray-500">{{ __('banners.hints.tap_to_edit') }}</span>
+                    <span
+                        class="text-xs text-gray-400 dark:text-gray-500 cursor-help border-b border-dashed border-gray-300 dark:border-gray-600"
+                        title="{{ __('banners.hints.tap_to_edit') }}"
+                    >{{ __('banners.hints.tap_to_edit') }}</span>
                 </div>
 
                 <div
-                    class="w-full max-w-[480px] mx-auto rounded-xl shadow-lg ring-1 ring-black/10 overflow-hidden"
-                    x-data="{ scale: 0 }"
-                    x-init="const fit = () => { scale = $el.clientWidth / {{ $banner->format->width() }} }; fit(); window.addEventListener('resize', fit)"
+                    class="banner-preview-frame relative w-full max-w-[480px] mx-auto min-w-0 rounded-xl shadow-lg ring-1 ring-black/10 overflow-hidden bg-gray-100 dark:bg-gray-900"
+                    style="aspect-ratio: {{ $canvasWidth }} / {{ $canvasHeight }};"
+                    x-data="{
+                        canvasWidth: {{ $canvasWidth }},
+                        scale: {{ 480 / $canvasWidth }},
+                        fit() {
+                            const measured = this.$el.clientWidth
+                            if (measured < 1) {
+                                return
+                            }
+                            this.scale = measured / this.canvasWidth
+                        },
+                    }"
+                    x-init="
+                        fit()
+                        requestAnimationFrame(() => fit())
+                        ;[50, 150, 400].forEach((ms) => setTimeout(() => fit(), ms))
+                        new ResizeObserver(() => fit()).observe($el)
+                        window.addEventListener('resize', () => fit())
+                    "
                 >
-                    <div x-bind:style="`height: ${Math.round({{ $banner->format->height() }} * scale)}px`" style="overflow: hidden;">
-                        <div x-bind:style="`transform: scale(${scale}); transform-origin: top left;`" style="width: {{ $banner->format->width() }}px;">
-                            @include('banners.canvas', [
-                                'format'        => $banner->format,
-                                'design'        => $design,
-                                'backgroundSrc' => $backgroundSrc,
-                                'logoSrc'       => asset(Banner::LOGO_PATH),
-                                'editable'      => auth()->user()?->can(Permission::EditBanner->value) ?? false,
-                            ])
-                        </div>
+                    <div
+                        class="absolute top-0 left-0"
+                        wire:key="banner-preview-{{ $banner->id }}-{{ $banner->updated_at?->timestamp }}"
+                        style="width: {{ $canvasWidth }}px; transform: scale({{ 480 / $canvasWidth }}); transform-origin: top left;"
+                        :style="`width: ${canvasWidth}px; transform: scale(${scale}); transform-origin: top left;`"
+                    >
+                        @include('banners.canvas', [
+                            'format'        => $banner->format,
+                            'design'        => $design,
+                            'backgroundSrc' => $backgroundSrc,
+                            'logoSrc'       => asset(Banner::LOGO_PATH),
+                            'editable'      => auth()->user()?->can(Permission::EditBanner->value) ?? false,
+                        ])
                     </div>
                 </div>
             </div>
@@ -104,12 +170,18 @@
                     @enderror
 
                     <div>
-                        <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('banners.fields.mood') }}</span>
+                        <div class="flex items-center gap-1.5 mb-2">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('banners.fields.mood') }}</span>
+                            <span class="text-gray-400 cursor-help" title="{{ __('banners.hints.mood') }}">
+                                <x-icon name="question-mark-circle" class="w-4 h-4" />
+                            </span>
+                        </div>
                         <div class="flex flex-wrap gap-2">
                             @foreach (BannerMood::cases() as $mood)
                                 <button
                                     type="button"
                                     wire:click="$set('backgroundMood', {{ $backgroundMood === $mood->value ? 'null' : "'{$mood->value}'" }})"
+                                    title="{{ $mood->tip() }}"
                                     class="rounded-full px-4 py-1.5 text-sm font-medium border transition
                                         {{ $backgroundMood === $mood->value
                                             ? 'border-primary-500 bg-primary-500 text-white'
@@ -119,15 +191,24 @@
                                 </button>
                             @endforeach
                         </div>
+                        <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                            {{ $backgroundMood ? BannerMood::from($backgroundMood)->tip() : __('banners.hints.mood') }}
+                        </p>
                     </div>
 
                     <div>
-                        <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('banners.fields.intensity') }}</span>
+                        <div class="flex items-center gap-1.5 mb-2">
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('banners.fields.intensity') }}</span>
+                            <span class="text-gray-400 cursor-help" title="{{ __('banners.hints.intensity') }}">
+                                <x-icon name="question-mark-circle" class="w-4 h-4" />
+                            </span>
+                        </div>
                         <div class="flex flex-wrap gap-2">
                             @foreach (BannerIntensity::cases() as $intensity)
                                 <button
                                     type="button"
                                     wire:click="$set('backgroundIntensity', {{ $backgroundIntensity === $intensity->value ? 'null' : "'{$intensity->value}'" }})"
+                                    title="{{ $intensity->tip() }}"
                                     class="rounded-full px-4 py-1.5 text-sm font-medium border transition
                                         {{ $backgroundIntensity === $intensity->value
                                             ? 'border-primary-500 bg-primary-500 text-white'
@@ -137,6 +218,9 @@
                                 </button>
                             @endforeach
                         </div>
+                        <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                            {{ $backgroundIntensity ? BannerIntensity::from($backgroundIntensity)->tip() : __('banners.hints.intensity') }}
+                        </p>
                     </div>
 
                     <div class="flex flex-wrap items-center gap-2">
@@ -268,13 +352,20 @@
 
             <x-banner.section name="export" :title="__('banners.sections.export')">
                 <div class="space-y-4">
-                    <x-native-select wire:model="exportScale" :label="__('banners.fields.resolution')">
-                        @foreach ([1, 2, 3] as $scale)
-                            <option value="{{ $scale }}">
-                                {{ $banner->format->width() * $scale }} × {{ $banner->format->height() * $scale }} px ({{ $scale }}x)
-                            </option>
-                        @endforeach
-                    </x-native-select>
+                    <div class="flex items-end gap-2">
+                        <div class="flex-1">
+                            <x-native-select wire:model="exportScale" :label="__('banners.fields.resolution')">
+                                @foreach ([1, 2, 3] as $scale)
+                                    <option value="{{ $scale }}">
+                                        {{ $banner->format->width() * $scale }} × {{ $banner->format->height() * $scale }} px ({{ $scale }}x)
+                                    </option>
+                                @endforeach
+                            </x-native-select>
+                        </div>
+                        <span class="mb-2 text-gray-400 cursor-help" title="{{ __('banners.hints.resolution') }}">
+                            <x-icon name="question-mark-circle" class="w-5 h-5" />
+                        </span>
+                    </div>
 
                     <div class="flex flex-wrap items-center gap-2">
                         <x-button
@@ -304,8 +395,17 @@
     </div>
 
     @can(Permission::EditBanner->value)
-        <div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-800/95 backdrop-blur border-t border-gray-200 dark:border-gray-700 p-3">
-            <x-button primary icon="check" :label="__('banners.actions.save')" wire:click="save" class="w-full" />
+        <div class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-gray-800/95 backdrop-blur border-t border-gray-200 dark:border-gray-700 p-3 space-y-2">
+            <p class="text-center text-xs font-medium text-amber-700 dark:text-amber-300 {{ $isDirty ? '' : 'hidden' }}">
+                {{ __('banners.messages.unsaved_changes') }} — {{ __('banners.messages.save_to_keep') }}
+            </p>
+            <x-button
+                :color="$isDirty ? 'warning' : 'primary'"
+                icon="check"
+                :label="$isDirty ? __('banners.actions.save_changes') : __('banners.actions.save')"
+                wire:click="save"
+                class="w-full"
+            />
         </div>
     @endcan
 </div>

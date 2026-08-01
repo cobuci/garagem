@@ -29,6 +29,20 @@ return [
         'items'           => 'Itens sem nome não aparecem no banner final.',
         'tap_to_edit'     => 'Toque no texto para editar',
         'drag_to_reorder' => 'Arraste para reordenar',
+        'mood'            => 'Define a iluminação geral do fundo gerado pela IA.',
+        'intensity'       => 'Controla o quanto os elementos do fundo se destacam.',
+        'resolution'      => 'Multiplica o tamanho do arquivo exportado. 2x e 3x ficam mais nítidos.',
+    ],
+
+    'mood_tips' => [
+        'dark'  => 'Fundo escuro e sofisticado — ideal para promoções noturnas.',
+        'light' => 'Iluminação clara e arejada — bom para petiscos e promoções do dia.',
+        'night' => 'Ambiente noturno com pontos de luz — combina com happy hour.',
+    ],
+
+    'intensity_tips' => [
+        'soft' => 'Elementos discretos e desfocados — o texto ganha mais atenção.',
+        'bold' => 'Cores vivas e elementos marcantes — mais impacto visual.',
     ],
 
     'presets' => [
@@ -150,6 +164,7 @@ return [
         'label'               => 'Ações',
         'create'              => 'Novo Banner',
         'save'                => 'Salvar',
+        'save_changes'        => 'Salvar alterações',
         'cancel'              => 'Cancelar',
         'delete'              => 'Excluir',
         'back'                => 'Voltar',
@@ -172,5 +187,8 @@ return [
         'background_failed'     => 'Falha ao gerar o fundo. Tente novamente.',
         'export_generating'     => 'Exportando em alta qualidade, aguarde...',
         'export_failed'         => 'Falha ao exportar. Tente novamente.',
+        'unsaved_changes'       => 'Alterações não salvas',
+        'save_to_keep'          => 'Salve para não perder as mudanças',
+        'discard_unsaved'       => 'Há alterações não salvas. Deseja sair mesmo assim?',
     ],
 ];

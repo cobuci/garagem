@@ -13,6 +13,11 @@ enum BannerMood: string
         return __("banners.moods.{$this->value}");
     }
 
+    public function tip(): string
+    {
+        return __("banners.mood_tips.{$this->value}");
+    }
+
     public function prompt(): string
     {
         return match ($this) {
