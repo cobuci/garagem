@@ -369,7 +369,7 @@
                                 <x-input wire:model.live.debounce.400ms="design.items.{{ $index }}.note" :label="$index === 0 ? __('banners.fields.item_note') : null" />
                             </div>
                             <div class="w-28 sm:w-32">
-                                <x-input wire:model.live.debounce.400ms="design.items.{{ $index }}.price" :label="$index === 0 ? __('banners.fields.item_price') : null" />
+                                <x-money-input prefix="R$" wire:model.live.debounce.400ms="design.items.{{ $index }}.price" :label="$index === 0 ? __('banners.fields.item_price') : null" />
                             </div>
                             <x-button flat negative icon="trash" wire:click="removeItem({{ $index }})" />
                         </div>

@@ -19,6 +19,9 @@
         default => 'center',
     };
     $editableAttrs = 'contenteditable="true" spellcheck="false" class="banner-editable"';
+    $formatPrice = fn ($price): string => is_numeric($price)
+        ? 'R$ ' . number_format((float) $price, 2, ',', '.')
+        : (string) $price;
 @endphp
 <div style="position: relative; width: {{ $width }}px; height: {{ $height }}px; background-color: {{ $design['background_color'] }}; overflow: hidden; font-family: {{ $textFont->family() }}; color: {{ $design['text_color'] }};">
     @if ($backgroundSrc)
@@ -66,9 +69,9 @@
                     @endif
                     <span style="flex: 1; border-bottom: 3px dotted {{ $design['text_color'] }}55; margin: 0 8px;"></span>
                     <span
-                        @if ($editable) {!! $editableAttrs !!} x-on:keydown.enter.prevent="$event.target.blur()" x-on:blur="$wire.set('design.items.{{ $index }}.price', $event.target.innerText.trim())" @endif
+                        @if ($editable) {!! $editableAttrs !!} x-on:keydown.enter.prevent="$event.target.blur()" x-on:blur="$wire.set('design.items.{{ $index }}.price', $event.target.innerText.replace(/[^0-9,]/g, '').replace(',', '.'))" @endif
                         style="font-weight: 700; white-space: nowrap; min-width: 60px;"
-                    >{{ $item['price'] }}</span>
+                    >{{ $formatPrice($item['price'] ?? '') }}</span>
                 </div>
             @endforeach
         </div>

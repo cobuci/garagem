@@ -220,6 +220,27 @@ it('reorders items by drag position', function () {
         ->assertSet('design.items.1.name', 'Bovino');
 });
 
+it('formats item prices as currency on the canvas', function () {
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->assertSee('R$ 0,00')
+        ->set('design.items.0.price', '12.5')
+        ->assertSee('R$ 12,50')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect($this->banner->fresh()->design['items'][0]['price'])->toBe('12.5');
+});
+
+it('keeps legacy free-text prices as they are on the canvas', function () {
+    $this->banner->update(['design' => [
+        ...Banner::defaultDesign(),
+        'items' => [['name' => 'Picanha', 'note' => '', 'price' => 'R$ 5,00 / kg']],
+    ]]);
+
+    Livewire::test(Studio::class, ['banner' => $this->banner->fresh()])
+        ->assertSee('R$ 5,00 / kg');
+});
+
 it('can add and remove items', function () {
     Livewire::test(Studio::class, ['banner' => $this->banner])
         ->call('addItem')

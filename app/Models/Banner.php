@@ -68,7 +68,7 @@ class Banner extends Model
             'logo_align'       => 'center',
             'logo_size'        => 'medium',
             'items'            => [
-                ['name' => 'Produto', 'note' => '', 'price' => 'R$ 0,00'],
+                ['name' => 'Produto', 'note' => '', 'price' => '0.00'],
             ],
             'texts' => [],
         ];
@@ -101,11 +101,11 @@ class Banner extends Model
                 'accent_color'     => '#f97316',
                 'text_color'       => '#fff7ed',
                 'items'            => [
-                    ['name' => 'Bovino', 'note' => '', 'price' => 'R$ 0,00'],
-                    ['name' => 'Frango', 'note' => '', 'price' => 'R$ 0,00'],
-                    ['name' => 'Linguiça', 'note' => '', 'price' => 'R$ 0,00'],
-                    ['name' => 'Kafta', 'note' => '', 'price' => 'R$ 0,00'],
-                    ['name' => 'Medalhão', 'note' => '5 uni', 'price' => 'R$ 0,00'],
+                    ['name' => 'Bovino', 'note' => '', 'price' => '0.00'],
+                    ['name' => 'Frango', 'note' => '', 'price' => '0.00'],
+                    ['name' => 'Linguiça', 'note' => '', 'price' => '0.00'],
+                    ['name' => 'Kafta', 'note' => '', 'price' => '0.00'],
+                    ['name' => 'Medalhão', 'note' => '5 uni', 'price' => '0.00'],
                 ],
             ],
             'drinks' => [
@@ -116,10 +116,10 @@ class Banner extends Model
                 'accent_color'     => '#38bdf8',
                 'text_color'       => '#f0f9ff',
                 'items'            => [
-                    ['name' => 'Cerveja lata', 'note' => '', 'price' => 'R$ 0,00'],
-                    ['name' => 'Long neck', 'note' => '', 'price' => 'R$ 0,00'],
-                    ['name' => 'Refrigerante', 'note' => '', 'price' => 'R$ 0,00'],
-                    ['name' => 'Água', 'note' => '', 'price' => 'R$ 0,00'],
+                    ['name' => 'Cerveja lata', 'note' => '', 'price' => '0.00'],
+                    ['name' => 'Long neck', 'note' => '', 'price' => '0.00'],
+                    ['name' => 'Refrigerante', 'note' => '', 'price' => '0.00'],
+                    ['name' => 'Água', 'note' => '', 'price' => '0.00'],
                 ],
             ],
             'snacks' => [
@@ -130,9 +130,9 @@ class Banner extends Model
                 'accent_color'     => '#fbbf24',
                 'text_color'       => '#fefce8',
                 'items'            => [
-                    ['name' => 'Batata frita', 'note' => '', 'price' => 'R$ 0,00'],
-                    ['name' => 'Frango a passarinho', 'note' => '', 'price' => 'R$ 0,00'],
-                    ['name' => 'Torresmo', 'note' => '', 'price' => 'R$ 0,00'],
+                    ['name' => 'Batata frita', 'note' => '', 'price' => '0.00'],
+                    ['name' => 'Frango a passarinho', 'note' => '', 'price' => '0.00'],
+                    ['name' => 'Torresmo', 'note' => '', 'price' => '0.00'],
                 ],
             ],
         ];
