@@ -8,6 +8,6 @@ return [
 
     'request_timeout' => env('GEMINI_REQUEST_TIMEOUT', 120),
 
-    'banner_image_model' => env('GEMINI_BANNER_IMAGE_MODEL', 'gemini-3.1-flash-image-preview'),
+    'banner_image_model' => env('GEMINI_BANNER_IMAGE_MODEL', 'gemini-2.5-flash-image'),
 
 ];
