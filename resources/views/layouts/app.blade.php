@@ -21,6 +21,16 @@
 
         <title>{{ $title ?? config('app.name') }}</title>
 
+        @php
+            $favicon = \App\Models\Banner::logoUrl();
+        @endphp
+        @if ($favicon)
+            <link rel="icon" href="{{ $favicon }}" type="image/png">
+            <link rel="apple-touch-icon" href="{{ $favicon }}">
+        @else
+            <link rel="icon" href="/favicon.ico" sizes="any">
+        @endif
+
         <script>
             function applyDarkMode() {
                 if (localStorage.getItem('darkMode') === 'true' ||
@@ -48,7 +58,7 @@
                 <livewire:layout.sidebar />
 
                 <!-- Main Content -->
-                <main class="flex-1 min-w-0 lg:ml-64 pt-16 lg:pt-0 min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col overflow-x-hidden">
+                <main class="flex-1 min-w-0 lg:ml-64 pt-16 lg:pt-0 min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col overflow-x-clip">
                     <div class="flex-1 p-4 lg:p-8 flex flex-col w-full">
                         {{ $slot }}
                     </div>

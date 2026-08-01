@@ -2,6 +2,7 @@
 /node_modules
 /public/build
 /public/hot
+/public/images/brand
 /public/storage
 /storage/*.key
 /storage/pail
@@ -29,3 +30,4 @@ yarn-error.log
 laradumps.yaml
 /.junie
 .DS_Store
+/public/images/brand
