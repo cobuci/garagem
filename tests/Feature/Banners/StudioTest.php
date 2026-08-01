@@ -45,6 +45,7 @@ it('can render the studio page', function () {
         ->assertSee(__('banners.sections.preview'))
         ->assertSee(__('banners.sections.presets'))
         ->assertSee(__('banners.themes.barbecue.label'))
+        ->assertSeeHtml('sticky top-16 lg:top-0')
         ->assertSeeHtml('banner-preview-frame')
         ->assertSeeHtml('aspect-ratio:')
         ->assertSeeHtml('ResizeObserver')

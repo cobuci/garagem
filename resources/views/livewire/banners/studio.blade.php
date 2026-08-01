@@ -38,7 +38,7 @@
         .banner-editable:focus { outline-color: rgba(56, 182, 248, 1); }
     </style>
 
-    <div class="flex items-center justify-between gap-3 mb-6">
+    <div class="sticky top-16 lg:top-0 z-30 flex items-center justify-between gap-3 mb-6 -mx-4 lg:-mx-8 px-4 lg:px-8 py-3 bg-gray-50/95 dark:bg-gray-900/95 backdrop-blur">
         <div class="min-w-0">
             <div class="flex items-center gap-2 min-w-0">
                 <h1 class="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white truncate">{{ $banner->name }}</h1>
