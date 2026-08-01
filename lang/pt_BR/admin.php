@@ -8,7 +8,29 @@ return [
         'import'    => 'Importar Legado',
         'roles'     => 'Roles e Permissões',
         'audits'    => 'Log de Auditoria',
+        'brand'     => 'Logo da Marca',
         'changelog' => 'Changelog',
+    ],
+    'brand' => [
+        'title'                => 'Logo da marca',
+        'subtitle'             => 'Envie o logo usado nos banners promocionais. Aceita apenas PNG (máx. 2 MB).',
+        'current'              => 'Logo atual',
+        'available_in_banners' => 'Disponível para uso no studio de banners.',
+        'empty'                => 'Nenhum logo enviado ainda. Enquanto isso, a opção de logo fica desabilitada nos banners.',
+        'fields'               => [
+            'upload'  => 'Enviar logo',
+            'replace' => 'Substituir logo',
+        ],
+        'actions' => [
+            'save'   => 'Salvar logo',
+            'remove' => 'Remover logo',
+        ],
+        'messages' => [
+            'success'        => 'Sucesso',
+            'uploaded'       => 'Logo enviado com sucesso.',
+            'removed'        => 'Logo removido com sucesso.',
+            'confirm_remove' => 'Tem certeza que deseja remover o logo?',
+        ],
     ],
     'users' => [
         'title'    => 'Gerenciamento de Usuários',

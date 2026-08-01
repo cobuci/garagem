@@ -27,6 +27,7 @@ test('sidebar displays correct menu items for admin', function () {
         ->assertSee(__('sidebar.pos'))
         ->assertSee(__('sidebar.orders'))
         ->assertSee(__('sidebar.bills_payable'))
+        ->assertSee(__('sidebar.banners'))
         ->assertSee(__('sidebar.reports'));
 });
 
@@ -44,7 +45,8 @@ test('sidebar hides restricted menu items for common user', function () {
         ->assertSee(__('sidebar.orders'))
         ->assertSee(__('sidebar.reports'))
         ->assertDontSee(__('sidebar.recent_activities'))
-        ->assertDontSee(__('sidebar.bills_payable'));
+        ->assertDontSee(__('sidebar.bills_payable'))
+        ->assertDontSee(__('sidebar.banners'));
 });
 
 test('user can switch accounts when not in production', function () {
