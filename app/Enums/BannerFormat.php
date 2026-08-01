@@ -31,6 +31,14 @@ enum BannerFormat: string
         };
     }
 
+    public function aiSize(): string
+    {
+        return match ($this) {
+            self::Stories, self::Post => '2:3',
+            self::Square              => '1:1',
+        };
+    }
+
     public function label(): string
     {
         return match ($this) {

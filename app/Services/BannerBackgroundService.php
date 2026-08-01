@@ -12,12 +12,12 @@ class BannerBackgroundService
     public function generate(Banner $banner): string
     {
         $image = Image::of($this->prompt($banner))
-            ->size($banner->format->aspectRatio())
+            ->size($banner->format->aiSize())
             ->quality('low')
             ->timeout(120)
             ->generate(
-                provider: Lab::Gemini,
-                model: config('ai.providers.gemini.models.image.default'),
+                provider: Lab::OpenAI,
+                model: config('ai.providers.openai.models.image.default'),
             );
 
         $path = $image->storeAs(

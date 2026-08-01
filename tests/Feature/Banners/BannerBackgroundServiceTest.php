@@ -26,5 +26,5 @@ it('generates and stores a banner background with laravel ai', function () {
         ->and(Storage::exists($path))->toBeTrue();
 
     Image::assertGenerated(fn ($prompt) => str_contains($prompt->prompt, 'fundo azul de oficina')
-        && $prompt->size === '9:16');
+        && $prompt->size === '2:3');
 });
