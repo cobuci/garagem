@@ -147,7 +147,7 @@
                             'format'        => $banner->format,
                             'design'        => $design,
                             'backgroundSrc' => $backgroundSrc,
-                            'logoSrc'       => asset(Banner::LOGO_PATH),
+                            'logoSrc'       => Banner::logoUrl(),
                             'editable'      => auth()->user()?->can(Permission::EditBanner->value) ?? false,
                         ])
                     </div>
@@ -271,42 +271,51 @@
             </x-banner.section>
 
             <x-banner.section name="logo" :title="__('banners.sections.logo')">
-                <div class="space-y-4">
-                    <x-toggle wire:model.live="design.show_logo" :label="__('banners.fields.show_logo')" />
+                @if (Banner::hasLogo())
+                    <div class="space-y-4">
+                        <x-toggle wire:model.live="design.show_logo" :label="__('banners.fields.show_logo')" />
 
-                    @if ($design['show_logo'])
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <x-native-select wire:model.live="design.logo_position" :label="__('banners.fields.logo_position')">
-                                <option value="top">{{ __('banners.logo_positions.top') }}</option>
-                                <option value="bottom">{{ __('banners.logo_positions.bottom') }}</option>
-                            </x-native-select>
+                        @if ($design['show_logo'])
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <x-native-select wire:model.live="design.logo_position" :label="__('banners.fields.logo_position')">
+                                    <option value="top">{{ __('banners.logo_positions.top') }}</option>
+                                    <option value="bottom">{{ __('banners.logo_positions.bottom') }}</option>
+                                </x-native-select>
 
-                            <x-native-select wire:model.live="design.logo_size" :label="__('banners.fields.logo_size')">
-                                <option value="small">{{ __('banners.logo_sizes.small') }}</option>
-                                <option value="medium">{{ __('banners.logo_sizes.medium') }}</option>
-                                <option value="large">{{ __('banners.logo_sizes.large') }}</option>
-                            </x-native-select>
-                        </div>
-
-                        <div>
-                            <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('banners.fields.logo_align') }}</span>
-                            <div class="inline-flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
-                                @foreach (['left', 'center', 'right'] as $align)
-                                    <button
-                                        type="button"
-                                        wire:click="$set('design.logo_align', '{{ $align }}')"
-                                        class="px-4 py-2 text-sm font-medium transition
-                                            {{ ($design['logo_align'] ?? 'center') === $align
-                                                ? 'bg-primary-500 text-white'
-                                                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700' }}"
-                                    >
-                                        {{ __('banners.logo_aligns.' . $align) }}
-                                    </button>
-                                @endforeach
+                                <x-native-select wire:model.live="design.logo_size" :label="__('banners.fields.logo_size')">
+                                    <option value="small">{{ __('banners.logo_sizes.small') }}</option>
+                                    <option value="medium">{{ __('banners.logo_sizes.medium') }}</option>
+                                    <option value="large">{{ __('banners.logo_sizes.large') }}</option>
+                                </x-native-select>
                             </div>
-                        </div>
-                    @endif
-                </div>
+
+                            <div>
+                                <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('banners.fields.logo_align') }}</span>
+                                <div class="inline-flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+                                    @foreach (['left', 'center', 'right'] as $align)
+                                        <button
+                                            type="button"
+                                            wire:click="$set('design.logo_align', '{{ $align }}')"
+                                            class="px-4 py-2 text-sm font-medium transition
+                                                {{ ($design['logo_align'] ?? 'center') === $align
+                                                    ? 'bg-primary-500 text-white'
+                                                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700' }}"
+                                        >
+                                            {{ __('banners.logo_aligns.' . $align) }}
+                                        </button>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                @else
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                        {{ __('banners.messages.logo_missing') }}
+                        @can(Permission::ViewAdmin->value)
+                            <a href="{{ route('admin.index', ['t' => 'brand']) }}" wire:navigate class="text-primary-600 dark:text-primary-400 hover:underline">{{ __('banners.actions.upload_logo') }}</a>
+                        @endcan
+                    </p>
+                @endif
             </x-banner.section>
 
             <x-banner.section name="content" :title="__('banners.sections.content')" :hint="__('banners.hints.content')">

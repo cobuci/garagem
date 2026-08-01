@@ -11,6 +11,7 @@ use App\Enums\BannerTheme;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @property int              $id
@@ -34,9 +35,30 @@ use Illuminate\Support\Carbon;
  */
 class Banner extends Model
 {
-    public const LOGO_PATH = 'images/brand/logo-46-garagem.png';
+    public const LOGO_STORAGE_PATH = 'brand/logo.png';
 
     protected $guarded = ['id'];
+
+    public static function hasLogo(): bool
+    {
+        return Storage::disk('public')->exists(self::LOGO_STORAGE_PATH);
+    }
+
+    public static function logoUrl(): ?string
+    {
+        return self::hasLogo()
+            ? Storage::disk('public')->url(self::LOGO_STORAGE_PATH)
+            : null;
+    }
+
+    public static function logoDataUri(): ?string
+    {
+        if (! self::hasLogo()) {
+            return null;
+        }
+
+        return 'data:image/png;base64,' . base64_encode(Storage::disk('public')->get(self::LOGO_STORAGE_PATH));
+    }
 
     protected function casts(): array
     {
@@ -63,7 +85,7 @@ class Banner extends Model
             'background_color' => '#0f172a',
             'accent_color'     => '#38bdf8',
             'text_color'       => '#ffffff',
-            'show_logo'        => true,
+            'show_logo'        => false,
             'logo_position'    => 'top',
             'logo_align'       => 'center',
             'logo_size'        => 'medium',

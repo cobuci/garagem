@@ -78,13 +78,7 @@ class ExportBannerJob implements ShouldQueue
 
     private function logoSrc(): ?string
     {
-        $path = public_path(Banner::LOGO_PATH);
-
-        if (! file_exists($path)) {
-            return null;
-        }
-
-        return 'data:image/png;base64,' . base64_encode(file_get_contents($path));
+        return Banner::logoDataUri();
     }
 
     private function browsershot(string $html, int $width, int $height): Browsershot

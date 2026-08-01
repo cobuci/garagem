@@ -49,6 +49,11 @@ class Studio extends Component
         $this->banner = $banner;
         $this->design = array_merge(Banner::defaultDesign(), $banner->design);
         $this->format = $banner->format->value;
+
+        if (! Banner::hasLogo()) {
+            $this->design['show_logo'] = false;
+        }
+
         $this->backgroundTheme = $banner->background_theme?->value;
         $this->backgroundMood = $banner->background_mood?->value;
         $this->backgroundIntensity = $banner->background_intensity?->value;

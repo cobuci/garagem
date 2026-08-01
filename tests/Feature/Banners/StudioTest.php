@@ -13,6 +13,7 @@ use App\Models\Banner;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
 use function Pest\Laravel\actingAs;
@@ -168,9 +169,32 @@ it('keeps custom texts inside the canvas bounds', function () {
         ->assertHasErrors(['design.texts.0.x']);
 });
 
-it('can save logo preferences', function () {
+it('hides logo controls when no brand logo is uploaded', function () {
+    Storage::fake('public');
+
     Livewire::test(Studio::class, ['banner' => $this->banner])
-        ->set('design.show_logo', false)
+        ->assertSet('design.show_logo', false)
+        ->assertSee(__('banners.messages.logo_missing'))
+        ->assertDontSee(__('banners.fields.show_logo'));
+});
+
+it('shows logo controls when a brand logo exists', function () {
+    Storage::fake('public');
+    Storage::disk('public')->put(Banner::LOGO_STORAGE_PATH, 'png');
+
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->assertSee(__('banners.fields.show_logo'))
+        ->assertDontSee(__('banners.messages.logo_missing'))
+        ->set('design.show_logo', true)
+        ->assertSee(__('banners.fields.logo_position'));
+});
+
+it('can save logo preferences', function () {
+    Storage::fake('public');
+    Storage::disk('public')->put(Banner::LOGO_STORAGE_PATH, 'png');
+
+    Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->set('design.show_logo', true)
         ->set('design.logo_position', 'bottom')
         ->set('design.logo_align', 'right')
         ->set('design.logo_size', 'large')
@@ -179,14 +203,18 @@ it('can save logo preferences', function () {
 
     $design = $this->banner->fresh()->design;
 
-    expect($design['show_logo'])->toBeFalse()
+    expect($design['show_logo'])->toBeTrue()
         ->and($design['logo_position'])->toBe('bottom')
         ->and($design['logo_align'])->toBe('right')
         ->and($design['logo_size'])->toBe('large');
 });
 
 it('updates logo alignment live on the design', function () {
+    Storage::fake('public');
+    Storage::disk('public')->put(Banner::LOGO_STORAGE_PATH, 'png');
+
     Livewire::test(Studio::class, ['banner' => $this->banner])
+        ->set('design.show_logo', true)
         ->set('design.logo_align', 'left')
         ->assertSet('design.logo_align', 'left')
         ->set('design.logo_align', 'right')
