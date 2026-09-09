@@ -147,3 +147,63 @@ it('can search customers by phone', function () {
                 ->and($customers->first()->name)->toBe('John');
         });
 });
+
+it('can sort customers by name ascending and descending', function () {
+    Customer::factory()->create(['name' => 'Zebra']);
+    Customer::factory()->create(['name' => 'Abelha']);
+    Customer::factory()->create(['name' => 'Baleia']);
+
+    $test = Livewire::test(Index::class);
+
+    expect($test->get('sortField'))->toBe('name')
+        ->and($test->get('sortDirection'))->toBe('asc');
+
+    $namesAsc = $test->instance()->customers->pluck('name')->toArray();
+    expect($namesAsc)->toBe(['Abelha', 'Baleia', 'Zebra']);
+
+    $test->call('sort', 'name');
+
+    expect($test->get('sortField'))->toBe('name')
+        ->and($test->get('sortDirection'))->toBe('desc');
+
+    $namesDesc = $test->instance()->customers->pluck('name')->toArray();
+    expect($namesDesc)->toBe(['Zebra', 'Baleia', 'Abelha']);
+});
+
+it('can sort customers by total due amount', function () {
+    $c1 = Customer::factory()->create(['name' => 'Cliente A']);
+    $c2 = Customer::factory()->create(['name' => 'Cliente B']);
+
+    $s1 = Sale::factory()->create(['customer_id' => $c1->id, 'status' => SaleStatus::Pending]);
+    $s1->update(['total_amount' => 5000]);
+
+    $s2 = Sale::factory()->create(['customer_id' => $c2->id, 'status' => SaleStatus::Pending]);
+    $s2->update(['total_amount' => 15000]);
+
+    $test = Livewire::test(Index::class)
+        ->call('sort', 'total_due');
+
+    expect($test->get('sortField'))->toBe('total_due')
+        ->and($test->get('sortDirection'))->toBe('desc');
+
+    $namesDesc = $test->instance()->customers->pluck('name')->toArray();
+    expect($namesDesc[0])->toBe('Cliente B')
+        ->and($namesDesc[1])->toBe('Cliente A');
+
+    $test->call('sort', 'total_due');
+
+    expect($test->get('sortDirection'))->toBe('asc');
+
+    $namesAsc = $test->instance()->customers->pluck('name')->toArray();
+    expect($namesAsc[0])->toBe('Cliente A')
+        ->and($namesAsc[1])->toBe('Cliente B');
+});
+
+it('ignores invalid sort fields', function () {
+    Customer::factory()->create(['name' => 'Test']);
+
+    Livewire::test(Index::class)
+        ->call('sort', 'invalid_field')
+        ->assertSet('sortField', 'name')
+        ->assertSet('sortDirection', 'asc');
+});
