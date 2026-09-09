@@ -107,6 +107,30 @@ it('authenticates user with correct otp', function () {
     assertAuthenticatedAs($user);
 });
 
+it('authenticates user when otp is passed as argument to verifyOtp', function () {
+    $user = User::factory()->create(['email' => 'arg@example.com']);
+
+    $otp = '654321';
+    OneTimePassword::create([
+        'authenticatable_id'   => $user->id,
+        'authenticatable_type' => User::class,
+        'password'             => $otp,
+        'expires_at'           => now()->addMinutes(10),
+        'origin_properties'    => [
+            'ip'        => '127.0.0.1',
+            'userAgent' => 'Symfony',
+        ],
+    ]);
+
+    Livewire::test(Login::class)
+        ->set('email', $user->email)
+        ->call('verifyOtp', $otp)
+        ->assertHasNoErrors();
+
+    assertAuthenticatedAs($user);
+});
+
+
 it('authenticates user with remember me enabled', function () {
     $user = User::factory()->create(['email' => 'remember@example.com']);
 

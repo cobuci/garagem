@@ -35,6 +35,7 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - You must follow all existing code conventions used in this application. When creating or editing a file, check sibling files for the correct structure, approach, and naming.
 - Use descriptive names for variables and methods. For example, `isRegisteredForDiscounts`, not `discount()`.
 - Check for existing components to reuse before writing a new one.
+- Always apply anti-slop writing guidelines (`no-ai-slop`, `unslop`, `stop-slop`) by default: write with a direct active voice, eliminate chatbot filler/sycophancy ("Certainly!", "Great question!", "I hope this helps!"), cut AI cliches (delve, tapestry, testament, pivotal) and tech-bro buzzwords, and vary sentence rhythm. Never alter code blocks, variable names, or technical commands.
 
 ## Verification Scripts
 
