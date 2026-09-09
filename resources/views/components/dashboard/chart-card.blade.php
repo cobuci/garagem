@@ -1,32 +1,33 @@
 @props(['chartData'])
 
-<div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-    <div class="flex items-center justify-between mb-6">
+<div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
             <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ __('dashboard.sales_overview') }}</h3>
             <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">{{ __('dashboard.last_6_months') }}</p>
         </div>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center flex-wrap gap-x-4 gap-y-2">
             <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-indigo-500"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-600"></span>
                 <span class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('dashboard.total') }}</span>
             </div>
             <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-violet-400"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-sky-600"></span>
                 <span class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('dashboard.paid_sales') }}</span>
             </div>
             <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                 <span class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('dashboard.profit') }}</span>
             </div>
             <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
                 <span class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ __('dashboard.not_paid') }}</span>
             </div>
         </div>
     </div>
 
     <div
+        wire:ignore
         x-data="{
             labels: @js($chartData['labels']),
             sales: @js($chartData['sales']),
@@ -40,7 +41,7 @@
                         height: 350,
                         toolbar: { show: false },
                         zoom: { enabled: false },
-                        fontFamily: 'Inter, ui-sans-serif, system-ui',
+                        fontFamily: 'Instrument Sans, ui-sans-serif, system-ui, sans-serif',
                         background: 'transparent'
                     },
                     series: [
@@ -65,7 +66,7 @@
                         type: 'gradient',
                         gradient: {
                             shadeIntensity: 1,
-                            opacityFrom: 0.45,
+                            opacityFrom: 0.35,
                             opacityTo: 0.05,
                             stops: [20, 100, 100, 100]
                         }
@@ -73,13 +74,13 @@
                     dataLabels: { enabled: false },
                     stroke: {
                         curve: 'smooth',
-                        width: [3, 2, 3, 2],
-                        colors: ['#6366f1', '#a78bfa', '#10b981', '#f59e0b'],
-                        dashArray: [0, 5, 0, 5]
+                        width: [3, 2, 2.5, 2],
+                        colors: ['#4f46e5', '#0284c7', '#10b981', '#f59e0b'],
+                        dashArray: [0, 0, 0, 4]
                     },
-                    colors: ['#6366f1', '#a78bfa', '#10b981', '#f59e0b'],
+                    colors: ['#4f46e5', '#0284c7', '#10b981', '#f59e0b'],
                     grid: {
-                        borderColor: 'rgba(156, 163, 175, 0.1)',
+                        borderColor: 'rgba(156, 163, 175, 0.12)',
                         strokeDashArray: 4,
                         padding: { left: 10, right: 10, top: 0, bottom: 0 }
                     },
@@ -90,7 +91,8 @@
                         labels: {
                             style: {
                                 colors: '#9ca3af',
-                                fontSize: '12px'
+                                fontSize: '12px',
+                                fontFamily: 'Instrument Sans, ui-sans-serif, system-ui, sans-serif'
                             }
                         }
                     },
@@ -98,7 +100,8 @@
                         labels: {
                             style: {
                                 colors: '#9ca3af',
-                                fontSize: '12px'
+                                fontSize: '12px',
+                                fontFamily: 'Instrument Sans, ui-sans-serif, system-ui, sans-serif'
                             },
                             formatter: function(val) {
                                 return 'R$ ' + val.toLocaleString('pt-BR');
@@ -107,7 +110,12 @@
                     },
                     tooltip: {
                         x: { show: true },
-                        theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                        theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+                        y: {
+                            formatter: function(val) {
+                                return 'R$ ' + val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                            }
+                        }
                     },
                     legend: { show: false }
                 });

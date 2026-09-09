@@ -41,13 +41,17 @@ class Login extends Component
         );
     }
 
-    public function verifyOtp(): void
+    public function verifyOtp(?string $code = null): void
     {
+        if ($code !== null && $code !== '') {
+            $this->otp = $code;
+        }
+
         $this->validateOnly('otp');
 
         $user = User::where('email', $this->email)->first();
 
-        if ($user->consumeOneTimePassword($this->otp)->isOk()) {
+        if ($user && $user->consumeOneTimePassword($this->otp)->isOk()) {
             Auth::login($user, $this->rememberMe);
 
             $this->redirect(route('dashboard'));

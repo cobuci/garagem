@@ -27,6 +27,8 @@ yarn-error.log
 /.junie
 *.md
 !README.md
+!PRODUCT.md
+!DESIGN.md
 laradumps.yaml
 /.junie
 .DS_Store

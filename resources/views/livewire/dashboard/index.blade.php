@@ -8,7 +8,7 @@
                 :title="__('dashboard.total_balance')"
                 :value="$this->totalBalance"
                 icon="banknotes"
-                color="blue"
+                color="sky"
             />
 
             <x-dashboard.stats-card
@@ -34,7 +34,7 @@
                 :pending-sales="$this->monthlyMetrics['pending_sales']"
                 :pending-profit="$this->monthlyMetrics['pending_profit']"
                 icon="calendar-days"
-                color="purple"
+                color="indigo"
             />
         </div>
     @endcan

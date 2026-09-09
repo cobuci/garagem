@@ -7,6 +7,7 @@ use App\Livewire\Forms\Products\ProductForm;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\View\View;
+use Livewire\Attributes\On;
 use Livewire\Component;
 use WireUi\Traits\WireUiActions;
 
@@ -20,6 +21,16 @@ class Create extends Component
     public bool $createDrawer = false;
 
     public Collection $categories;
+
+    #[On('product:open-create')]
+    public function openDrawer(): void
+    {
+        $this->authorize(Permission::CreateProduct->value);
+
+        $this->form->reset();
+        $this->resetErrorBag();
+        $this->createDrawer = true;
+    }
 
     public function create(): void
     {
