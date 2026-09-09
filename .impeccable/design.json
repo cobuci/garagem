@@ -1,0 +1,226 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-09T13:09:20-03:00",
+  "title": "Design System: Garagem",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Command Sky",
+        "canonical": "#0284c7",
+        "tonalRamp": ["#082f49", "#0c4a6e", "#075985", "#0369a1", "#0284c7", "#38bdf8", "#7dd3fc", "#e0f2fe"]
+      },
+      "primary-hover": {
+        "role": "primary",
+        "displayName": "Command Sky Hover",
+        "canonical": "#0369a1",
+        "tonalRamp": ["#082f49", "#0c4a6e", "#075985", "#0369a1", "#0284c7", "#38bdf8", "#7dd3fc", "#e0f2fe"]
+      },
+      "primary-light": {
+        "role": "primary",
+        "displayName": "Command Sky Tint",
+        "canonical": "#e0f2fe",
+        "tonalRamp": ["#082f49", "#0c4a6e", "#075985", "#0369a1", "#0284c7", "#38bdf8", "#7dd3fc", "#e0f2fe"]
+      },
+      "nav-indigo": {
+        "role": "secondary",
+        "displayName": "Nav Indigo",
+        "canonical": "#4f46e5",
+        "tonalRamp": ["#1e1b4b", "#312e81", "#3730a3", "#4338ca", "#4f46e5", "#818cf8", "#c7d2fe", "#eef2ff"]
+      },
+      "status-paid": {
+        "role": "tertiary",
+        "displayName": "Semaphore Emerald (Paid/Profit)",
+        "canonical": "#10b981",
+        "tonalRamp": ["#064e3b", "#065f46", "#047857", "#059669", "#10b981", "#34d399", "#a7f3d0", "#ecfdf5"]
+      },
+      "status-pending": {
+        "role": "tertiary",
+        "displayName": "Semaphore Amber (Pending)",
+        "canonical": "#f59e0b",
+        "tonalRamp": ["#451a03", "#78350f", "#92400e", "#b45309", "#d97706", "#f59e0b", "#fcd34d", "#fef3c7"]
+      },
+      "status-danger": {
+        "role": "tertiary",
+        "displayName": "Semaphore Red (Debt/Loss)",
+        "canonical": "#ef4444",
+        "tonalRamp": ["#450a0a", "#7f1d1d", "#991b1b", "#b91c1c", "#dc2626", "#ef4444", "#fca5a5", "#fef2f2"]
+      },
+      "neutral-bg": {
+        "role": "neutral",
+        "displayName": "Slate Canvas",
+        "canonical": "#f9fafb",
+        "tonalRamp": ["#111827", "#1f2937", "#374151", "#4b5563", "#9ca3af", "#d1d5db", "#f3f4f6", "#f9fafb"]
+      },
+      "neutral-surface": {
+        "role": "neutral",
+        "displayName": "Pure White Surface",
+        "canonical": "#ffffff",
+        "tonalRamp": ["#111827", "#1f2937", "#374151", "#4b5563", "#9ca3af", "#d1d5db", "#f3f4f6", "#ffffff"]
+      },
+      "neutral-border": {
+        "role": "neutral",
+        "displayName": "Hairline Border",
+        "canonical": "#f3f4f6",
+        "tonalRamp": ["#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#cbd5e1", "#e2e8f0", "#f3f4f6"]
+      },
+      "neutral-text": {
+        "role": "neutral",
+        "displayName": "Charcoal Text",
+        "canonical": "#111827",
+        "tonalRamp": ["#030712", "#111827", "#1f2937", "#374151", "#4b5563", "#6b7280", "#9ca3af", "#d1d5db"]
+      },
+      "neutral-muted": {
+        "role": "neutral",
+        "displayName": "Muted Steel",
+        "canonical": "#6b7280",
+        "tonalRamp": ["#111827", "#1f2937", "#374151", "#4b5563", "#6b7280", "#9ca3af", "#d1d5db", "#f3f4f6"]
+      },
+      "dark-bg": {
+        "role": "neutral",
+        "displayName": "Obsidian Canvas",
+        "canonical": "#0f172a",
+        "tonalRamp": ["#020617", "#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#e2e8f0"]
+      },
+      "dark-surface": {
+        "role": "neutral",
+        "displayName": "Slate Surface Dark",
+        "canonical": "#1e293b",
+        "tonalRamp": ["#020617", "#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#e2e8f0"]
+      },
+      "dark-border": {
+        "role": "neutral",
+        "displayName": "Border Slate Dark",
+        "canonical": "#334155",
+        "tonalRamp": ["#020617", "#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#e2e8f0"]
+      },
+      "dark-text": {
+        "role": "neutral",
+        "displayName": "Ice Text Dark",
+        "canonical": "#f8fafc",
+        "tonalRamp": ["#020617", "#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#cbd5e1", "#f8fafc"]
+      },
+      "dark-muted": {
+        "role": "neutral",
+        "displayName": "Muted Slate Dark",
+        "canonical": "#94a3b8",
+        "tonalRamp": ["#020617", "#0f172a", "#1e293b", "#334155", "#475569", "#64748b", "#94a3b8", "#f1f5f9"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero marketing banner and login branding." },
+      "headline": { "displayName": "Headline", "purpose": "Page titles and top-level screen headers." },
+      "title": { "displayName": "Title", "purpose": "Card titles and group divider headers." },
+      "body": { "displayName": "Body", "purpose": "Table rows, inputs, description text." },
+      "label": { "displayName": "Label", "purpose": "Column headers, stat metric names, status pills." }
+    },
+    "shadows": [
+      { "name": "ambient-rest", "value": "0 1px 2px 0 rgba(0, 0, 0, 0.05)", "purpose": "Card and container elevation at rest." },
+      { "name": "interactive-lift", "value": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)", "purpose": "Hover lift for interactive cards and stat widgets." },
+      { "name": "modal-overlay", "value": "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)", "purpose": "Dialogs and drawer overlays." }
+    ],
+    "motion": [
+      { "name": "ease-standard", "value": "cubic-bezier(0.4, 0, 0.2, 1)", "purpose": "Default easing for state transitions." },
+      { "name": "duration-fast", "value": "150ms", "purpose": "Immediate feedback on buttons and table row hover." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary action button for key operations and saves.",
+      "html": "<button class=\"ds-btn-primary\">Confirmar Operação</button>",
+      "css": ".ds-btn-primary { background: #0284c7; color: #ffffff; font-family: 'Instrument Sans', sans-serif; font-size: 0.875rem; font-weight: 500; padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; transition: background 0.15s ease, box-shadow 0.15s ease; display: inline-flex; align-items: center; justify-content: center; line-height: 1.25; } .ds-btn-primary:hover { background: #0369a1; } .ds-btn-primary:focus-visible { outline: 2px solid #0284c7; outline-offset: 2px; }"
+    },
+    {
+      "name": "Stat Card Widget",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "High-density dashboard KPI metric card with trend indicator.",
+      "html": "<div class=\"ds-card-stat\"><div class=\"ds-stat-header\"><span class=\"ds-stat-label\">Vendas Hoje</span><span class=\"ds-stat-trend\">+12.4%</span></div><div class=\"ds-stat-value\">R$ 8.750,00</div><div class=\"ds-stat-footer\"><span>Recebido: R$ 7.200,00</span><span class=\"ds-stat-pending\">Pendente: R$ 1.550,00</span></div></div>",
+      "css": ".ds-card-stat { background: #ffffff; border: 1px solid #f3f4f6; border-radius: 16px; padding: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); font-family: 'Instrument Sans', sans-serif; transition: box-shadow 0.2s ease, transform 0.2s ease; } .ds-card-stat:hover { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transform: translateY(-1px); } .ds-stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; } .ds-stat-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #6b7280; } .ds-stat-trend { font-size: 0.75rem; font-weight: 700; color: #059669; background: #ecfdf5; padding: 2px 8px; border-radius: 6px; } .ds-stat-value { font-size: 1.75rem; font-weight: 800; color: #111827; font-variant-numeric: tabular-nums; margin-bottom: 12px; } .ds-stat-footer { display: flex; justify-content: space-between; font-size: 0.75rem; color: #6b7280; font-variant-numeric: tabular-nums; border-top: 1px solid #f3f4f6; padding-top: 8px; } .ds-stat-pending { color: #d97706; font-weight: 600; }"
+    },
+    {
+      "name": "Interactive Table Row",
+      "kind": "custom",
+      "refersTo": "table-row",
+      "description": "Selected table row with Command Sky left accent indicator and subtle wash.",
+      "html": "<div class=\"ds-table-row ds-selected\"><div class=\"ds-cell\">Cliente Atacado Central</div><div class=\"ds-cell ds-mono\">R$ 4.250,00</div><div class=\"ds-cell ds-badge-container\"><span class=\"ds-badge-paid\">Pago</span></div></div>",
+      "css": ".ds-table-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #ffffff; border-bottom: 1px solid #f3f4f6; font-family: 'Instrument Sans', sans-serif; font-size: 0.875rem; transition: background 0.15s ease; cursor: pointer; } .ds-table-row:hover { background: #f9fafb; } .ds-table-row.ds-selected { background: #f0f9ff; box-shadow: inset 3px 0 0 0 #0ea5e9; } .ds-cell { color: #111827; } .ds-mono { font-variant-numeric: tabular-nums; font-weight: 600; } .ds-badge-paid { background: #ecfdf5; color: #065f46; font-size: 0.75rem; font-weight: 600; padding: 2px 8px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.025em; }"
+    },
+    {
+      "name": "Text & Currency Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Form input field with integrated currency prefix and focus state.",
+      "html": "<div class=\"ds-input-wrapper\"><span class=\"ds-input-prefix\">R$</span><input type=\"text\" class=\"ds-input\" value=\"1.250,00\" /></div>",
+      "css": ".ds-input-wrapper { display: flex; align-items: center; border: 1px solid #d1d5db; border-radius: 8px; background: #ffffff; padding: 0 12px; transition: border-color 0.15s, box-shadow 0.15s; } .ds-input-wrapper:focus-within { border-color: #0284c7; box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.2); } .ds-input-prefix { color: #6b7280; font-size: 0.875rem; font-weight: 600; margin-right: 8px; } .ds-input { border: none; outline: none; width: 100%; padding: 8px 0; font-family: 'Instrument Sans', sans-serif; font-size: 0.875rem; color: #111827; font-variant-numeric: tabular-nums; }"
+    },
+    {
+      "name": "Navigation Link",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Sidebar navigation item with soft indigo active state.",
+      "html": "<a class=\"ds-nav-item ds-active\"><svg class=\"ds-nav-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/></svg>Painel Principal</a>",
+      "css": ".ds-nav-item { display: flex; align-items: center; padding: 8px 12px; border-radius: 8px; font-family: 'Instrument Sans', sans-serif; font-size: 0.875rem; font-weight: 500; color: #4b5563; text-decoration: none; transition: background 0.15s, color 0.15s; cursor: pointer; } .ds-nav-item:hover { background: #f9fafb; color: #111827; } .ds-nav-item.ds-active { background: #eef2ff; color: #4338ca; } .ds-nav-icon { width: 18px; height: 18px; margin-right: 12px; stroke: currentColor; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Command Depot",
+    "overview": "Garagem is built as a high-density, robust commercial workstation that pairs operational hierarchy with immediate, unambiguous status signaling. Designed for wholesale distributors and central store operators, the interface favors tabular clarity, crisp data boundaries, and rapid navigation over decorative softness. Every surface operates like an instrument panel in an active distribution hub: clear, responsive, and uncompromising on numerical legibility.",
+    "keyCharacteristics": [
+      "High-Density Tabular Precision: Tight vertical rhythm, horizontal rule dividers, and monospace tabular numbers for immediate scanning.",
+      "Purposeful Semaphore Signaling: Strict, non-negotiable color semantic roles where emerald exclusively means collected/profit, amber means pending receivable, and red means liability/loss.",
+      "Tonal Depth Hierarchy: Flat at rest with hairline borders (1px) and subtle interactive lift on active inspection.",
+      "Dual-Mode Cohesion: Native dark mode mirroring the light mode structure without contrast degradation."
+    ],
+    "rules": [
+      {
+        "name": "The Semaphore Rule",
+        "body": "Status colors are functional indicators, never decorative accents. Green, amber, and red must not be used for generic branding or background ornamentation.",
+        "section": "colors"
+      },
+      {
+        "name": "The Left-Accent Rule",
+        "body": "Selected records and active table rows project an inset 3px Command Sky indicator on their left border (shadow-[inset_3px_0_0_0_#0ea5e9]) accompanied by a subtle sky tint.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Numbers Rule",
+        "body": "All currency amounts, inventory counts, percentages, and dates must use tabular numbers (tabular-nums) to prevent jitter and maintain column alignment.",
+        "section": "typography"
+      },
+      {
+        "name": "The Micro-Label Rule",
+        "body": "Descriptive metadata and table column headers must always use uppercase 11-12px bold labels with letter spacing.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-By-Default Rule",
+        "body": "Surfaces remain flat with hairline border definition at rest. Elevated shadows only appear to communicate modal priority or interactive hover response.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do format every currency value in Brazilian Real with integer cents precision (R$ 1.250,00).",
+      "Do use tabular-nums on all numerical data columns, metric values, and stock counts.",
+      "Do respect the Semaphore rule: emerald for paid/profit, amber for pending/unpaid, red for debt/loss/danger.",
+      "Do maintain 1px hairline border separation between cards and backgrounds.",
+      "Do support full dark mode contrast across all custom components and table rows."
+    ],
+    "donts": [
+      "Don't use amber or red as decorative brand colors; they are strictly reserved for financial/operational state.",
+      "Don't remove the 3px inset accent from selected table rows.",
+      "Don't float floating action buttons or decorative elements over data grids.",
+      "Don't apply heavy drop shadows to rest-state cards or data tables.",
+      "Don't mix inconsistent rounding scales; use rounded-xl for cards, rounded-md for inputs/buttons, and rounded-full for badges."
+    ]
+  }
+}
