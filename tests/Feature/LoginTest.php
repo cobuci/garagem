@@ -130,7 +130,6 @@ it('authenticates user when otp is passed as argument to verifyOtp', function ()
     assertAuthenticatedAs($user);
 });
 
-
 it('authenticates user with remember me enabled', function () {
     $user = User::factory()->create(['email' => 'remember@example.com']);
 
