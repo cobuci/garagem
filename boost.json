@@ -11,11 +11,12 @@
     "nightwatch_mcp": false,
     "sail": false,
     "skills": [
+        "infer-conventions",
         "ai-sdk-development",
         "laravel-best-practices",
+        "testing-best-practices",
         "configuring-horizon",
         "livewire-development",
-        "pest-testing",
         "tailwindcss-development"
     ]
 }
