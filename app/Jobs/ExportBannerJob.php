@@ -83,10 +83,21 @@ class ExportBannerJob implements ShouldQueue
 
     private function browsershot(string $html, int $width, int $height): Browsershot
     {
-        return Browsershot::html($html)
+        $browsershot = Browsershot::html($html)
             ->setNodeBinary(config('services.browsershot.node_binary'))
             ->setNpmBinary(config('services.browsershot.npm_binary'))
             ->setNodeModulePath(base_path('node_modules'))
+            ->addChromiumArguments([
+                '--disable-gpu',
+                '--disable-dev-shm-usage',
+                '--headless=new',
+            ])
             ->windowSize($width, $height);
+
+        if (config('services.browsershot.no_sandbox')) {
+            $browsershot->noSandbox();
+        }
+
+        return $browsershot;
     }
 }
