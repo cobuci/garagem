@@ -1,16 +1,18 @@
 <?php
 
 return [
-    'title'       => 'Categorias',
-    'subtitle'    => 'Gerencie as categorias do estoque. Arraste para reordenar.',
-    'empty'       => 'Nenhuma categoria cadastrada.',
-    'delete_word' => 'excluir',
+    'title'             => 'Categorias',
+    'subtitle'          => 'Gerencie as categorias do estoque. Arraste para reordenar.',
+    'empty'             => 'Nenhuma categoria cadastrada.',
+    'empty_description' => 'Crie sua primeira categoria para organizar seu catálogo de produtos.',
+    'delete_word'       => 'excluir',
 
     'fields' => [
         'name'             => 'Nome',
         'name_placeholder' => 'Ex: Bebidas',
         'sort_order'       => 'Ordem',
         'products_count'   => 'Produtos',
+        'products_badge'   => '{0} produtos|{1} produto|[2,*] produtos',
     ],
 
     'actions' => [

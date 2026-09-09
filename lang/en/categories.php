@@ -1,16 +1,18 @@
 <?php
 
 return [
-    'title'       => 'Categories',
-    'subtitle'    => 'Manage inventory categories. Drag to reorder.',
-    'empty'       => 'No categories registered.',
-    'delete_word' => 'delete',
+    'title'             => 'Categories',
+    'subtitle'          => 'Manage inventory categories. Drag to reorder.',
+    'empty'             => 'No categories registered.',
+    'empty_description' => 'Create your first category to organize your product catalog.',
+    'delete_word'       => 'delete',
 
     'fields' => [
         'name'             => 'Name',
         'name_placeholder' => 'E.g. Beverages',
         'sort_order'       => 'Order',
         'products_count'   => 'Products',
+        'products_badge'   => '{0} products|{1} product|[2,*] products',
     ],
 
     'actions' => [
