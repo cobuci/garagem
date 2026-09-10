@@ -68,6 +68,20 @@ class Index extends Component
         ];
     }
 
+    /**
+     * @return array{all: int, pending: int, paid: int, overdue: int}
+     */
+    #[Computed]
+    public function counts(): array
+    {
+        return [
+            'all'     => ProductPurchase::count(),
+            'pending' => ProductPurchase::where('is_paid', false)->count(),
+            'paid'    => ProductPurchase::where('is_paid', true)->count(),
+            'overdue' => ProductPurchase::where('is_paid', false)->where('due_date', '<', now()->toDateString())->count(),
+        ];
+    }
+
     public function confirmPayment(int $id): void
     {
         $this->selectedBill = ProductPurchase::with('product')->findOrFail($id);
