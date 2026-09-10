@@ -192,6 +192,8 @@ class Create extends Component
 
         $this->amountPaid = '';
 
+        $this->dispatch('sale-completed');
+
         $this->notification()->success(__('sales.sale_success'));
     }
 

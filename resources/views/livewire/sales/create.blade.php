@@ -1,8 +1,10 @@
 <div
     x-data="{
         cartOpen: false,
+        cartTab: 'items',
         viewMode: window.innerWidth < 1024 ? 'list' : 'grid'
     }"
+    x-on:sale-completed.window="cartOpen = false; cartTab = 'items'"
     class="h-[calc(100vh-4rem)] lg:h-screen -m-4 lg:-m-8 flex flex-col overflow-hidden bg-gray-50 dark:bg-gray-950 relative"
 >
     <div class="flex flex-1 overflow-hidden h-full">
@@ -312,13 +314,13 @@
         <!-- Cart Column / Mobile Bottom Sheet -->
         <div
             :class="cartOpen ? 'translate-y-0 lg:translate-x-0' : 'translate-y-full lg:translate-y-0 lg:translate-x-0'"
-            class="fixed inset-x-0 bottom-0 h-[88vh] lg:h-full lg:relative lg:w-[400px] flex flex-col bg-white dark:bg-gray-900 rounded-t-2xl lg:rounded-none shadow-2xl lg:shadow-none z-50 lg:z-20 transition-transform duration-300 ease-in-out border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-gray-800"
+            class="fixed inset-x-0 bottom-0 h-[92dvh] max-h-[92dvh] lg:h-full lg:max-h-full lg:relative lg:w-[400px] flex flex-col bg-white dark:bg-gray-900 rounded-t-2xl lg:rounded-none shadow-2xl lg:shadow-none z-50 lg:z-20 transition-transform duration-300 ease-in-out border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-gray-800 overflow-hidden"
         >
             <!-- Mobile Pull Handle -->
             <div class="lg:hidden w-12 h-1.5 rounded-full bg-gray-300 dark:bg-gray-600 mx-auto mt-2.5 mb-1 shrink-0"></div>
 
             <!-- Cart Header -->
-            <div class="p-3.5 sm:p-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between shrink-0">
+            <div class="px-3.5 py-3 sm:px-4 sm:py-3.5 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-2.5">
                     <button
                         type="button"
@@ -331,7 +333,7 @@
                     <div class="relative">
                         <x-icon name="shopping-cart" class="w-5 h-5 text-gray-500 dark:text-gray-400" />
                         @if(count($form->items) > 0)
-                            <span class="absolute -top-1.5 -right-2 bg-primary-600 text-white text-xs font-bold px-1.5 py-0.2 rounded-full tabular-nums leading-none ring-2 ring-white dark:ring-gray-900">
+                            <span class="absolute -top-1.5 -right-2 bg-primary-600 text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full tabular-nums leading-none ring-2 ring-white dark:ring-gray-900">
                                 {{ collect($form->items)->sum('quantity') }}
                             </span>
                         @endif
@@ -341,7 +343,7 @@
                 @if(count($form->items) > 0)
                     <button
                         type="button"
-                        wire:click="$set('form.items', [])"
+                        wire:click="$set('form.items', []); cartTab = 'items'"
                         class="text-xs text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400 transition-colors font-semibold"
                     >
                         {{ __('sales.clear_cart') }}
@@ -349,292 +351,376 @@
                 @endif
             </div>
 
-            <!-- Items List -->
-            <div class="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-2.5">
-                @forelse($form->items as $productId => $item)
-                    <div class="flex gap-3 bg-gray-50/60 dark:bg-gray-800/60 p-3 rounded-xl border border-gray-200 dark:border-gray-700/60 transition-colors">
-                        <div class="h-10 w-10 rounded-lg bg-white dark:bg-gray-800 flex items-center justify-center shrink-0 border border-gray-100 dark:border-gray-700 text-gray-400 dark:text-gray-500">
-                            <x-icon name="cube" class="w-5 h-5" />
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex justify-between items-start gap-2 mb-1">
-                                <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate flex-1">{{ $item['name'] }}</p>
-                                <button
-                                    type="button"
-                                    wire:click="removeItem({{ $productId }})"
-                                    class="p-0.5 rounded text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors shrink-0"
-                                    title="{{ __('sales.cancel') }}"
-                                >
-                                    <x-icon name="x-mark" class="w-4 h-4" />
-                                </button>
-                            </div>
-                            @if(!empty($item['brand']) || !empty($item['weight']))
-                                <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 mb-2 text-xs text-gray-500 dark:text-gray-400">
-                                    @if(!empty($item['brand']))
-                                        <span>{{ $item['brand'] }}</span>
-                                    @endif
-                                    @if(!empty($item['brand']) && !empty($item['weight']))
-                                        <span class="text-gray-300 dark:text-gray-600">·</span>
-                                    @endif
-                                    @if(!empty($item['weight']))
-                                        <span class="tabular-nums">{{ $item['weight'] }}</span>
-                                    @endif
-                                </div>
-                            @endif
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center bg-white dark:bg-gray-700 rounded-md p-0.5 border border-gray-200 dark:border-gray-600">
-                                    <button
-                                        type="button"
-                                        wire:click="updateQuantity({{ $productId }}, {{ $item['quantity'] - 1 }})"
-                                        class="h-7 w-7 rounded flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 transition-colors"
-                                        aria-label="Diminuir"
-                                    >
-                                        <x-icon name="minus" class="w-3.5 h-3.5" />
-                                    </button>
-                                    <span class="text-xs font-bold w-7 text-center text-gray-900 dark:text-gray-100 tabular-nums">{{ $item['quantity'] }}</span>
-                                    <button
-                                        type="button"
-                                        wire:click="updateQuantity({{ $productId }}, {{ $item['quantity'] + 1 }})"
-                                        class="h-7 w-7 rounded flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 transition-colors"
-                                        aria-label="Aumentar"
-                                    >
-                                        <x-icon name="plus" class="w-3.5 h-3.5" />
-                                    </button>
-                                </div>
-                                <span class="text-sm font-bold text-gray-900 dark:text-white tabular-nums">
-                                    R$ {{ number_format(($item['unit_price'] * $item['quantity']) / 100, 2, ',', '.') }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    <div class="h-full flex flex-col items-center justify-center text-center py-12 px-4">
-                        <div class="w-14 h-14 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-3 text-gray-400 dark:text-gray-500">
-                            <x-icon name="shopping-cart" class="w-7 h-7" />
-                        </div>
-                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('sales.empty_cart') }}</p>
-                    </div>
-                @endforelse
+            <!-- Mobile Tab Navigation -->
+            <div class="lg:hidden px-3.5 pt-2.5 pb-2 shrink-0 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800/80">
+                <div class="flex p-1 bg-gray-100 dark:bg-gray-800 rounded-xl border border-gray-200/80 dark:border-gray-700/60">
+                    <button
+                        type="button"
+                        @click="cartTab = 'items'"
+                        :class="cartTab === 'items' ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-xs font-bold' : 'text-gray-600 dark:text-gray-400 font-medium hover:text-gray-900 dark:hover:text-white'"
+                        class="flex-1 py-1.5 px-3 rounded-lg text-xs transition-all flex items-center justify-center gap-1.5"
+                    >
+                        <x-icon name="shopping-bag" class="w-3.5 h-3.5" />
+                        <span>{{ __('sales.items') }} ({{ collect($form->items)->sum('quantity') }})</span>
+                    </button>
+                    <button
+                        type="button"
+                        @click="cartTab = 'checkout'"
+                        :class="cartTab === 'checkout' ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-xs font-bold' : 'text-gray-600 dark:text-gray-400 font-medium hover:text-gray-900 dark:hover:text-white'"
+                        class="flex-1 py-1.5 px-3 rounded-lg text-xs transition-all flex items-center justify-center gap-1.5"
+                    >
+                        <x-icon name="credit-card" class="w-3.5 h-3.5" />
+                        <span>{{ __('sales.payment') }}</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- Cart Footer / Checkout -->
-            <div class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 p-3.5 sm:p-4 shrink-0 space-y-3">
-                <!-- Customer Selection -->
-                <x-select
-                    label="{{ __('sales.customer') }}"
-                    wire:model="form.customerId"
-                    placeholder="{{ __('sales.customer_placeholder') }}"
-                    :options="$this->customers"
-                    option-label="name"
-                    option-value="id"
-                    icon="user"
-                    shadowless
-                />
-
-                <!-- Payment Method Touch Pills -->
-                <div class="space-y-1.5">
-                    <label class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                        {{ __('sales.payment_method') }}
-                    </label>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-                        @php
-                            $payments = [
-                                ['value' => 'money', 'label' => __('sales.payments.money'), 'icon' => 'banknotes'],
-                                ['value' => 'pix', 'label' => __('sales.payments.pix'), 'icon' => 'qr-code'],
-                                ['value' => 'credit_card', 'label' => __('sales.payments.credit_card'), 'icon' => 'credit-card'],
-                                ['value' => 'debit_card', 'label' => __('sales.payments.debit_card'), 'icon' => 'credit-card'],
-                            ];
-                        @endphp
-                        @foreach($payments as $pay)
-                            <button
-                                type="button"
-                                wire:click="$set('form.paymentMethod', '{{ $pay['value'] }}')"
-                                @class([
-                                    'flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-semibold border transition-colors',
-                                    'bg-primary-600 text-white border-primary-600 shadow-xs' => $form->paymentMethod === $pay['value'],
-                                    'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700' => $form->paymentMethod !== $pay['value'],
-                                ])
-                            >
-                                <x-icon name="{{ $pay['icon'] }}" class="w-4 h-4" />
-                                <span class="truncate">{{ $pay['label'] }}</span>
-                            </button>
-                        @endforeach
-                    </div>
-                </div>
-
-                <!-- Cash Calculator (Troco) -->
-                @if($form->paymentMethod === 'money')
-                    <div class="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60">
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 block mb-1">
-                                    {{ __('sales.amount_paid') }}
-                                </label>
-                                <x-money-input
-                                    wire:model.live="amountPaid"
-                                    placeholder="0,00"
-                                    prefix="R$"
-                                    shadowless
-                                />
+            <!-- Items Container -->
+            <div
+                :class="cartTab === 'items' ? 'flex flex-1 flex-col overflow-hidden' : 'hidden lg:flex lg:flex-1 lg:flex-col lg:overflow-hidden'"
+                class="min-h-0"
+            >
+                <!-- Items List -->
+                <div class="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-2.5">
+                    @forelse($form->items as $productId => $item)
+                        <div class="flex gap-3 bg-gray-50/60 dark:bg-gray-800/60 p-3 rounded-xl border border-gray-200 dark:border-gray-700/60 transition-colors">
+                            <div class="h-10 w-10 rounded-lg bg-white dark:bg-gray-800 flex items-center justify-center shrink-0 border border-gray-100 dark:border-gray-700 text-gray-400 dark:text-gray-500">
+                                <x-icon name="cube" class="w-5 h-5" />
                             </div>
-                            <div class="flex flex-col justify-end">
-                                <span class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 block mb-1">
-                                    {{ __('sales.change') }}
-                                </span>
-                                <div class="h-9 px-3 rounded-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center">
-                                    <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
-                                        R$ {{ number_format($this->changeAmount / 100, 2, ',', '.') }}
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between items-start gap-2 mb-1">
+                                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate flex-1">{{ $item['name'] }}</p>
+                                    <button
+                                        type="button"
+                                        wire:click="removeItem({{ $productId }})"
+                                        class="p-0.5 rounded text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors shrink-0"
+                                        title="{{ __('sales.cancel') }}"
+                                    >
+                                        <x-icon name="x-mark" class="w-4 h-4" />
+                                    </button>
+                                </div>
+                                @if(!empty($item['brand']) || !empty($item['weight']))
+                                    <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 mb-2 text-xs text-gray-500 dark:text-gray-400">
+                                        @if(!empty($item['brand']))
+                                            <span>{{ $item['brand'] }}</span>
+                                        @endif
+                                        @if(!empty($item['brand']) && !empty($item['weight']))
+                                            <span class="text-gray-300 dark:text-gray-600">·</span>
+                                        @endif
+                                        @if(!empty($item['weight']))
+                                            <span class="tabular-nums">{{ $item['weight'] }}</span>
+                                        @endif
+                                    </div>
+                                @endif
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center bg-white dark:bg-gray-700 rounded-md p-0.5 border border-gray-200 dark:border-gray-600">
+                                        <button
+                                            type="button"
+                                            wire:click="updateQuantity({{ $productId }}, {{ $item['quantity'] - 1 }})"
+                                            class="h-7 w-7 rounded flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 transition-colors"
+                                            aria-label="Diminuir"
+                                        >
+                                            <x-icon name="minus" class="w-3.5 h-3.5" />
+                                        </button>
+                                        <span class="text-xs font-bold w-7 text-center text-gray-900 dark:text-gray-100 tabular-nums">{{ $item['quantity'] }}</span>
+                                        <button
+                                            type="button"
+                                            wire:click="updateQuantity({{ $productId }}, {{ $item['quantity'] + 1 }})"
+                                            class="h-7 w-7 rounded flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 transition-colors"
+                                            aria-label="Aumentar"
+                                        >
+                                            <x-icon name="plus" class="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                    <span class="text-sm font-bold text-gray-900 dark:text-white tabular-nums">
+                                        R$ {{ number_format(($item['unit_price'] * $item['quantity']) / 100, 2, ',', '.') }}
                                     </span>
                                 </div>
                             </div>
                         </div>
+                    @empty
+                        <div class="h-full flex flex-col items-center justify-center text-center py-12 px-4">
+                            <div class="w-14 h-14 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-3 text-gray-400 dark:text-gray-500">
+                                <x-icon name="shopping-cart" class="w-7 h-7" />
+                            </div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('sales.empty_cart') }}</p>
+                        </div>
+                    @endforelse
+                </div>
+
+                <!-- Mobile Only: Action Footer in Items Tab -->
+                @if(count($form->items) > 0)
+                    <div class="lg:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 p-3.5 shrink-0 flex items-center justify-between gap-3 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-lg">
+                        <div>
+                            <span class="text-[11px] font-semibold text-gray-500 dark:text-gray-400 block uppercase tracking-wider">
+                                {{ __('sales.total') }}
+                            </span>
+                            <span class="text-lg font-bold text-gray-900 dark:text-white tabular-nums">
+                                R$ {{ number_format($this->totalAmount / 100, 2, ',', '.') }}
+                            </span>
+                        </div>
+                        <button
+                            type="button"
+                            @click="cartTab = 'checkout'"
+                            class="flex items-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg text-sm shadow-sm active:scale-95 transition-transform"
+                        >
+                            <span>{{ __('sales.proceed_to_payment') }}</span>
+                            <x-icon name="arrow-right" class="w-4 h-4" />
+                        </button>
                     </div>
                 @endif
+            </div>
 
-                <!-- Discount & Status -->
-                <div class="grid grid-cols-2 gap-2 pt-1 border-t border-gray-100 dark:border-gray-800">
-                    <x-money-input
-                        label="{{ __('sales.discount') }}"
-                        wire:model.live="form.discountAmount"
-                        prefix="R$"
+            <!-- Checkout / Payment Container -->
+            <div
+                :class="cartTab === 'checkout' ? 'flex flex-1 flex-col overflow-hidden' : 'hidden lg:flex lg:shrink-0 lg:flex-col lg:max-h-[58vh] lg:overflow-y-auto'"
+                class="min-h-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800"
+            >
+                <!-- Scrollable Form Area -->
+                <div class="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-3">
+                    <!-- Mobile items summary banner -->
+                    @if(count($form->items) > 0)
+                        <div class="lg:hidden flex items-center justify-between p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60">
+                            <div class="flex items-center gap-2">
+                                <div class="h-7 w-7 rounded-lg bg-primary-100 dark:bg-primary-950/60 flex items-center justify-center text-primary-600 dark:text-primary-400">
+                                    <x-icon name="shopping-bag" class="w-4 h-4" />
+                                </div>
+                                <span class="text-xs font-semibold text-gray-700 dark:text-gray-300">
+                                    {{ collect($form->items)->sum('quantity') }} {{ strtolower(__('sales.in_cart')) }}
+                                </span>
+                            </div>
+                            <button
+                                type="button"
+                                @click="cartTab = 'items'"
+                                class="text-xs font-bold text-primary-600 dark:text-primary-400 hover:underline flex items-center gap-1"
+                            >
+                                <span>{{ __('sales.back_to_items') }}</span>
+                                <x-icon name="chevron-right" class="w-3 h-3" />
+                            </button>
+                        </div>
+                    @endif
+
+                    <!-- Customer Selection -->
+                    <x-select
+                        label="{{ __('sales.customer') }}"
+                        wire:model="form.customerId"
+                        placeholder="{{ __('sales.customer_placeholder') }}"
+                        :options="$this->customers"
+                        option-label="name"
+                        option-value="id"
+                        icon="user"
                         shadowless
                     />
-                    <div>
-                        <div class="flex mb-1 justify-between items-end">
-                            <x-label>{{ __('sales.status') }}</x-label>
-                        </div>
-                        <div class="grid grid-cols-2 gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700 h-10">
-                            <button
-                                type="button"
-                                wire:click="$set('form.status', 'paid')"
-                                @class([
-                                    'h-full flex items-center justify-center text-xs font-semibold rounded-md transition-colors',
-                                    'bg-emerald-600 text-white shadow-xs' => $form->status === 'paid',
-                                    'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white' => $form->status !== 'paid',
-                                ])
-                            >
-                                {{ __('sales.paid') }}
-                            </button>
-                            <button
-                                type="button"
-                                wire:click="$set('form.status', 'pending')"
-                                @class([
-                                    'h-full flex items-center justify-center text-xs font-semibold rounded-md transition-colors',
-                                    'bg-amber-500 text-white shadow-xs' => $form->status === 'pending',
-                                    'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white' => $form->status !== 'pending',
-                                ])
-                            >
-                                {{ __('sales.pending') }}
-                            </button>
+
+                    <!-- Payment Method Touch Pills -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                            {{ __('sales.payment_method') }}
+                        </label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-1.5">
+                            @php
+                                $payments = [
+                                    ['value' => 'money', 'label' => __('sales.payments.money'), 'icon' => 'banknotes'],
+                                    ['value' => 'pix', 'label' => __('sales.payments.pix'), 'icon' => 'qr-code'],
+                                    ['value' => 'credit_card', 'label' => __('sales.payments.credit_card'), 'icon' => 'credit-card'],
+                                    ['value' => 'debit_card', 'label' => __('sales.payments.debit_card'), 'icon' => 'credit-card'],
+                                ];
+                            @endphp
+                            @foreach($payments as $pay)
+                                <button
+                                    type="button"
+                                    wire:click="$set('form.paymentMethod', '{{ $pay['value'] }}')"
+                                    @class([
+                                        'flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-xs font-semibold border transition-colors',
+                                        'bg-primary-600 text-white border-primary-600 shadow-xs' => $form->paymentMethod === $pay['value'],
+                                        'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700' => $form->paymentMethod !== $pay['value'],
+                                    ])
+                                >
+                                    <x-icon name="{{ $pay['icon'] }}" class="w-4 h-4 shrink-0" />
+                                    <span class="truncate">{{ $pay['label'] }}</span>
+                                </button>
+                            @endforeach
                         </div>
                     </div>
-                </div>
 
-                <!-- Gift / Cortesia Card -->
-                <div @class([
-                    'flex items-center justify-between p-2.5 rounded-xl border transition-colors',
-                    'bg-emerald-50 border-emerald-300 dark:bg-emerald-950/40 dark:border-emerald-800' => $form->isGift,
-                    'bg-gray-50 border-gray-200 dark:bg-gray-800/50 dark:border-gray-700/60' => ! $form->isGift,
-                ])>
-                    <div class="flex items-center gap-2.5">
-                        <div @class([
-                            'h-8 w-8 rounded-lg flex items-center justify-center shrink-0',
-                            'bg-emerald-600 text-white' => $form->isGift,
-                            'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300' => ! $form->isGift,
-                        ])>
-                            <x-icon name="gift" class="w-4 h-4" />
+                    <!-- Cash Calculator (Troco) -->
+                    @if($form->paymentMethod === 'money')
+                        <div class="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60">
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 block mb-1">
+                                        {{ __('sales.amount_paid') }}
+                                    </label>
+                                    <x-money-input
+                                        wire:model.live="amountPaid"
+                                        placeholder="0,00"
+                                        prefix="R$"
+                                        shadowless
+                                    />
+                                </div>
+                                <div class="flex flex-col justify-end">
+                                    <span class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 block mb-1">
+                                        {{ __('sales.change') }}
+                                    </span>
+                                    <div class="h-9 px-3 rounded-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 flex items-center">
+                                        <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400 tabular-nums">
+                                            R$ {{ number_format($this->changeAmount / 100, 2, ',', '.') }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                    @endif
+
+                    <!-- Discount & Status -->
+                    <div class="grid grid-cols-2 gap-2 pt-1 border-t border-gray-100 dark:border-gray-800">
+                        <x-money-input
+                            label="{{ __('sales.discount') }}"
+                            wire:model.live="form.discountAmount"
+                            prefix="R$"
+                            shadowless
+                        />
                         <div>
-                            <span @class([
-                                'text-xs font-semibold block leading-tight',
-                                'text-emerald-900 dark:text-emerald-100' => $form->isGift,
-                                'text-gray-900 dark:text-white' => ! $form->isGift,
-                            ])>
-                                {{ __('sales.gift') }}
-                            </span>
-                            <span @class([
-                                'text-xs block leading-tight',
-                                'text-emerald-700 dark:text-emerald-300 font-medium' => $form->isGift,
-                                'text-gray-600 dark:text-gray-400' => ! $form->isGift,
-                            ])>
-                                {{ $form->isGift ? __('sales.gift_applied') : __('sales.gift_subtitle') }}
-                            </span>
+                            <div class="flex mb-1 justify-between items-end">
+                                <x-label>{{ __('sales.status') }}</x-label>
+                            </div>
+                            <div class="grid grid-cols-2 gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700 h-10">
+                                <button
+                                    type="button"
+                                    wire:click="$set('form.status', 'paid')"
+                                    @class([
+                                        'h-full flex items-center justify-center text-xs font-semibold rounded-md transition-colors',
+                                        'bg-emerald-600 text-white shadow-xs' => $form->status === 'paid',
+                                        'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white' => $form->status !== 'paid',
+                                    ])
+                                >
+                                    {{ __('sales.paid') }}
+                                </button>
+                                <button
+                                    type="button"
+                                    wire:click="$set('form.status', 'pending')"
+                                    @class([
+                                        'h-full flex items-center justify-center text-xs font-semibold rounded-md transition-colors',
+                                        'bg-amber-500 text-white shadow-xs' => $form->status === 'pending',
+                                        'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white' => $form->status !== 'pending',
+                                    ])
+                                >
+                                    {{ __('sales.pending') }}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <x-toggle wire:model.live="form.isGift" />
+
+                    <!-- Gift / Cortesia Card -->
+                    <div @class([
+                        'flex items-center justify-between p-2.5 rounded-xl border transition-colors',
+                        'bg-emerald-50 border-emerald-300 dark:bg-emerald-950/40 dark:border-emerald-800' => $form->isGift,
+                        'bg-gray-50 border-gray-200 dark:bg-gray-800/50 dark:border-gray-700/60' => ! $form->isGift,
+                    ])>
+                        <div class="flex items-center gap-2.5">
+                            <div @class([
+                                'h-8 w-8 rounded-lg flex items-center justify-center shrink-0',
+                                'bg-emerald-600 text-white' => $form->isGift,
+                                'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300' => ! $form->isGift,
+                            ])>
+                                <x-icon name="gift" class="w-4 h-4" />
+                            </div>
+                            <div>
+                                <span @class([
+                                    'text-xs font-semibold block leading-tight',
+                                    'text-emerald-900 dark:text-emerald-100' => $form->isGift,
+                                    'text-gray-900 dark:text-white' => ! $form->isGift,
+                                ])>
+                                    {{ __('sales.gift') }}
+                                </span>
+                                <span @class([
+                                    'text-[11px] block leading-tight',
+                                    'text-emerald-700 dark:text-emerald-300 font-medium' => $form->isGift,
+                                    'text-gray-600 dark:text-gray-400' => ! $form->isGift,
+                                ])>
+                                    {{ $form->isGift ? __('sales.gift_applied') : __('sales.gift_subtitle') }}
+                                </span>
+                            </div>
+                        </div>
+                        <x-toggle wire:model.live="form.isGift" />
+                    </div>
+
+                    @if(in_array($form->paymentMethod, ['credit_card', 'debit_card']))
+                        <div class="flex items-center justify-between px-3 py-1.5 bg-sky-50 dark:bg-sky-950/40 rounded-lg border border-sky-200 dark:border-sky-800/60 text-xs font-semibold text-sky-700 dark:text-sky-300">
+                            <span class="tabular-nums">{{ __('sales.fee') }} ({{ $this->feePercentage }}%)</span>
+                            <x-toggle wire:model.live="form.passFeeToCustomer" sm />
+                        </div>
+                    @endif
+
+                    <!-- Financial Summary -->
+                    <div class="space-y-1 pt-2 border-t border-gray-100 dark:border-gray-800 text-xs">
+                        <div class="flex justify-between font-medium text-gray-500 dark:text-gray-400">
+                            <span>{{ __('sales.subtotal') }}</span>
+                            <span class="tabular-nums">R$ {{ number_format($this->subtotal / 100, 2, ',', '.') }}</span>
+                        </div>
+                        @if($this->discountInCents > 0)
+                            <div class="flex justify-between font-medium text-red-600 dark:text-red-400">
+                                <span>{{ __('sales.discount') }}</span>
+                                <span class="tabular-nums">- R$ {{ number_format($this->discountInCents / 100, 2, ',', '.') }}</span>
+                            </div>
+                        @endif
+                        @if($this->feeAmount > 0 && $form->passFeeToCustomer)
+                            <div class="flex justify-between font-medium text-sky-600 dark:text-sky-400">
+                                <span>{{ __('sales.fee_addition') }}</span>
+                                <span class="tabular-nums">+ R$ {{ number_format($this->feeAmount / 100, 2, ',', '.') }}</span>
+                            </div>
+                        @endif
+                        @if($form->isGift)
+                            <div class="flex justify-between font-semibold text-emerald-600 dark:text-emerald-400">
+                                <span>{{ __('sales.gift_applied') }}</span>
+                                <span class="tabular-nums">- R$ {{ number_format($this->subtotal / 100, 2, ',', '.') }}</span>
+                            </div>
+                        @endif
+                        @if($this->feeAmount > 0 && !$form->passFeeToCustomer && !$form->isGift)
+                            <div class="flex justify-between font-medium text-amber-600 dark:text-amber-400">
+                                <span>{{ __('sales.fee_deduction') }} ({{ $this->feePercentage }}%)</span>
+                                <span class="tabular-nums">- R$ {{ number_format($this->feeAmount / 100, 2, ',', '.') }}</span>
+                            </div>
+                            <div class="flex justify-between font-semibold text-gray-700 dark:text-gray-300">
+                                <span>{{ __('sales.net_amount') }}</span>
+                                <span class="tabular-nums">R$ {{ number_format($this->netAmount / 100, 2, ',', '.') }}</span>
+                            </div>
+                        @endif
+                    </div>
                 </div>
 
-                @if(in_array($form->paymentMethod, ['credit_card', 'debit_card']))
-                    <div class="flex items-center justify-between px-3 py-1.5 bg-sky-50 dark:bg-sky-950/40 rounded-lg border border-sky-200 dark:border-sky-800/60 text-xs font-semibold text-sky-700 dark:text-sky-300">
-                        <span class="tabular-nums">{{ __('sales.fee') }} ({{ $this->feePercentage }}%)</span>
-                        <x-toggle wire:model.live="form.passFeeToCustomer" sm />
-                    </div>
-                @endif
-
-                <!-- Financial Summary -->
-                <div class="space-y-1 pt-2 border-t border-gray-100 dark:border-gray-800 text-xs">
-                    <div class="flex justify-between font-medium text-gray-500 dark:text-gray-400">
-                        <span>{{ __('sales.subtotal') }}</span>
-                        <span class="tabular-nums">R$ {{ number_format($this->subtotal / 100, 2, ',', '.') }}</span>
-                    </div>
-                    @if($this->discountInCents > 0)
-                        <div class="flex justify-between font-medium text-red-600 dark:text-red-400">
-                            <span>{{ __('sales.discount') }}</span>
-                            <span class="tabular-nums">- R$ {{ number_format($this->discountInCents / 100, 2, ',', '.') }}</span>
-                        </div>
-                    @endif
-                    @if($this->feeAmount > 0 && $form->passFeeToCustomer)
-                        <div class="flex justify-between font-medium text-sky-600 dark:text-sky-400">
-                            <span>{{ __('sales.fee_addition') }}</span>
-                            <span class="tabular-nums">+ R$ {{ number_format($this->feeAmount / 100, 2, ',', '.') }}</span>
-                        </div>
-                    @endif
-                    @if($form->isGift)
-                        <div class="flex justify-between font-semibold text-emerald-600 dark:text-emerald-400">
-                            <span>{{ __('sales.gift_applied') }}</span>
-                            <span class="tabular-nums">- R$ {{ number_format($this->subtotal / 100, 2, ',', '.') }}</span>
-                        </div>
-                    @endif
-                    @if($this->feeAmount > 0 && !$form->passFeeToCustomer && !$form->isGift)
-                        <div class="flex justify-between font-medium text-amber-600 dark:text-amber-400">
-                            <span>{{ __('sales.fee_deduction') }} ({{ $this->feePercentage }}%)</span>
-                            <span class="tabular-nums">- R$ {{ number_format($this->feeAmount / 100, 2, ',', '.') }}</span>
-                        </div>
-                        <div class="flex justify-between font-semibold text-gray-700 dark:text-gray-300">
-                            <span>{{ __('sales.net_amount') }}</span>
-                            <span class="tabular-nums">R$ {{ number_format($this->netAmount / 100, 2, ',', '.') }}</span>
-                        </div>
-                    @endif
-                    <div class="flex justify-between items-baseline pt-1.5 border-t border-gray-100 dark:border-gray-800">
+                <!-- Sticky Checkout Footer (Total & Submit) -->
+                <div class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 p-3.5 sm:p-4 shrink-0 space-y-2.5 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-lg">
+                    <div class="flex justify-between items-baseline">
                         <span class="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">{{ __('sales.total') }}</span>
                         <span class="text-2xl font-bold text-gray-900 dark:text-white tabular-nums tracking-tight">
                             R$ {{ number_format($this->totalAmount / 100, 2, ',', '.') }}
                         </span>
                     </div>
-                </div>
 
-                <!-- Submit Button -->
-                <x-button
-                    primary
-                    full
-                    rounded="md"
-                    wire:click="save"
-                    wire:loading.attr="disabled"
-                    wire:target="save"
-                    class="py-2.5 font-semibold text-sm shadow-sm"
-                >
-                    <span wire:loading.remove wire:target="save" class="inline-flex items-center justify-center gap-2">
-                        <x-icon name="check" class="w-4 h-4" />
-                        {{ __('sales.finish_sale') }}
-                    </span>
-                    <span wire:loading wire:target="save" class="inline-flex items-center justify-center gap-2">
-                        <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                        </svg>
-                        {{ __('sales.finish_sale') }}...
-                    </span>
-                </x-button>
+                    <!-- Submit Button -->
+                    <x-button
+                        primary
+                        full
+                        rounded="md"
+                        wire:click="save"
+                        wire:loading.attr="disabled"
+                        wire:target="save"
+                        class="py-2.5 font-semibold text-sm shadow-sm"
+                    >
+                        <span wire:loading.remove wire:target="save" class="inline-flex items-center justify-center gap-2">
+                            <x-icon name="check" class="w-4 h-4" />
+                            {{ __('sales.finish_sale') }}
+                        </span>
+                        <span wire:loading wire:target="save" class="inline-flex items-center justify-center gap-2">
+                            <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                            </svg>
+                            {{ __('sales.finish_sale') }}...
+                        </span>
+                    </x-button>
+                </div>
             </div>
         </div>
     </div>
@@ -655,9 +741,9 @@
 
     <!-- Mobile Sticky Bottom Summary Bar -->
     @if(count($form->items) > 0)
-        <div class="lg:hidden fixed bottom-0 inset-x-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 p-3 z-30 shadow-lg">
+        <div class="lg:hidden fixed bottom-0 inset-x-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 p-3 z-30 shadow-lg pb-[max(0.75rem,env(safe-area-inset-bottom))]">
             <div class="flex items-center justify-between gap-3">
-                <div class="flex items-center gap-2.5">
+                <div class="flex items-center gap-2.5 cursor-pointer" @click="cartTab = 'items'; cartOpen = true">
                     <div class="relative">
                         <div class="h-10 w-10 rounded-lg bg-primary-50 dark:bg-primary-950/60 flex items-center justify-center text-primary-600 dark:text-primary-400 border border-primary-200 dark:border-primary-800">
                             <x-icon name="shopping-cart" class="w-5 h-5" />
@@ -676,14 +762,23 @@
                     </div>
                 </div>
 
-                <button
-                    type="button"
-                    @click="cartOpen = true"
-                    class="flex items-center gap-1.5 px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg text-sm shadow-sm active:scale-95 transition-transform"
-                >
-                    <span>{{ __('sales.view_order') }}</span>
-                    <x-icon name="arrow-right" class="w-4 h-4" />
-                </button>
+                <div class="flex items-center gap-1.5">
+                    <button
+                        type="button"
+                        @click="cartTab = 'items'; cartOpen = true"
+                        class="px-2.5 py-2 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                    >
+                        {{ __('sales.view_order') }}
+                    </button>
+                    <button
+                        type="button"
+                        @click="cartTab = 'checkout'; cartOpen = true"
+                        class="flex items-center gap-1.5 px-3.5 py-2 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg text-xs sm:text-sm shadow-sm active:scale-95 transition-transform"
+                    >
+                        <span>{{ __('sales.finish_sale') }}</span>
+                        <x-icon name="arrow-right" class="w-3.5 h-3.5" />
+                    </button>
+                </div>
             </div>
         </div>
     @endif
