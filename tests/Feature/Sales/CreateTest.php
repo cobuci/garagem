@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\MobileSaleStatus;
 use App\Enums\Permission;
 use App\Livewire\Sales\Create;
 use App\Models\AccountBalance;
@@ -316,4 +317,28 @@ test('prefills cart without customer when mobile sale has no customer_id', funct
     actingAs($this->user)
         ->get(route('sales.create', ['mobileSaleId' => $mobileSale->id]))
         ->assertOk();
+});
+
+test('marks mobile sale as synced when POS sale is finalized', function () {
+    $product = Product::factory()->create(['sale_price' => 20.00]);
+    $mobileSale = MobileSale::factory()->create([
+        'status' => MobileSaleStatus::Pending,
+    ]);
+    MobileSaleItem::factory()->create([
+        'mobile_sale_id'   => $mobileSale->id,
+        'product_id'       => $product->id,
+        'quantity'         => 2,
+        'unit_price_cents' => 2000,
+        'subtotal_cents'   => 4000,
+    ]);
+
+    Livewire::actingAs($this->user)
+        ->withQueryParams(['mobileSaleId' => $mobileSale->id])
+        ->test(Create::class)
+        ->set('form.paymentMethod', 'money')
+        ->set('amountPaid', '40,00')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    expect($mobileSale->fresh()->status)->toBe(MobileSaleStatus::Synced);
 });

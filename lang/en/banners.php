@@ -1,9 +1,10 @@
 <?php
 
 return [
-    'title'    => 'Banners',
-    'subtitle' => 'Create promotional banners with AI-generated backgrounds and export in high quality.',
-    'empty'    => 'No banners created yet.',
+    'title'             => 'Banners',
+    'subtitle'          => 'Create promotional banners with AI-generated backgrounds and export in high quality.',
+    'empty'             => 'No banners created yet.',
+    'empty_description' => 'Create promotional banners with artificial intelligence for offers, menus, and special deals.',
 
     'formats' => [
         'stories' => 'Stories (1080 × 1920)',

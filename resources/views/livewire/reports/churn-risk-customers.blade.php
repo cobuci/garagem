@@ -18,7 +18,7 @@
         </div>
     @endif
     @if (! $customers->isEmpty())
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto" wire:loading.delay.class="opacity-60 transition-opacity duration-200">
             <table class="w-full text-sm text-left table-fixed">
                     <colgroup>
                         <col class="w-auto min-w-0">
@@ -32,7 +32,7 @@
                     <tr class="border-b border-gray-100 dark:border-gray-700">
                         @php
                             $thBase = 'pb-3 pr-4 text-xs font-semibold uppercase tracking-wide select-none whitespace-nowrap';
-                            $thSortable = $thBase . ' cursor-pointer hover:text-gray-700 dark:hover:text-gray-200 transition-colors group/th';
+                            $thSortable = $thBase . ' cursor-pointer hover:text-gray-700 dark:hover:text-gray-200 transition-colors group/th focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-gray-800 rounded';
                             $thActive = 'text-gray-800 dark:text-gray-100';
                             $thInactive = 'text-gray-500 dark:text-gray-400';
 
@@ -45,29 +45,58 @@
                                 }
                                 return '<svg class="inline w-3 h-3 ml-0.5 opacity-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 15l5 5 5-5"/></svg>';
                             };
+
+                            $sortAria = function (string $field) use ($sortField, $sortDirection): string {
+                                if ($sortField !== $field) return 'none';
+                                return $sortDirection === 'asc' ? 'ascending' : 'descending';
+                            };
                         @endphp
 
                         <th wire:click="sort('name')"
+                            wire:keydown.enter="sort('name')"
+                            tabindex="0"
+                            role="button"
+                            aria-sort="{{ $sortAria('name') }}"
                             class="{{ $thSortable }} {{ $sortField === 'name' ? $thActive : $thInactive }}">
                             {{ __('reports.churn_risk.columns.name') }}{!! $icon('name') !!}
                         </th>
                         <th wire:click="sort('total_purchases')"
+                            wire:keydown.enter="sort('total_purchases')"
+                            tabindex="0"
+                            role="button"
+                            aria-sort="{{ $sortAria('total_purchases') }}"
                             class="{{ $thSortable }} {{ $sortField === 'total_purchases' ? $thActive : $thInactive }} text-right">
                             {{ __('reports.churn_risk.columns.purchases') }}{!! $icon('total_purchases') !!}
                         </th>
                         <th wire:click="sort('avg_interval')"
+                            wire:keydown.enter="sort('avg_interval')"
+                            tabindex="0"
+                            role="button"
+                            aria-sort="{{ $sortAria('avg_interval') }}"
                             class="{{ $thSortable }} {{ $sortField === 'avg_interval' ? $thActive : $thInactive }} text-right hidden sm:table-cell">
                             {{ __('reports.churn_risk.columns.avg_interval') }}{!! $icon('avg_interval') !!}
                         </th>
                         <th wire:click="sort('days_since_last')"
+                            wire:keydown.enter="sort('days_since_last')"
+                            tabindex="0"
+                            role="button"
+                            aria-sort="{{ $sortAria('days_since_last') }}"
                             class="{{ $thSortable }} {{ $sortField === 'days_since_last' ? $thActive : $thInactive }} text-right">
                             {{ __('reports.churn_risk.columns.days_since') }}{!! $icon('days_since_last') !!}
                         </th>
                         <th wire:click="sort('urgency')"
+                            wire:keydown.enter="sort('urgency')"
+                            tabindex="0"
+                            role="button"
+                            aria-sort="{{ $sortAria('urgency') }}"
                             class="{{ $thSortable }} {{ $sortField === 'urgency' ? $thActive : $thInactive }} text-center">
                             {{ __('reports.churn_risk.columns.urgency') }}{!! $icon('urgency') !!}
                         </th>
                         <th wire:click="sort('total_spent')"
+                            wire:keydown.enter="sort('total_spent')"
+                            tabindex="0"
+                            role="button"
+                            aria-sort="{{ $sortAria('total_spent') }}"
                             class="{{ $thSortable }} {{ $sortField === 'total_spent' ? $thActive : $thInactive }} text-right hidden md:table-cell">
                             {{ __('reports.churn_risk.columns.total_spent') }}{!! $icon('total_spent') !!}
                         </th>
@@ -83,18 +112,18 @@
                             $urgencyTextClass = match ($urgency) {
                                 'critical' => 'text-red-600 dark:text-red-400',
                                 'high'     => 'text-orange-500 dark:text-orange-400',
-                                default    => 'text-yellow-600 dark:text-yellow-400',
+                                default    => 'text-amber-700 dark:text-amber-300',
                             };
                             $urgencyBadgeClass = match ($urgency) {
                                 'critical' => 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
                                 'high'     => 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
-                                default    => 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300',
+                                default    => 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
                             };
                         @endphp
                         <tr class="group hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
                             <td class="py-3 pr-4 min-w-0">
                                 <a href="{{ route('customers.show', $customer->id) }}"
-                                   class="block truncate font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                                   class="block truncate font-medium text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
                                    title="{{ $customer->name }}">
                                     {{ $customer->name }}
                                 </a>
@@ -111,7 +140,7 @@
                                 <span class="text-xs font-normal text-gray-400">{{ __('reports.churn_risk.days') }}</span>
                             </td>
                             <td class="py-3 pr-4 text-center">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold {{ $urgencyBadgeClass }}">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {{ $urgencyBadgeClass }}">
                                     {{ __('reports.churn_risk.urgency.' . $urgency) }}
                                 </span>
                             </td>

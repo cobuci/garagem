@@ -92,6 +92,8 @@ return [
     'export' => [
         'title'               => 'Relatório Completo',
         'subtitle'            => 'Exporte todos os dados para PDF e receba por e-mail',
+        'trigger'             => 'Exportar',
+        'cancel'              => 'Cancelar',
         'quick_select'        => 'Seleção rápida',
         'start_date'          => 'Data Inicial',
         'end_date'            => 'Data Final',

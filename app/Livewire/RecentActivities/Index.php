@@ -26,6 +26,10 @@ class Index extends Component
 
     public string $type = 'all';
 
+    public string $search = '';
+
+    public string $period = 'all';
+
     public ?string $amount = null;
 
     public string $description = '';
@@ -48,6 +52,63 @@ class Index extends Component
         $this->resetPage();
     }
 
+    public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingPeriod(): void
+    {
+        $this->resetPage();
+    }
+
+    public function resetFilters(): void
+    {
+        $this->reset(['type', 'search', 'period']);
+        $this->resetPage();
+    }
+
+    #[Computed]
+    public function hasActiveFilters(): bool
+    {
+        return $this->type !== 'all' || filled($this->search) || $this->period !== 'all';
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    #[Computed]
+    public function typeCounts(): array
+    {
+        $baseQuery = FinancialTransaction::query()
+            ->when(filled($this->search), function ($query) {
+                $query->where('description', 'like', '%' . trim($this->search) . '%');
+            })
+            ->when($this->period !== 'all', function ($query) {
+                match ($this->period) {
+                    'today'      => $query->whereDate('transaction_date', today()),
+                    '7_days'     => $query->where('transaction_date', '>=', now()->subDays(7)),
+                    '30_days'    => $query->where('transaction_date', '>=', now()->subDays(30)),
+                    'this_month' => $query->whereMonth('transaction_date', now()->month)->whereYear('transaction_date', now()->year),
+                    default      => null,
+                };
+            });
+
+        $grouped = (clone $baseQuery)
+            ->selectRaw('type, count(*) as count')
+            ->groupBy('type')
+            ->pluck('count', 'type')
+            ->all();
+
+        return [
+            'all'               => (int) (clone $baseQuery)->count(),
+            'sale'              => (int) ($grouped[TransactionType::Sale->value] ?? 0),
+            'purchase'          => (int) ($grouped[TransactionType::Purchase->value] ?? 0),
+            'cancelled_sale'    => (int) ($grouped[TransactionType::CancelledSale->value] ?? 0),
+            'manual_adjustment' => (int) ($grouped[TransactionType::ManualAdjustment->value] ?? 0),
+        ];
+    }
+
     #[Computed]
     public function transactions(): LengthAwarePaginator
     {
@@ -63,6 +124,18 @@ class Index extends Component
                 if (isset($typeMap[$this->type])) {
                     return $query->where('type', $typeMap[$this->type]);
                 }
+            })
+            ->when(filled($this->search), function ($query) {
+                $query->where('description', 'like', '%' . trim($this->search) . '%');
+            })
+            ->when($this->period !== 'all', function ($query) {
+                match ($this->period) {
+                    'today'      => $query->whereDate('transaction_date', today()),
+                    '7_days'     => $query->where('transaction_date', '>=', now()->subDays(7)),
+                    '30_days'    => $query->where('transaction_date', '>=', now()->subDays(30)),
+                    'this_month' => $query->whereMonth('transaction_date', now()->month)->whereYear('transaction_date', now()->year),
+                    default      => null,
+                };
             })
             ->orderBy('transaction_date', 'desc')
             ->orderBy('id', 'desc')
@@ -91,6 +164,15 @@ class Index extends Component
         $this->amount = null;
         $this->description = '';
         $this->showAdjustmentModal = true;
+    }
+
+    public function fillAllBalance(): void
+    {
+        $currentBalanceInCents = $this->summary['current_balance'];
+
+        if ($currentBalanceInCents > 0) {
+            $this->amount = number_format($currentBalanceInCents / 100, 2, '.', '');
+        }
     }
 
     public function saveAdjustment(): void
@@ -172,6 +254,16 @@ class Index extends Component
             title: __('finance.cancel_success_title'),
             description: __('finance.cancel_success_description'),
         );
+    }
+
+    #[Computed]
+    public function cancellingTransaction(): ?FinancialTransaction
+    {
+        if (! $this->transactionToCancel) {
+            return null;
+        }
+
+        return FinancialTransaction::find($this->transactionToCancel);
     }
 
     public function render(): View

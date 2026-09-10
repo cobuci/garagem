@@ -36,9 +36,11 @@
 >
     <link href="{{ BannerFont::stylesheetUrl(...BannerFont::cases()) }}" rel="stylesheet">
     <style>
-        .banner-editable { transition: outline-color 0.15s; outline: 2px dashed transparent; outline-offset: 6px; }
-        .banner-editable:hover { outline-color: rgba(56, 182, 248, 0.7); cursor: text; }
-        .banner-editable:focus { outline-color: rgba(56, 182, 248, 1); }
+        .banner-editable { transition: outline-color 0.15s, box-shadow 0.15s; outline: 2px dashed transparent; outline-offset: 4px; border-radius: 6px; }
+        .banner-editable:hover { outline-color: rgba(2, 132, 199, 0.7); cursor: text; }
+        .banner-editable:focus { outline-color: #0284c7; }
+        .banner-draggable { transition: outline-color 0.15s; outline: 2px dashed transparent; outline-offset: 4px; border-radius: 6px; }
+        .banner-draggable:hover { outline-color: rgba(2, 132, 199, 0.7); }
     </style>
 
     <div
@@ -51,16 +53,16 @@
             : 'bg-gray-50/95 dark:bg-gray-900/95 border-b border-transparent'"
     >
         <div class="min-w-0">
-            <div class="flex items-center gap-2 min-w-0">
+            <div class="flex items-center gap-2.5 min-w-0">
                 <h1 class="text-xl lg:text-2xl font-bold text-gray-900 dark:text-white truncate">{{ $banner->name }}</h1>
-                <span class="inline-flex items-center gap-1.5 shrink-0 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800 dark:bg-amber-500/15 dark:text-amber-300 {{ $isDirty ? '' : 'hidden' }}">
+                <span class="inline-flex items-center gap-1.5 shrink-0 rounded-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-300 {{ $isDirty ? '' : 'hidden' }}">
                     <span class="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse"></span>
                     {{ __('banners.messages.unsaved_changes') }}
                 </span>
             </div>
             <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400 truncate">
                 {{ $banner->format->label() }}
-                <span class="text-amber-600 dark:text-amber-400 {{ $isDirty ? '' : 'hidden' }}">· {{ __('banners.messages.save_to_keep') }}</span>
+                <span class="text-amber-600 dark:text-amber-400 font-medium {{ $isDirty ? '' : 'hidden' }}">· {{ __('banners.messages.save_to_keep') }}</span>
             </p>
         </div>
         <div class="flex items-center gap-2 shrink-0">
@@ -88,6 +90,7 @@
                     icon="check"
                     :label="$isDirty ? __('banners.actions.save_changes') : __('banners.actions.save')"
                     wire:click="save"
+                    spinner="save"
                     class="!hidden lg:!inline-flex"
                 />
             @endcan
@@ -96,16 +99,16 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
         <div class="lg:col-span-2 lg:order-last min-w-0">
-            <div class="lg:sticky lg:top-8 min-w-0">
+            <div class="lg:sticky lg:top-20 min-w-0">
                 <div class="flex items-center justify-between gap-3 mb-3">
-                    <h2 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    <h2 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         {{ __('banners.sections.preview') }}
                     </h2>
                     @can(Permission::EditBanner->value)
                         <select
                             wire:model.live="format"
                             aria-label="{{ __('banners.fields.format') }}"
-                            class="rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs text-gray-700 dark:text-gray-300 py-1.5 pl-2 pr-8 focus:ring-primary-500 focus:border-primary-500"
+                            class="rounded-lg border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-xs font-medium text-gray-700 dark:text-gray-300 py-1.5 pl-2.5 pr-8 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 shadow-2xs transition-colors"
                         >
                             @foreach (App\Enums\BannerFormat::cases() as $formatOption)
                                 <option value="{{ $formatOption->value }}">{{ $formatOption->label() }} ({{ $formatOption->width() }} × {{ $formatOption->height() }})</option>
@@ -116,7 +119,7 @@
 
                 <div
                     wire:key="preview-frame-{{ $banner->format->value }}"
-                    class="banner-preview-frame relative w-full max-w-[480px] mx-auto min-w-0 rounded-xl shadow-lg ring-1 ring-black/10 overflow-hidden bg-gray-100 dark:bg-gray-900"
+                    class="banner-preview-frame relative w-full max-w-[480px] mx-auto min-w-0 rounded-xl shadow-md border border-gray-200/80 dark:border-gray-700 ring-1 ring-black/5 dark:ring-white/5 overflow-hidden bg-gray-100 dark:bg-gray-900"
                     style="aspect-ratio: {{ $canvasWidth }} / {{ $canvasHeight }};"
                     x-data="{
                         canvasWidth: {{ $canvasWidth }},
@@ -153,20 +156,25 @@
                     </div>
                 </div>
 
-                <p class="mt-2 text-center text-xs text-gray-400 dark:text-gray-500">{{ __('banners.hints.tap_to_edit') }}</p>
+                <p class="mt-2.5 text-center text-xs text-gray-400 dark:text-gray-500 flex items-center justify-center gap-1">
+                    <x-icon name="cursor-arrow-rays" class="w-3.5 h-3.5 inline-block shrink-0" />
+                    {{ __('banners.hints.tap_to_edit') }}
+                </p>
             </div>
         </div>
 
         <div class="lg:col-span-3 space-y-4" x-data="{ active: 'presets' }">
             <x-banner.section name="presets" :title="__('banners.sections.presets')" :hint="__('banners.hints.presets')">
-                <div class="flex flex-wrap gap-2">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                     @foreach (array_keys(Banner::presets()) as $presetKey)
-                        <x-button
-                            flat
-                            primary
-                            :label="__('banners.presets.' . $presetKey)"
+                        <button
+                            type="button"
                             wire:click="applyPreset('{{ $presetKey }}')"
-                        />
+                            class="flex items-center justify-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/80 px-3.5 py-2.5 text-center text-xs font-semibold text-gray-700 dark:text-gray-300 hover:border-sky-500 hover:bg-sky-50/50 dark:hover:bg-sky-950/30 hover:text-sky-700 dark:hover:text-sky-300 transition-all duration-150 shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        >
+                            <x-icon name="sparkles" class="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
+                            <span>{{ __('banners.presets.' . $presetKey) }}</span>
+                        </button>
                     @endforeach
                 </div>
             </x-banner.section>
@@ -178,13 +186,18 @@
                             <button
                                 type="button"
                                 wire:click="selectTheme('{{ $theme->value }}')"
-                                class="rounded-lg border p-3 text-left transition
+                                class="relative rounded-lg border p-3 text-left transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-sky-500
                                     {{ $backgroundTheme === $theme->value
-                                        ? 'border-primary-500 ring-2 ring-primary-500/40 bg-primary-50 dark:bg-primary-900/20'
-                                        : 'border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-700' }}"
+                                        ? 'border-sky-500 ring-2 ring-sky-500/20 bg-sky-50/80 dark:bg-sky-950/30 shadow-2xs'
+                                        : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/60 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50/80 dark:hover:bg-gray-700/30' }}"
                             >
-                                <span class="block text-sm font-semibold text-gray-900 dark:text-white">{{ $theme->label() }}</span>
-                                <span class="block mt-1 text-xs text-gray-500 dark:text-gray-400">{{ $theme->description() }}</span>
+                                <div class="flex items-start justify-between gap-1">
+                                    <span class="block text-sm font-semibold text-gray-900 dark:text-white">{{ $theme->label() }}</span>
+                                    @if ($backgroundTheme === $theme->value)
+                                        <x-icon name="check-circle" class="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0 mt-0.5" />
+                                    @endif
+                                </div>
+                                <span class="block mt-1 text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{{ $theme->description() }}</span>
                             </button>
                         @endforeach
                     </div>
@@ -194,7 +207,7 @@
 
                     <div>
                         <div class="flex items-center gap-1.5 mb-2">
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('banners.fields.mood') }}</span>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('banners.fields.mood') }}</span>
                             <span class="text-gray-400 cursor-help" title="{{ __('banners.hints.mood') }}">
                                 <x-icon name="question-mark-circle" class="w-4 h-4" />
                             </span>
@@ -205,10 +218,10 @@
                                     type="button"
                                     wire:click="$set('backgroundMood', {{ $backgroundMood === $mood->value ? 'null' : "'{$mood->value}'" }})"
                                     title="{{ $mood->tip() }}"
-                                    class="rounded-full px-4 py-1.5 text-sm font-medium border transition
+                                    class="rounded-full px-4 py-1.5 text-xs font-semibold border transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-sky-500
                                         {{ $backgroundMood === $mood->value
-                                            ? 'border-primary-500 bg-primary-500 text-white'
-                                            : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-primary-400' }}"
+                                            ? 'border-sky-600 bg-sky-600 text-white shadow-xs'
+                                            : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-sky-400 hover:text-sky-600 dark:hover:text-sky-400' }}"
                                 >
                                     {{ $mood->label() }}
                                 </button>
@@ -221,7 +234,7 @@
 
                     <div>
                         <div class="flex items-center gap-1.5 mb-2">
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ __('banners.fields.intensity') }}</span>
+                            <span class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">{{ __('banners.fields.intensity') }}</span>
                             <span class="text-gray-400 cursor-help" title="{{ __('banners.hints.intensity') }}">
                                 <x-icon name="question-mark-circle" class="w-4 h-4" />
                             </span>
@@ -232,10 +245,10 @@
                                     type="button"
                                     wire:click="$set('backgroundIntensity', {{ $backgroundIntensity === $intensity->value ? 'null' : "'{$intensity->value}'" }})"
                                     title="{{ $intensity->tip() }}"
-                                    class="rounded-full px-4 py-1.5 text-sm font-medium border transition
+                                    class="rounded-full px-4 py-1.5 text-xs font-semibold border transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-sky-500
                                         {{ $backgroundIntensity === $intensity->value
-                                            ? 'border-primary-500 bg-primary-500 text-white'
-                                            : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:border-primary-400' }}"
+                                            ? 'border-sky-600 bg-sky-600 text-white shadow-xs'
+                                            : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-sky-400 hover:text-sky-600 dark:hover:text-sky-400' }}"
                                 >
                                     {{ $intensity->label() }}
                                 </button>
@@ -246,26 +259,33 @@
                         </p>
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-2.5 pt-1">
                         <x-button
                             primary
                             icon="sparkles"
                             :label="__('banners.actions.generate_background')"
                             wire:click="generateBackground"
+                            spinner="generateBackground"
                             :disabled="$banner->background_status === BannerJobStatus::Generating"
                         />
 
                         @if ($banner->background_path)
-                            <x-button flat negative :label="__('banners.actions.remove_background')" wire:click="removeBackground" />
+                            <x-button flat negative icon="trash" :label="__('banners.actions.remove_background')" wire:click="removeBackground" />
                         @endif
                     </div>
 
                     @if ($banner->background_status === BannerJobStatus::Generating)
-                        <p class="text-sm text-primary-600 dark:text-primary-400 animate-pulse">{{ __('banners.messages.background_generating') }}</p>
+                        <div class="flex items-center gap-2.5 rounded-lg bg-sky-50 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-800/50 p-3 text-sky-700 dark:text-sky-300">
+                            <svg class="h-4 w-4 animate-spin text-sky-600 dark:text-sky-400 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            <p class="text-xs font-medium">{{ __('banners.messages.background_generating') }}</p>
+                        </div>
                     @endif
 
                     @if ($banner->background_status === BannerJobStatus::Failed)
-                        <p class="text-sm text-red-600 dark:text-red-400">{{ __('banners.messages.background_failed') }}</p>
+                        <div class="flex items-center gap-2.5 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/50 p-3 text-red-700 dark:text-red-300">
+                            <x-icon name="exclamation-circle" class="w-4 h-4 shrink-0 text-red-600 dark:text-red-400" />
+                            <p class="text-xs font-medium">{{ __('banners.messages.background_failed') }}</p>
+                        </div>
                     @endif
                 </div>
             </x-banner.section>
@@ -358,18 +378,27 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('banners.fields.background_color') }}</label>
-                            <input type="color" wire:model.live="design.background_color" class="h-10 w-full cursor-pointer rounded-lg border border-gray-300 dark:border-gray-600 bg-transparent">
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">{{ __('banners.fields.background_color') }}</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" wire:model.live="design.background_color" class="h-9 w-12 cursor-pointer rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 p-0.5 shadow-2xs">
+                                <span class="text-xs font-mono font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{{ $design['background_color'] ?? '' }}</span>
+                            </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('banners.fields.accent_color') }}</label>
-                            <input type="color" wire:model.live="design.accent_color" class="h-10 w-full cursor-pointer rounded-lg border border-gray-300 dark:border-gray-600 bg-transparent">
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">{{ __('banners.fields.accent_color') }}</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" wire:model.live="design.accent_color" class="h-9 w-12 cursor-pointer rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 p-0.5 shadow-2xs">
+                                <span class="text-xs font-mono font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{{ $design['accent_color'] ?? '' }}</span>
+                            </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('banners.fields.text_color') }}</label>
-                            <input type="color" wire:model.live="design.text_color" class="h-10 w-full cursor-pointer rounded-lg border border-gray-300 dark:border-gray-600 bg-transparent">
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1.5">{{ __('banners.fields.text_color') }}</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" wire:model.live="design.text_color" class="h-9 w-12 cursor-pointer rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 p-0.5 shadow-2xs">
+                                <span class="text-xs font-mono font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">{{ $design['text_color'] ?? '' }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -388,7 +417,7 @@
                             <div class="w-28 sm:w-32">
                                 <x-money-input prefix="R$" wire:model.live.debounce.400ms="design.items.{{ $index }}.price" :label="$index === 0 ? __('banners.fields.item_price') : null" />
                             </div>
-                            <x-button flat negative icon="trash" wire:click="removeItem({{ $index }})" />
+                            <x-button flat negative icon="trash" wire:click="removeItem({{ $index }})" aria-label="{{ __('banners.actions.delete') }}" title="{{ __('banners.actions.delete') }}" />
                         </div>
                     @endforeach
 
@@ -399,14 +428,14 @@
             <x-banner.section name="texts" :title="__('banners.sections.texts')" :hint="__('banners.hints.texts')">
                 <div class="space-y-3">
                     @foreach ($design['texts'] ?? [] as $index => $text)
-                        <div class="space-y-3 rounded-lg border border-gray-200 dark:border-gray-700 p-3" wire:key="text-{{ $index }}">
+                        <div class="space-y-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/40 p-3" wire:key="text-{{ $index }}">
                             <div class="flex items-end gap-2">
                                 <div class="flex-1 min-w-0">
                                     <x-input wire:model.live.debounce.400ms="design.texts.{{ $index }}.content" :label="__('banners.fields.text_content')" />
                                 </div>
-                                <x-button flat negative icon="trash" wire:click="removeText({{ $index }})" />
+                                <x-button flat negative icon="trash" wire:click="removeText({{ $index }})" aria-label="{{ __('banners.actions.delete') }}" title="{{ __('banners.actions.delete') }}" />
                             </div>
-                            <div class="grid grid-cols-3 gap-2">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                                 <x-native-select wire:model.live="design.texts.{{ $index }}.font" :label="__('banners.fields.font')">
                                     @foreach (BannerFont::cases() as $font)
                                         <option value="{{ $font->value }}" style="font-family: {{ $font->family() }}">{{ $font->label() }}</option>
@@ -414,8 +443,11 @@
                                 </x-native-select>
                                 <x-input type="number" min="12" max="200" wire:model.live.debounce.400ms="design.texts.{{ $index }}.size" :label="__('banners.fields.size')" />
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ __('banners.fields.color') }}</label>
-                                    <input type="color" wire:model.live="design.texts.{{ $index }}.color" class="h-10 w-full cursor-pointer rounded-lg border border-gray-300 dark:border-gray-600 bg-transparent">
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">{{ __('banners.fields.color') }}</label>
+                                    <div class="flex items-center gap-2">
+                                        <input type="color" wire:model.live="design.texts.{{ $index }}.color" class="h-9 w-10 cursor-pointer rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 p-0.5">
+                                        <span class="text-xs font-mono font-medium text-gray-600 dark:text-gray-400 uppercase">{{ $design['texts'][$index]['color'] ?? '' }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -442,12 +474,13 @@
                         </span>
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-2">
+                    <div class="flex flex-wrap items-center gap-2.5 pt-1">
                         <x-button
                             primary
                             icon="arrow-down-tray"
                             :label="__('banners.actions.export')"
                             wire:click="export"
+                            spinner="export"
                             :disabled="$banner->export_status === BannerJobStatus::Generating"
                         />
 
@@ -458,18 +491,24 @@
                     </div>
 
                     @if ($exportIsOutdated)
-                        <p class="flex items-start gap-1.5 text-sm text-amber-600 dark:text-amber-400">
-                            <x-icon name="exclamation-triangle" class="w-4 h-4 mt-0.5 shrink-0" />
-                            {{ __('banners.messages.export_outdated') }}
-                        </p>
+                        <div class="flex items-start gap-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 p-3 text-amber-800 dark:text-amber-300 text-xs">
+                            <x-icon name="exclamation-triangle" class="w-4 h-4 mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
+                            <p>{{ __('banners.messages.export_outdated') }}</p>
+                        </div>
                     @endif
 
                     @if ($banner->export_status === BannerJobStatus::Generating)
-                        <p class="text-sm text-primary-600 dark:text-primary-400 animate-pulse">{{ __('banners.messages.export_generating') }}</p>
+                        <div class="flex items-center gap-2.5 rounded-lg bg-sky-50 dark:bg-sky-950/30 border border-sky-200 dark:border-sky-800/50 p-3 text-sky-700 dark:text-sky-300">
+                            <svg class="h-4 w-4 animate-spin text-sky-600 dark:text-sky-400 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            <p class="text-xs font-medium">{{ __('banners.messages.export_generating') }}</p>
+                        </div>
                     @endif
 
                     @if ($banner->export_status === BannerJobStatus::Failed)
-                        <p class="text-sm text-red-600 dark:text-red-400">{{ __('banners.messages.export_failed') }}</p>
+                        <div class="flex items-center gap-2.5 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/50 p-3 text-red-700 dark:text-red-300">
+                            <x-icon name="exclamation-circle" class="w-4 h-4 shrink-0 text-red-600 dark:text-red-400" />
+                            <p class="text-xs font-medium">{{ __('banners.messages.export_failed') }}</p>
+                        </div>
                     @endif
                 </div>
             </x-banner.section>
@@ -487,6 +526,7 @@
                     icon="check"
                     :label="__('banners.actions.save_changes')"
                     wire:click="save"
+                    spinner="save"
                     class="w-full"
                 />
             </div>

@@ -102,7 +102,12 @@
                                @if($item['route'] !== '#') wire:navigate @endif
                                class="flex items-center px-2 py-2 text-sm font-medium rounded-md {{ $item['active'] ? 'bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white' }}">
                                 <x-icon name="{{ $item['icon'] }}" class="mr-3 h-5 w-5 {{ $item['active'] ? 'text-indigo-500' : 'text-gray-400 group-hover:text-gray-500 dark:text-gray-500 dark:group-hover:text-gray-300' }}" />
-                                {{ $item['label'] }}
+                                <span class="flex-1 truncate">{{ $item['label'] }}</span>
+                                @if(!empty($item['badge']))
+                                    <span class="ml-auto inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-semibold tabular-nums bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">
+                                        {{ $item['badge'] }}
+                                    </span>
+                                @endif
                             </a>
                         @endforeach
                     </div>

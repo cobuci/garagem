@@ -5,7 +5,6 @@ namespace App\Jobs;
 use App\Enums\Queue;
 use App\Models\Sale;
 use App\Models\Setting;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Storage;
@@ -35,14 +34,6 @@ class GenerateInvoiceJob implements ShouldQueue
         $sale = $this->sale->load(['customer', 'items.product']);
         $settings = Setting::singleton();
 
-        $pdf = Pdf::loadView('pdf.invoice', [
-            'sale'     => $sale,
-            'settings' => $settings,
-        ]);
-
-        $pdfFileName = "invoices/{$this->sale->id}.pdf";
-        Storage::put($pdfFileName, $pdf->output());
-
         $html = view('pdf.invoice', ['sale' => $sale, 'settings' => $settings])->render();
         $pngFileName = "invoices/{$this->sale->id}.png";
         $pngAbsPath = Storage::path($pngFileName);
@@ -69,7 +60,7 @@ class GenerateInvoiceJob implements ShouldQueue
 
         $this->sale->update([
             'invoice_status'   => 'ready',
-            'invoice_path'     => $pdfFileName,
+            'invoice_path'     => null,
             'invoice_png_path' => $pngFileName,
         ]);
     }

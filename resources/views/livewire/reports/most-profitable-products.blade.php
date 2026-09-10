@@ -30,12 +30,14 @@
     <div
         wire:ignore
         id="chart-most-profitable-products"
+        wire:loading.delay.class="opacity-60 pointer-events-none transition-opacity duration-200"
         x-data="{
             labels: @entangle('chartDataArray.labels'),
             profit: @entangle('chartDataArray.profit'),
             quantity: @entangle('chartDataArray.quantity'),
             avg_margin: @entangle('chartDataArray.avg_margin'),
             chart: null,
+            observer: null,
             init() {
                 this.$nextTick(() => {
                     this.initChart();
@@ -43,6 +45,25 @@
 
                 this.$watch('profit', () => this.updateChart());
                 this.$watch('labels', () => this.updateChart());
+
+                this.observer = new MutationObserver(() => {
+                    if (this.chart) {
+                        const dark = document.documentElement.classList.contains('dark');
+                        this.chart.updateOptions({
+                            tooltip: {
+                                theme: dark ? 'dark' : 'light'
+                            },
+                            grid: {
+                                borderColor: dark ? 'rgba(156, 163, 175, 0.15)' : 'rgba(156, 163, 175, 0.1)'
+                            }
+                        });
+                    }
+                });
+                this.observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+            },
+            destroy() {
+                if (this.observer) this.observer.disconnect();
+                if (this.chart) this.chart.destroy();
             },
             updateChart() {
                 if (this.chart) {
@@ -53,11 +74,12 @@
                             data: this.profit
                         }],
                         tooltip: {
+                            theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
                             y: {
                                 formatter: (val, { seriesIndex, dataPointIndex, w }) => {
                                     let qty = this.quantity[dataPointIndex] || 0;
                                     let margin = this.avg_margin[dataPointIndex] || 0;
-                                    return 'R$ ' + val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) +
+                                    return 'R$ ' + (val || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) +
                                            ' (' + qty + ' {{ __('reports.units') }} | Avg: R$ ' +
                                            margin.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ')';
                                 }
@@ -76,14 +98,25 @@
                     this.chart.destroy();
                 }
 
+                const dark = document.documentElement.classList.contains('dark');
                 this.chart = new ApexCharts(this.$refs.chart, {
                     chart: {
                         type: 'bar',
                         height: 350,
                         toolbar: { show: false },
-                        fontFamily: 'Inter, ui-sans-serif, system-ui',
+                        fontFamily: 'Instrument Sans, sans-serif',
                         background: 'transparent',
                         animations: { enabled: true }
+                    },
+                    noData: {
+                        text: '{{ __('reports.heatmap.no_data') }}',
+                        align: 'center',
+                        verticalAlign: 'middle',
+                        style: {
+                            color: '#9ca3af',
+                            fontSize: '14px',
+                            fontFamily: 'Instrument Sans, sans-serif'
+                        }
                     },
                     plotOptions: {
                         bar: {
@@ -96,7 +129,7 @@
                             }
                         }
                     },
-                    colors: ['#10b981', '#059669', '#047857', '#065f46', '#064e3b', '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5', '#ecfdf5'],
+                    colors: ['#065f46', '#047857', '#059669', '#10b981', '#34d399', '#14b8a6', '#0d9488', '#0f766e', '#0e7490', '#0284c7'],
                     series: [{
                         name: '{{ __('reports.profit') }}',
                         data: this.profit
@@ -106,16 +139,17 @@
                         textAnchor: 'start',
                         style: {
                             colors: ['#fff'],
-                            fontSize: '11px',
-                            fontWeight: 600
+                            fontSize: '12px',
+                            fontWeight: 600,
+                            fontFamily: 'Instrument Sans, sans-serif'
                         },
                         formatter: function(val) {
-                            return 'R$ ' + val.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                            return 'R$ ' + (val || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
                         },
                         offsetX: 0,
                     },
                     grid: {
-                        borderColor: 'rgba(156, 163, 175, 0.1)',
+                        borderColor: dark ? 'rgba(156, 163, 175, 0.15)' : 'rgba(156, 163, 175, 0.1)',
                         strokeDashArray: 4,
                         xaxis: { lines: { show: true } },
                         yaxis: { lines: { show: false } }
@@ -127,7 +161,8 @@
                         labels: {
                             style: {
                                 colors: '#9ca3af',
-                                fontSize: '11px'
+                                fontSize: '12px',
+                                fontFamily: 'Instrument Sans, sans-serif'
                             },
                             formatter: function(val) {
                                 return 'R$ ' + val;
@@ -138,17 +173,18 @@
                         labels: {
                             style: {
                                 colors: '#9ca3af',
-                                fontSize: '11px'
+                                fontSize: '12px',
+                                fontFamily: 'Instrument Sans, sans-serif'
                             }
                         }
                     },
                     tooltip: {
-                        theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+                        theme: dark ? 'dark' : 'light',
                         y: {
                             formatter: (val, { seriesIndex, dataPointIndex, w }) => {
-                                let qty = this.quantity[dataPointIndex];
-                                let margin = this.avg_margin[dataPointIndex];
-                                return 'R$ ' + val.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) +
+                                let qty = this.quantity[dataPointIndex] || 0;
+                                let margin = this.avg_margin[dataPointIndex] || 0;
+                                return 'R$ ' + (val || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) +
                                        ' (' + qty + ' {{ __('reports.units') }} | Avg: R$ ' +
                                        margin.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) + ')';
                             }

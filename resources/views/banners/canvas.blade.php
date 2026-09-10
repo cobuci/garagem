@@ -70,7 +70,7 @@
                     <span style="flex: 1; border-bottom: 3px dotted {{ $design['text_color'] }}55; margin: 0 8px;"></span>
                     <span
                         @if ($editable) {!! $editableAttrs !!} x-on:keydown.enter.prevent="$event.target.blur()" x-on:blur="$wire.set('design.items.{{ $index }}.price', $event.target.innerText.replace(/[^0-9,]/g, '').replace(',', '.'))" @endif
-                        style="font-weight: 700; white-space: nowrap; min-width: 60px;"
+                        style="font-weight: 700; white-space: nowrap; min-width: 60px; font-variant-numeric: tabular-nums;"
                     >{{ $formatPrice($item['price'] ?? '') }}</span>
                 </div>
             @endforeach
@@ -117,6 +117,7 @@
                     window.addEventListener('pointerup', stop);
                 "
             @endif
+            @if ($editable) class="banner-draggable" @endif
             style="position: absolute; left: {{ $text['x'] }}%; top: {{ $text['y'] }}%; font-family: {{ App\Enums\BannerFont::fromDesign($text, 'font')->family() }}; font-size: {{ $text['size'] }}px; font-weight: 700; color: {{ $text['color'] }}; white-space: nowrap; line-height: 1.2;{{ $editable ? ' cursor: move; touch-action: none; user-select: none;' : '' }}"
         >{{ $text['content'] }}</div>
     @endforeach

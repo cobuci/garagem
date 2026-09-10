@@ -38,7 +38,7 @@ return [
     'browsershot' => [
         'node_binary' => env('BROWSERSHOT_NODE_BINARY', '/usr/bin/node'),
         'npm_binary'  => env('BROWSERSHOT_NPM_BINARY', '/usr/bin/npm'),
-        'no_sandbox' => env('BROWSERSHOT_NO_SANDBOX', false),
+        'no_sandbox'  => env('BROWSERSHOT_NO_SANDBOX', false),
     ],
 
 ];

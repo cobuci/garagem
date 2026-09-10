@@ -27,7 +27,7 @@
                         <div class="absolute left-0 top-5 w-8 h-8 rounded-full flex items-center justify-center z-10"
                              :class="open ? 'bg-indigo-600' : 'bg-white dark:bg-gray-900 border-2 border-indigo-400'"
                         >
-                            <x-icon name="megaphone" class="w-4 h-4 transition-colors" :class="open ? 'text-white' : 'text-indigo-400'" />
+                            <x-icon name="megaphone" class="w-4 h-4 transition-colors" ::class="open ? 'text-white' : 'text-indigo-400'" />
                         </div>
 
                         {{-- Card --}}

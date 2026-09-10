@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Layout;
 
+use App\Enums\MobileSaleStatus;
 use App\Enums\Permission as PermissionEnum;
 use App\Models\Changelog;
+use App\Models\MobileSale;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -40,6 +42,12 @@ class Sidebar extends Component
     public function availableUsers(): Collection
     {
         return User::query()->limit(5)->get();
+    }
+
+    #[Computed]
+    public function pendingMobileSalesCount(): int
+    {
+        return MobileSale::query()->where('status', MobileSaleStatus::Pending)->count();
     }
 
     #[Computed]
@@ -121,6 +129,7 @@ class Sidebar extends Component
                         'route'      => 'mobile-sales.index',
                         'active'     => request()->routeIs('mobile-sales.*'),
                         'permission' => PermissionEnum::ViewSale->value,
+                        'badge'      => $this->pendingMobileSalesCount ?: null,
                     ],
                     [
                         'label'      => __('sidebar.bills_payable'),

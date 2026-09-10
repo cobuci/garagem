@@ -33,7 +33,7 @@
                         </p>
                         <div class="flex items-center gap-2 mt-0.5 overflow-hidden">
                             <span @class([
-                                'px-1.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wider flex-none',
+                                'px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider flex-none',
                                 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400' => $transaction->type === \App\Enums\TransactionType::Sale,
                                 'bg-red-50 text-red-700 dark:bg-red-950/50 dark:text-red-400' => in_array($transaction->type, [\App\Enums\TransactionType::Purchase, \App\Enums\TransactionType::CancelledSale]),
                                 'bg-sky-50 text-sky-700 dark:bg-sky-950/50 dark:text-sky-400' => $transaction->type === \App\Enums\TransactionType::ManualAdjustment,
@@ -42,7 +42,7 @@
                             </span>
                             <span class="text-gray-300 dark:text-gray-600 flex-none">•</span>
                             <span class="text-xs font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1 truncate">
-                                <x-icon name="clock" class="w-3.5 h-3.5 flex-none" />
+                                <x-icon name="clock" class="w-3.5 h-3.5 flex-none text-gray-400 dark:text-gray-500" />
                                 <span class="truncate">{{ $transaction->transaction_date->diffForHumans() }}</span>
                             </span>
                         </div>
@@ -57,17 +57,17 @@
                     ])>
                         {{ $transaction->amount > 0 ? '+' : '' }} R$ {{ number_format(abs($transaction->amount) / 100, 2, ',', '.') }}
                     </p>
-                    <p class="hidden sm:block text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tabular-nums">
+                    <p class="hidden sm:block text-xs font-medium text-gray-400 dark:text-gray-500 tabular-nums">
                         {{ $transaction->transaction_date->format('d/m/Y H:i') }}
                     </p>
                 </div>
             </div>
         @empty
             <div class="p-12 text-center">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 dark:bg-gray-900 mb-4 transition-transform hover:scale-110">
-                    <x-icon name="inbox" class="w-8 h-8 text-gray-300 dark:text-gray-600" />
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gray-100 dark:bg-gray-800 mb-4 transition-transform hover:scale-105 border border-gray-200/60 dark:border-gray-700">
+                    <x-icon name="inbox" class="w-7 h-7 text-gray-400 dark:text-gray-500" />
                 </div>
-                <p class="text-gray-500 dark:text-gray-400 font-medium">{{ __('finance.table.no_records') }}</p>
+                <p class="text-gray-600 dark:text-gray-400 font-medium text-sm">{{ __('finance.table.no_records') }}</p>
             </div>
         @endforelse
     </div>
