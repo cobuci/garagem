@@ -20,6 +20,12 @@ use WireUi\Traits\WireUiActions;
 /**
  * @property-read LengthAwarePaginator $sales
  * @property-read float $totalPendingAmount
+ * @property-read float $totalPaidAmount
+ * @property-read float $totalAllAmount
+ * @property-read int $pendingCount
+ * @property-read int $paidCount
+ * @property-read int $cancelledCount
+ * @property-read int $allCount
  * @property-read ?Sale $selectedSale
  */
 class Index extends Component
@@ -29,6 +35,8 @@ class Index extends Component
     use WithPagination;
 
     public ?string $status = 'pending';
+
+    public string $search = '';
 
     public ?int $selectedSaleId = null;
 
@@ -43,6 +51,11 @@ class Index extends Component
         $this->authorize(PermissionEnum::ViewSale->value);
     }
 
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
     public function filterByStatus(?string $status): void
     {
         $this->status = $status;
@@ -55,6 +68,15 @@ class Index extends Component
         return Sale::query()
             ->with(['customer', 'items.product'])
             ->when($this->status, fn (Builder $query) => $query->where('status', $this->status))
+            ->when(filled($this->search), function (Builder $query) {
+                $query->where(function (Builder $subQuery) {
+                    $subQuery->where('id', 'like', "%{$this->search}%")
+                        ->orWhereHas(
+                            'customer',
+                            fn (Builder $customerQuery) => $customerQuery->where('name', 'like', "%{$this->search}%"),
+                        );
+                });
+            })
             ->latest()
             ->paginate(10);
     }
@@ -65,6 +87,52 @@ class Index extends Component
         return Sale::query()
             ->where('status', SaleStatus::Pending)
             ->sum('net_amount') / 100;
+    }
+
+    #[Computed]
+    public function totalPaidAmount(): float
+    {
+        return Sale::query()
+            ->where('status', SaleStatus::Paid)
+            ->sum('net_amount') / 100;
+    }
+
+    #[Computed]
+    public function totalAllAmount(): float
+    {
+        return Sale::query()
+            ->whereIn('status', [SaleStatus::Pending, SaleStatus::Paid])
+            ->sum('net_amount') / 100;
+    }
+
+    #[Computed]
+    public function pendingCount(): int
+    {
+        return Sale::query()
+            ->where('status', SaleStatus::Pending)
+            ->count();
+    }
+
+    #[Computed]
+    public function paidCount(): int
+    {
+        return Sale::query()
+            ->where('status', SaleStatus::Paid)
+            ->count();
+    }
+
+    #[Computed]
+    public function cancelledCount(): int
+    {
+        return Sale::query()
+            ->where('status', SaleStatus::Cancelled)
+            ->count();
+    }
+
+    #[Computed]
+    public function allCount(): int
+    {
+        return Sale::query()->count();
     }
 
     #[Computed]

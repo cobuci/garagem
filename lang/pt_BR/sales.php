@@ -3,6 +3,7 @@
 return [
     'title'                      => 'PDV',
     'search_placeholder'         => 'Procurar produto ou código...',
+    'search_placeholder_sales'   => 'Buscar por cliente ou Nº...',
     'categories_placeholder'     => 'Categorias',
     'all_categories'             => 'Todos',
     'out_of_stock'               => 'Esgotado',

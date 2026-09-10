@@ -3,6 +3,7 @@
 return [
     'title'                      => 'POS',
     'search_placeholder'         => 'Search product or code...',
+    'search_placeholder_sales'   => 'Search by customer or ID...',
     'categories_placeholder'     => 'Categories',
     'all_categories'             => 'All',
     'out_of_stock'               => 'Out of Stock',

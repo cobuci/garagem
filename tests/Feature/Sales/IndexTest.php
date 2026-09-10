@@ -5,6 +5,7 @@ use App\Enums\SaleStatus;
 use App\Jobs\GenerateInvoiceJob;
 use App\Livewire\Sales\Index;
 use App\Models\AccountBalance;
+use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\User;
@@ -435,4 +436,59 @@ test('dispatches invoice job when png requested but invoice not yet generated', 
     });
 
     expect($sale->fresh()->invoice_status)->toBe('generating');
+});
+
+test('can filter sales by cancelled and all statuses', function () {
+    Sale::factory()->create(['status' => SaleStatus::Paid]);
+    Sale::factory()->create(['status' => SaleStatus::Pending]);
+    Sale::factory()->create(['status' => SaleStatus::Cancelled]);
+
+    Livewire::actingAs($this->user)
+        ->test(Index::class)
+        ->call('filterByStatus', 'cancelled')
+        ->assertSet('status', 'cancelled')
+        ->assertSet('sales', function ($sales) {
+            return $sales->count() === 1 && $sales->first()->status === SaleStatus::Cancelled;
+        })
+        ->call('filterByStatus', null)
+        ->assertSet('status', null)
+        ->assertSet('sales', function ($sales) {
+            return $sales->count() === 3;
+        });
+});
+
+test('can search sales by customer name and id', function () {
+    $customerA = Customer::factory()->create(['name' => 'Alpha Customer']);
+    $customerB = Customer::factory()->create(['name' => 'Beta Customer']);
+
+    $sale1 = Sale::factory()->create(['customer_id' => $customerA->id, 'status' => SaleStatus::Pending]);
+    $sale2 = Sale::factory()->create(['customer_id' => $customerB->id, 'status' => SaleStatus::Pending]);
+
+    Livewire::actingAs($this->user)
+        ->test(Index::class)
+        ->set('search', 'Alpha')
+        ->assertSet('sales', function ($sales) use ($sale1) {
+            return $sales->count() === 1 && $sales->first()->id === $sale1->id;
+        })
+        ->set('search', (string) $sale2->id)
+        ->assertSet('sales', function ($sales) use ($sale2) {
+            return $sales->count() === 1 && $sales->first()->id === $sale2->id;
+        });
+});
+
+test('computes status counts and totals accurately', function () {
+    Sale::factory()->create(['status' => SaleStatus::Pending, 'net_amount' => 50.00]);
+    Sale::factory()->create(['status' => SaleStatus::Pending, 'net_amount' => 30.00]);
+    Sale::factory()->create(['status' => SaleStatus::Paid, 'net_amount' => 120.00]);
+    Sale::factory()->create(['status' => SaleStatus::Cancelled, 'net_amount' => 80.00]);
+
+    Livewire::actingAs($this->user)
+        ->test(Index::class)
+        ->assertSet('pendingCount', 2)
+        ->assertSet('paidCount', 1)
+        ->assertSet('cancelledCount', 1)
+        ->assertSet('allCount', 4)
+        ->assertSet('totalPendingAmount', 80.00)
+        ->assertSet('totalPaidAmount', 120.00)
+        ->assertSet('totalAllAmount', 200.00);
 });
