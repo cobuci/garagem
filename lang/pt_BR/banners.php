@@ -1,9 +1,10 @@
 <?php
 
 return [
-    'title'    => 'Banners',
-    'subtitle' => 'Crie banners promocionais com fundo gerado por IA e exporte em alta qualidade.',
-    'empty'    => 'Nenhum banner criado ainda.',
+    'title'             => 'Banners',
+    'subtitle'          => 'Crie banners promocionais com fundo gerado por IA e exporte em alta qualidade.',
+    'empty'             => 'Nenhum banner criado ainda.',
+    'empty_description' => 'Crie banners com inteligência artificial para promoções, cardápios e ofertas especiais.',
 
     'formats' => [
         'stories' => 'Stories (1080 × 1920)',
