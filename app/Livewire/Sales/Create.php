@@ -26,6 +26,8 @@ class Create extends Component
 
     public string $search = '';
 
+    public float|string $amountPaid = '';
+
     public function mount(): void
     {
         $this->authorize(PermissionEnum::CreateSale->value);
@@ -83,7 +85,13 @@ class Create extends Component
 
         return Product::query()
             ->when($this->selectedCategoryId, fn ($q) => $q->where('category_id', $this->selectedCategoryId))
-            ->when($this->search, fn ($q) => $q->where('name', 'like', "%{$this->search}%"))
+            ->when($this->search, function ($q) {
+                $q->where(function ($sub) {
+                    $sub->where('name', 'like', "%{$this->search}%")
+                        ->orWhere('brand', 'like', "%{$this->search}%")
+                        ->orWhere('upc', 'like', "%{$this->search}%");
+                });
+            })
             ->with('category')
             ->orderBy('name')
             ->get();
@@ -146,6 +154,19 @@ class Create extends Component
         return $this->form->netAmount();
     }
 
+    #[Computed]
+    public function changeAmount(): int
+    {
+        if (empty($this->amountPaid) || $this->form->paymentMethod !== 'money') {
+            return 0;
+        }
+
+        $paid = (float) str_replace(',', '.', (string) $this->amountPaid);
+        $paidInCents = (int) round($paid * 100);
+
+        return max(0, $paidInCents - $this->totalAmount);
+    }
+
     public function save(): void
     {
         $this->authorize(PermissionEnum::CreateSale->value);
@@ -157,6 +178,8 @@ class Create extends Component
         }
 
         $this->form->store();
+
+        $this->amountPaid = '';
 
         $this->notification()->success(__('sales.sale_success'));
     }
