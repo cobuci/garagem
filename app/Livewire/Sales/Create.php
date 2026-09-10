@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Sales;
 
+use App\Enums\MobileSaleStatus;
 use App\Enums\Permission as PermissionEnum;
 use App\Livewire\Forms\SaleForm;
 use App\Models\Category;
@@ -28,6 +29,8 @@ class Create extends Component
 
     public float|string $amountPaid = '';
 
+    public ?int $mobileSaleId = null;
+
     public function mount(): void
     {
         $this->authorize(PermissionEnum::CreateSale->value);
@@ -35,6 +38,7 @@ class Create extends Component
         $mobileSaleId = (int) request()->query('mobileSaleId');
 
         if ($mobileSaleId) {
+            $this->mobileSaleId = $mobileSaleId;
             $this->prefillFromMobileSale($mobileSaleId);
         }
     }
@@ -178,6 +182,13 @@ class Create extends Component
         }
 
         $this->form->store();
+
+        if ($this->mobileSaleId) {
+            MobileSale::where('id', $this->mobileSaleId)
+                ->where('status', MobileSaleStatus::Pending)
+                ->update(['status' => MobileSaleStatus::Synced]);
+            $this->mobileSaleId = null;
+        }
 
         $this->amountPaid = '';
 

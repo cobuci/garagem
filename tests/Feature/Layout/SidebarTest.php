@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Layout;
 
+use App\Enums\MobileSaleStatus;
 use App\Livewire\Layout\Sidebar;
+use App\Models\MobileSale;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -29,6 +31,19 @@ test('sidebar displays correct menu items for admin', function () {
         ->assertSee(__('sidebar.bills_payable'))
         ->assertSee(__('sidebar.banners'))
         ->assertSee(__('sidebar.reports'));
+});
+
+test('sidebar displays pending mobile sales count badge when pending sales exist', function () {
+    MobileSale::factory()->count(3)->create([
+        'status' => MobileSaleStatus::Pending,
+    ]);
+
+    $user = User::factory()->create();
+    $user->assignRole('admin');
+
+    Livewire::actingAs($user)
+        ->test(Sidebar::class)
+        ->assertSee('3');
 });
 
 test('sidebar hides restricted menu items for common user', function () {
