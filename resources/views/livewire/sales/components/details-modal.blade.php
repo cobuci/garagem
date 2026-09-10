@@ -199,33 +199,26 @@
                         <x-button
                             flat
                             negative
+                            icon="x-circle"
                             label="{{ __('sales.cancel_sale') }}"
                             wire:click="confirmCancelSale({{ $selectedSale->id }})"
                             spinner="confirmCancelSale"
-                            class="w-full sm:w-auto text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
+                            class="w-full sm:w-auto text-xs font-medium"
                         />
                     @endcan
                 @endif
             </div>
 
             {{-- Operational Actions (Right) --}}
-            <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2">
-                <x-button
-                    flat
-                    label="{{ __('sales.close') }}"
-                    x-on:click="close"
-                    class="w-full sm:w-auto text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                />
-
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
                 @if($selectedSale)
                     @if($selectedSale->invoice_status === 'generating')
                         <x-button
-                            secondary
                             outline
-                            spinner="downloadInvoicePng"
+                            disabled
                             icon="arrow-path"
                             label="{{ __('sales.generating_invoice') }}"
-                            class="w-full sm:w-auto"
+                            class="w-full sm:w-auto bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-medium shadow-xs opacity-75"
                         />
                     @elseif($selectedSale->invoice_status === 'failed')
                         <x-button
@@ -235,17 +228,16 @@
                             spinner="downloadInvoicePng"
                             label="{{ __('sales.invoice_failed_retry') }}"
                             wire:click="downloadInvoicePng({{ $selectedSale->id }})"
-                            class="w-full sm:w-auto"
+                            class="w-full sm:w-auto font-medium shadow-xs"
                         />
                     @else
                         <x-button
-                            secondary
                             outline
-                            icon="arrow-down-tray"
+                            icon="receipt-percent"
                             spinner="downloadInvoicePng"
-                            label="{{ $selectedSale->invoice_status === 'ready' ? __('sales.download_invoice_ready') : __('sales.download_invoice') }}"
+                            label="{{ $selectedSale->invoice_status === 'ready' ? __('sales.download_invoice_png') : __('sales.download_invoice') }}"
                             wire:click="downloadInvoicePng({{ $selectedSale->id }})"
-                            class="w-full sm:w-auto font-medium"
+                            class="w-full sm:w-auto bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/60 font-medium shadow-xs transition-all duration-150 active:scale-[0.98]"
                         />
                     @endif
                 @endif
@@ -253,12 +245,12 @@
                 @if($selectedSale && $selectedSale->status === \App\Enums\SaleStatus::Pending)
                     @can(\App\Enums\Permission::EditSale->value)
                         <x-button
-                            primary
+                            positive
                             icon="check"
                             label="{{ __('sales.mark_as_paid') }}"
                             wire:click="confirmMarkAsPaid({{ $selectedSale->id }})"
                             spinner="confirmMarkAsPaid"
-                            class="w-full sm:w-auto font-medium shadow-xs"
+                            class="w-full sm:w-auto font-semibold shadow-xs hover:shadow transition-all duration-150 active:scale-[0.98]"
                         />
                     @endcan
                 @endif
