@@ -193,12 +193,10 @@
                     <td class="total-value" style="color: #dc2626;">- R$ {{ number_format($sale->discount_amount, 2, ',', '.') }}</td>
                 </tr>
             @endif
-            @if($sale->fee_amount > 0)
+            @if($sale->fee_amount > 0 && $sale->pass_fee_to_customer)
                 <tr>
                     <td class="total-label">{{ __('sales.fee') }} ({{ $sale->fee_percentage }}%)</td>
-                    <td class="total-value">
-                        {{ $sale->pass_fee_to_customer ? '+' : '-' }} R$ {{ number_format($sale->fee_amount, 2, ',', '.') }}
-                    </td>
+                    <td class="total-value">+ R$ {{ number_format($sale->fee_amount, 2, ',', '.') }}</td>
                 </tr>
             @endif
             <tr class="grand-total-row">

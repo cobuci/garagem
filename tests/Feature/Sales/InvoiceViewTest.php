@@ -65,3 +65,41 @@ test('invoice view shows weight without brand when brand is missing', function (
         ->toContain('1kg')
         ->not->toContain(' · 1kg');
 });
+
+test('invoice view does not show fee when fee is not passed to customer', function () {
+    $sale = Sale::factory()->create([
+        'fee_amount'           => 3.50,
+        'fee_percentage'       => 3.5,
+        'pass_fee_to_customer' => false,
+    ]);
+
+    $sale->load(['customer', 'items.product']);
+
+    $html = view('pdf.invoice', [
+        'sale'     => $sale,
+        'settings' => Setting::singleton(),
+    ])->render();
+
+    expect($html)
+        ->not->toContain(__('sales.fee'))
+        ->not->toContain('R$ 3,50');
+});
+
+test('invoice view shows fee when fee is passed to customer', function () {
+    $sale = Sale::factory()->create([
+        'fee_amount'           => 3.50,
+        'fee_percentage'       => 3.5,
+        'pass_fee_to_customer' => true,
+    ]);
+
+    $sale->load(['customer', 'items.product']);
+
+    $html = view('pdf.invoice', [
+        'sale'     => $sale,
+        'settings' => Setting::singleton(),
+    ])->render();
+
+    expect($html)
+        ->toContain(__('sales.fee') . ' (3.5%)')
+        ->toContain('+ R$ 3,50');
+});
