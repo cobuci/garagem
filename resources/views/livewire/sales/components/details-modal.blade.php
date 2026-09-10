@@ -191,8 +191,9 @@
     @endif
 
     <x-slot name="footer">
-        <div class="flex flex-col sm:flex-row justify-between items-center w-full gap-y-3">
-            <div>
+        <div class="flex flex-col-reverse sm:flex-row justify-between items-stretch sm:items-center w-full gap-3">
+            {{-- Destructive Action (Left) --}}
+            <div class="flex items-center justify-start">
                 @if($selectedSale && $selectedSale->status !== \App\Enums\SaleStatus::Cancelled)
                     @can(\App\Enums\Permission::EditSale->value)
                         <x-button
@@ -201,18 +202,19 @@
                             label="{{ __('sales.cancel_sale') }}"
                             wire:click="confirmCancelSale({{ $selectedSale->id }})"
                             spinner="confirmCancelSale"
-                            class="w-full sm:w-auto"
+                            class="w-full sm:w-auto text-xs text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
                         />
                     @endcan
                 @endif
             </div>
 
-            <div class="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+            {{-- Operational Actions (Right) --}}
+            <div class="flex flex-col-reverse sm:flex-row items-stretch sm:items-center gap-2">
                 <x-button
                     flat
                     label="{{ __('sales.close') }}"
                     x-on:click="close"
-                    class="w-full sm:w-auto"
+                    class="w-full sm:w-auto text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                 />
 
                 @if($selectedSale)
@@ -236,48 +238,54 @@
                             class="w-full sm:w-auto"
                         />
                     @else
-                        <div class="relative inline-flex w-full sm:w-auto rounded-md shadow-sm" x-data="{ open: false }">
-                            <x-button
-                                secondary
-                                outline
-                                icon="arrow-down-tray"
-                                spinner="downloadInvoicePng"
-                                label="{{ $selectedSale->invoice_status === 'ready' ? __('sales.download_invoice_ready') : __('sales.download_invoice') }}"
+                        <div class="relative inline-flex w-full sm:w-auto rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-xs divide-x divide-gray-300 dark:divide-gray-600 overflow-hidden" x-data="{ open: false }">
+                            <button
+                                type="button"
                                 wire:click="downloadInvoicePng({{ $selectedSale->id }})"
-                                class="flex-1 sm:flex-initial rounded-r-none border-r-0"
-                            />
+                                wire:loading.attr="disabled"
+                                class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-3.5 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/60 focus:outline-none transition-colors"
+                            >
+                                <x-icon name="arrow-down-tray" class="w-4 h-4 text-gray-500 dark:text-gray-400" wire:loading.remove wire:target="downloadInvoicePng({{ $selectedSale->id }})" />
+                                <x-icon name="arrow-path" class="w-4 h-4 text-gray-500 dark:text-gray-400 animate-spin" wire:loading wire:target="downloadInvoicePng({{ $selectedSale->id }})" />
+                                <span>{{ $selectedSale->invoice_status === 'ready' ? __('sales.download_invoice_ready') : __('sales.download_invoice') }}</span>
+                            </button>
                             <button
                                 @click="open = !open"
                                 type="button"
-                                class="inline-flex items-center px-2 border border-secondary-300 dark:border-secondary-600 rounded-r-md bg-white dark:bg-secondary-800 text-secondary-700 dark:text-secondary-300 hover:bg-secondary-50 dark:hover:bg-secondary-700 focus:outline-none transition"
+                                class="inline-flex items-center justify-center px-2.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/60 focus:outline-none transition-colors"
                                 aria-haspopup="true"
                                 :aria-expanded="open"
                             >
-                                <x-icon name="chevron-down" class="w-4 h-4" />
+                                <x-icon name="chevron-down" class="w-4 h-4 transition-transform duration-200" ::class="open ? 'rotate-180' : ''" />
                             </button>
                             <div
                                 x-show="open"
                                 @click.outside="open = false"
-                                x-transition
-                                class="absolute right-0 bottom-full mb-1 w-44 rounded-md shadow-lg bg-white dark:bg-secondary-800 border border-secondary-200 dark:border-secondary-600 z-50"
+                                x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="opacity-0 scale-95"
+                                x-transition:enter-end="opacity-100 scale-100"
+                                x-transition:leave="transition ease-in duration-75"
+                                x-transition:leave-start="opacity-100 scale-100"
+                                x-transition:leave-end="opacity-0 scale-95"
+                                class="absolute right-0 bottom-full mb-1.5 w-48 rounded-lg shadow-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 py-1 z-50 focus:outline-none"
                                 x-cloak
                             >
                                 <button
                                     type="button"
                                     wire:click="downloadInvoice({{ $selectedSale->id }})"
                                     @click="open = false"
-                                    class="flex items-center gap-2 w-full px-4 py-2 text-sm text-secondary-700 dark:text-secondary-300 hover:bg-secondary-50 dark:hover:bg-secondary-700 rounded-t-md"
+                                    class="flex items-center gap-2.5 w-full px-3.5 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60 transition-colors"
                                 >
-                                    <x-icon name="document-text" class="w-4 h-4" />
+                                    <x-icon name="document-text" class="w-4 h-4 text-gray-500 dark:text-gray-400" />
                                     {{ __('sales.download_invoice_pdf') }}
                                 </button>
                                 <button
                                     type="button"
                                     wire:click="downloadInvoicePng({{ $selectedSale->id }})"
                                     @click="open = false"
-                                    class="flex items-center gap-2 w-full px-4 py-2 text-sm text-secondary-700 dark:text-secondary-300 hover:bg-secondary-50 dark:hover:bg-secondary-700 rounded-b-md"
+                                    class="flex items-center gap-2.5 w-full px-3.5 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700/60 transition-colors"
                                 >
-                                    <x-icon name="photo" class="w-4 h-4" />
+                                    <x-icon name="photo" class="w-4 h-4 text-gray-500 dark:text-gray-400" />
                                     {{ __('sales.download_invoice_png') }}
                                 </button>
                             </div>
@@ -289,10 +297,11 @@
                     @can(\App\Enums\Permission::EditSale->value)
                         <x-button
                             primary
+                            icon="check"
                             label="{{ __('sales.mark_as_paid') }}"
                             wire:click="confirmMarkAsPaid({{ $selectedSale->id }})"
                             spinner="confirmMarkAsPaid"
-                            class="w-full sm:w-auto"
+                            class="w-full sm:w-auto font-medium shadow-xs"
                         />
                     @endcan
                 @endif
