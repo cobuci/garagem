@@ -2,8 +2,8 @@
     <x-button
         secondary
         outline
-        icon="chart-bar"
-        label="Export"
+        icon="arrow-down-tray"
+        :label="__('reports.export.trigger')"
         x-on:click="$wire.set('showModal', true)"
     />
 
@@ -30,7 +30,7 @@
                     <button
                         type="button"
                         wire:click="applyPeriod('{{ $key }}')"
-                        class="py-1.5 px-2 text-xs font-medium rounded-md text-center border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-primary-50 hover:border-primary-400 hover:text-primary-700 dark:hover:bg-primary-900/30 dark:hover:border-primary-500 dark:hover:text-primary-400 transition-colors cursor-pointer"
+                        class="py-1.5 px-2 text-xs font-medium rounded-md text-center border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-primary-50 hover:border-primary-400 hover:text-primary-700 dark:hover:bg-primary-900/30 dark:hover:border-primary-500 dark:hover:text-primary-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-1 dark:focus-visible:ring-offset-gray-800 active:scale-95 transition-all cursor-pointer"
                     >
                         {{ $label }}
                     </button>
@@ -55,7 +55,7 @@
 
         <x-slot name="footer">
             <div class="flex justify-end gap-x-4">
-                <x-button flat label="Cancel" x-on:click="close" />
+                <x-button flat :label="__('reports.export.cancel')" x-on:click="close" />
                 <x-button
                     primary
                     wire:click="export"

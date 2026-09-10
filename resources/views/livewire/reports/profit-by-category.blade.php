@@ -7,6 +7,7 @@
         <div class="flex items-center gap-2">
             <x-native-select
                 wire:model.live="period"
+                noscroll
                 :options="[
                     ['name' => __('reports.periods.today'), 'id' => 'today'],
                     ['name' => __('reports.periods.yesterday'), 'id' => 'yesterday'],
@@ -40,11 +41,13 @@
     <div
         wire:ignore
         id="chart-profit-by-category"
+        wire:loading.delay.class="opacity-60 pointer-events-none transition-opacity duration-200"
         x-data="{
             labels: @entangle('chartDataArray.labels'),
             revenue: @entangle('chartDataArray.revenue'),
             profit: @entangle('chartDataArray.profit'),
             chart: null,
+            observer: null,
             init() {
                 this.$nextTick(() => {
                     this.initChart();
@@ -54,16 +57,24 @@
                 this.$watch('profit', () => this.updateChart());
                 this.$watch('labels', () => this.updateChart());
 
-                const observer = new MutationObserver(() => {
+                this.observer = new MutationObserver(() => {
                     if (this.chart) {
+                        const dark = document.documentElement.classList.contains('dark');
                         this.chart.updateOptions({
                             tooltip: {
-                                theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                                theme: dark ? 'dark' : 'light'
+                            },
+                            grid: {
+                                borderColor: dark ? 'rgba(156, 163, 175, 0.15)' : 'rgba(156, 163, 175, 0.1)'
                             }
                         });
                     }
                 });
-                observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+                this.observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+            },
+            destroy() {
+                if (this.observer) this.observer.disconnect();
+                if (this.chart) this.chart.destroy();
             },
             updateChart() {
                 if (this.chart) {
@@ -86,15 +97,26 @@
                     this.chart.destroy();
                 }
 
+                const dark = document.documentElement.classList.contains('dark');
                 this.chart = new ApexCharts(this.$refs.chart, {
                     chart: {
                         type: 'bar',
                         height: 350,
                         toolbar: { show: false },
                         zoom: { enabled: false },
-                        fontFamily: 'Inter, ui-sans-serif, system-ui',
+                        fontFamily: 'Instrument Sans, sans-serif',
                         background: 'transparent',
                         animations: { enabled: true }
+                    },
+                    noData: {
+                        text: '{{ __('reports.heatmap.no_data') }}',
+                        align: 'center',
+                        verticalAlign: 'middle',
+                        style: {
+                            color: '#9ca3af',
+                            fontSize: '14px',
+                            fontFamily: 'Instrument Sans, sans-serif'
+                        }
                     },
                     plotOptions: {
                         bar: {
@@ -122,7 +144,7 @@
                     },
                     colors: ['#6366f1', '#10b981'],
                     grid: {
-                        borderColor: 'rgba(156, 163, 175, 0.1)',
+                        borderColor: dark ? 'rgba(156, 163, 175, 0.15)' : 'rgba(156, 163, 175, 0.1)',
                         strokeDashArray: 4,
                         padding: { left: 10, right: 10, top: 0, bottom: 0 }
                     },
@@ -133,8 +155,8 @@
                         labels: {
                             style: {
                                 colors: '#9ca3af',
-                                fontSize: '11px',
-                                fontFamily: 'Inter, ui-sans-serif, system-ui'
+                                fontSize: '12px',
+                                fontFamily: 'Instrument Sans, sans-serif'
                             }
                         }
                     },
@@ -142,21 +164,21 @@
                         labels: {
                             style: {
                                 colors: '#9ca3af',
-                                fontSize: '11px',
-                                fontFamily: 'Inter, ui-sans-serif, system-ui'
+                                fontSize: '12px',
+                                fontFamily: 'Instrument Sans, sans-serif'
                             },
                             formatter: function(val) {
-                                return 'R$ ' + val.toLocaleString('pt-BR');
+                                return 'R$ ' + (val || 0).toLocaleString('pt-BR');
                             }
                         }
                     },
                     tooltip: {
                         shared: true,
                         intersect: false,
-                        theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+                        theme: dark ? 'dark' : 'light',
                         y: {
                             formatter: function(val) {
-                                return 'R$ ' + val.toLocaleString('pt-BR');
+                                return 'R$ ' + (val || 0).toLocaleString('pt-BR');
                             }
                         }
                     },

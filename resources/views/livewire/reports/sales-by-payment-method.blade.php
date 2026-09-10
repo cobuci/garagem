@@ -7,6 +7,7 @@
         <div class="flex items-center gap-2">
             <x-native-select
                 wire:model.live="period"
+                noscroll
                 :options="[
                     ['name' => __('reports.periods.today'), 'id' => 'today'],
                     ['name' => __('reports.periods.yesterday'), 'id' => 'yesterday'],
@@ -29,10 +30,12 @@
     <div
         wire:ignore
         id="chart-sales-by-payment-method"
+        wire:loading.delay.class="opacity-60 pointer-events-none transition-opacity duration-200"
         x-data="{
             labels: @entangle('chartDataArray.labels'),
             series: @entangle('chartDataArray.series'),
             chart: null,
+            observer: null,
             init() {
                 this.$nextTick(() => {
                     this.initChart();
@@ -40,6 +43,36 @@
 
                 this.$watch('series', () => this.updateChart());
                 this.$watch('labels', () => this.updateChart());
+
+                this.observer = new MutationObserver(() => {
+                    if (this.chart) {
+                        const dark = document.documentElement.classList.contains('dark');
+                        this.chart.updateOptions({
+                            stroke: {
+                                colors: [dark ? '#1f2937' : '#ffffff']
+                            },
+                            plotOptions: {
+                                pie: {
+                                    donut: {
+                                        labels: {
+                                            value: {
+                                                color: dark ? '#ffffff' : '#111827'
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                theme: dark ? 'dark' : 'light'
+                            }
+                        });
+                    }
+                });
+                this.observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+            },
+            destroy() {
+                if (this.observer) this.observer.disconnect();
+                if (this.chart) this.chart.destroy();
             },
             updateChart() {
                 if (this.chart) {
@@ -59,13 +92,24 @@
                     this.chart.destroy();
                 }
 
+                const dark = document.documentElement.classList.contains('dark');
                 this.chart = new ApexCharts(this.$refs.chart, {
                     chart: {
                         type: 'donut',
                         height: 350,
-                        fontFamily: 'Inter, ui-sans-serif, system-ui',
+                        fontFamily: 'Instrument Sans, sans-serif',
                         background: 'transparent',
                         animations: { enabled: true }
+                    },
+                    noData: {
+                        text: '{{ __('reports.heatmap.no_data') }}',
+                        align: 'center',
+                        verticalAlign: 'middle',
+                        style: {
+                            color: '#9ca3af',
+                            fontSize: '14px',
+                            fontFamily: 'Instrument Sans, sans-serif'
+                        }
                     },
                     series: this.series,
                     labels: this.labels,
@@ -73,7 +117,7 @@
                     stroke: {
                         show: true,
                         width: 2,
-                        colors: [document.documentElement.classList.contains('dark') ? '#1f2937' : '#ffffff']
+                        colors: [dark ? '#1f2937' : '#ffffff']
                     },
                     plotOptions: {
                         pie: {
@@ -89,9 +133,9 @@
                                     },
                                     value: {
                                         show: true,
-                                        fontSize: '20px',
+                                        fontSize: '18px',
                                         fontWeight: 700,
-                                        color: document.documentElement.classList.contains('dark') ? '#ffffff' : '#111827',
+                                        color: dark ? '#ffffff' : '#111827',
                                         formatter: function(val) {
                                             return 'R$ ' + parseFloat(val).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
                                         }
@@ -111,7 +155,7 @@
                     dataLabels: { enabled: false },
                     legend: {
                         position: 'bottom',
-                        fontFamily: 'Inter, ui-sans-serif, system-ui',
+                        fontFamily: 'Instrument Sans, sans-serif',
                         fontSize: '12px',
                         fontWeight: 500,
                         labels: {
@@ -136,7 +180,7 @@
                                 },
                                 legend: {
                                     position: 'bottom',
-                                    fontSize: '11px'
+                                    fontSize: '12px'
                                 },
                                 plotOptions: {
                                     pie: {
@@ -144,7 +188,7 @@
                                             size: '65%',
                                             labels: {
                                                 name: { fontSize: '12px' },
-                                                value: { fontSize: '16px' },
+                                                value: { fontSize: '14px' },
                                                 total: { fontSize: '12px' }
                                             }
                                         }
@@ -154,7 +198,7 @@
                         }
                     ],
                     tooltip: {
-                        theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+                        theme: dark ? 'dark' : 'light',
                         y: {
                             formatter: function(val) {
                                 return 'R$ ' + val.toLocaleString('pt-BR', { minimumFractionDigits: 2 });

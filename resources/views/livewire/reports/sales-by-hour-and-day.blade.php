@@ -30,6 +30,7 @@
     <div
         wire:ignore
         id="chart-sales-by-hour-and-day"
+        wire:loading.delay.class="opacity-60 pointer-events-none transition-opacity duration-200"
         x-data="{
             series: @entangle('chartDataArray.series'),
             chart: null,
@@ -77,11 +78,28 @@
                 const transactions = '{{ __('reports.pdf.transactions') }}';
                 const self = this;
                 this.chart = new ApexCharts(this.$refs.chart, {
-                    chart: { type: 'heatmap', height: 550, toolbar: { show: false }, fontFamily: 'Inter, ui-sans-serif, system-ui', background: c.bg, animations: { enabled: false } },
+                    chart: {
+                        type: 'heatmap',
+                        height: 550,
+                        toolbar: { show: false },
+                        fontFamily: 'Instrument Sans, sans-serif',
+                        background: c.bg,
+                        animations: { enabled: false }
+                    },
+                    noData: {
+                        text: noData,
+                        align: 'center',
+                        verticalAlign: 'middle',
+                        style: {
+                            color: '#9ca3af',
+                            fontSize: '14px',
+                            fontFamily: 'Instrument Sans, sans-serif'
+                        }
+                    },
                     dataLabels: { enabled: false },
                     series: this.series,
-                    xaxis: { type: 'category', axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: c.text, fontSize: '12px', fontWeight: 500 } } },
-                    yaxis: { labels: { style: { colors: c.text, fontSize: '11px' } } },
+                    xaxis: { type: 'category', axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: c.text, fontSize: '12px', fontWeight: 500, fontFamily: 'Instrument Sans, sans-serif' } } },
+                    yaxis: { labels: { style: { colors: c.text, fontSize: '12px', fontFamily: 'Instrument Sans, sans-serif' } } },
                     plotOptions: {
                         heatmap: {
                             shadeIntensity: 0,
@@ -90,7 +108,7 @@
                             colorScale: {
                                 min: 0, max: 5000,
                                 ranges: [
-                                    { from: 0,       to: 0,         color: c.empty,  name: 'N/A' },
+                                    { from: 0,       to: 0,         color: c.empty,  name: noData },
                                     { from: 0.01,    to: 100,       color: c.low,    name: '{{ __('reports.heatmap.low') }}' },
                                     { from: 100.01,  to: 500,       color: c.medium, name: '{{ __('reports.heatmap.medium') }}' },
                                     { from: 500.01,  to: 2000,      color: c.high,   name: '{{ __('reports.heatmap.high') }}' },
@@ -101,7 +119,7 @@
                     },
                     stroke: { show: true, width: 1, colors: [c.bg] },
                     grid: { show: false, padding: { right: 20 } },
-                    legend: { show: true, position: 'top', horizontalAlign: 'left', fontSize: '12px', fontFamily: 'Inter, ui-sans-serif, system-ui', labels: { colors: c.text }, markers: { size: 10, shape: 'square', offsetX: -2 }, itemMargin: { horizontal: 12 } },
+                    legend: { show: true, position: 'top', horizontalAlign: 'left', fontSize: '12px', fontFamily: 'Instrument Sans, sans-serif', labels: { colors: c.text }, markers: { size: 10, shape: 'square', offsetX: -2 }, itemMargin: { horizontal: 12 } },
                     tooltip: {
                         theme: this.isDarkMode() ? 'dark' : 'light',
                         y: {

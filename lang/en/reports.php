@@ -92,6 +92,8 @@ return [
     'export' => [
         'title'               => 'Complete Report',
         'subtitle'            => 'Export all data to PDF and receive by email',
+        'trigger'             => 'Export',
+        'cancel'              => 'Cancel',
         'quick_select'        => 'Quick select',
         'start_date'          => 'Start Date',
         'end_date'            => 'End Date',
